@@ -5,7 +5,7 @@
     "One Scalpel Short of a Medpack": { "summary": "Grotsnik is Fearless and has Rampage. He must always move towards the nearest enemy." },
     "Zog's Curse": { "summary": "Psychic Power. Turn an enemy independent character into a Squig on a roll of 4+." },
     "Da Vulcha's Klaws": { "summary": "Zagstruk strikes at Initiative 1, but on the turn he Deep Strikes, he strikes at Initiative 4." },
-    "Ambush": { "summary": "Snikrot and his unit can move on from any table edge." }
+    "Ambush": { "summary": "Snikrot and his unit can move on from any table edge." },
     "Mob Rule": { "summary": "Units can use the number of models in the squad as their Leadership value (Max 10). If >10 models, they are Fearless." },
     "Furious Charge": { "summary": "+1 Strength and +1 Initiative on the turn they assault." },
     "Waaagh!": { "summary": "Once per game, declare Waaagh! Infantry units gain Fleet. If they roll a 1 for Fleet, they take a wound. Affects Run moves." },
@@ -20,7 +20,7 @@
     "Bike of the Aporkalypse": { "summary": "Warbike. Can fire the Dakkacannon (S8 AP4 Assault 4) and still assault." },
     "Da Ripper": { "summary": "Badrukk's Gun: Range 24\" S7 AP2 Assault 3, Gets Hot." },
     "Goldtoof Armour": { "summary": "3+ Armor Save. 5+ Invulnerable Save (improves to 3+ vs Shooting)." },
-    "Nest of Vipers": { "summary": "Zogwort attacks with 2D6 poison attacks in melee." }
+    "Nest of Vipers": { "summary": "Zogwort attacks with 2D6 poison attacks in melee." },
     "Bosspole": { "summary": "Allows unit to re-roll failed Morale/Pinning tests. Usually requires taking a wound." },
     "Cybork Body": { "summary": "5+ Invulnerable Save." },
     "Attack Squig": { "summary": "Adds +1 Attack to profile." },
@@ -152,7 +152,7 @@
       "wargear": [ "Two Kustom Choppas (+2 S)", "Stikkbombs" ],
       "special_rules": [ "Independent Character", "Mob Rule", "Furious Charge", "Ambush", "Move Through Cover" ],
       "options": []
-    }
+    },
     {
       "id": "hq_warboss",
       "name": "Warboss",

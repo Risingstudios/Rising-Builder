@@ -1,0 +1,771 @@
+{
+  "codex_name": "Tau Empire (My Data)",
+  "rules": {
+    "Acute Senses": { "summary": "Re-roll Night Fighting spotting distance checks." },
+    "Deep Strike": { "summary": "Unit may start in reserve and arrive via Deep Strike." },
+    "Infiltrate": { "summary": "Unit may deploy anywhere not within 12\" of an enemy (18\" if in sight)." },
+    "Fleet": { "summary": "Unit may Run and Assault in the same turn (if applicable) or Run D6\"." },
+    "Jet Pack": { "summary": "Moves 6\" in Movement. Can move 6\" in Assault phase (Jet Pack move)." },
+    "Scouts": { "summary": "May Outflank. After deployment, may make a free move." },
+    "Stealth Field": { "summary": "Night Fighting rules apply to enemies shooting at this unit. +1 Cover Save." },
+    "Slow and Purposeful": { "summary": "Move as through difficult terrain. Count as stationary for shooting heavy weapons. Cannot Run/Sweeping Advance." },
+    "Markerlight": { "summary": "Heavy 1 weapon. No damage. Place a counter on target. Counters can be spent to boost BS, ignore cover, or launch Seeker Missiles." },
+    "Supporting Fire": { "summary": "Not a 5th ed rule, but Photon Grenades provide defensive bonuses." },
+    "Bonding Knife": { "summary": "Unit may regroup even if below 50% strength." },
+    "Hit and Run": { "summary": "At end of assault phase, may choose to leave combat (roll Initiative check)." },
+    "Independent Character": { "summary": "May join/leave units." },
+    "Fearless": { "summary": "Automatically pass Morale and Pinning tests. Cannot go to Ground." },
+    "Relentless": { "summary": "Can move and shoot Heavy weapons. Can charge after firing Rapid Fire/Heavy weapons." },
+    "Move Through Cover": { "summary": "Roll 3D6 for cover move, pick highest." },
+    "Ethereal": { "summary": "Friendly Tau within 12\" may re-roll Morale/Pinning. If Ethereal is killed, all Tau must test Morale." },
+    "Inspiring Presence": { "summary": "Friendly units within 12\" can use the Ethereal's Leadership." },
+    "Supreme Commander": { "summary": "Aun'Va allows all Tau on the table to re-roll failed Morale, Pinning, and Regroup tests." }
+  },
+  "wargear": {
+    "Battlesuit": { "summary": "3+ Armor Save. Multi-tracker, Blacksun Filter built-in. Counts as Jet Pack infantry." },
+    "Combat Armour": { "summary": "4+ Armor Save." },
+    "Stealth Armour": { "summary": "3+ Armor Save. Stealth Field Generator." },
+    "Shield Generator": { "summary": "4+ Invulnerable Save." },
+    "Drone Controller": { "summary": "Allows the model to take Drones." },
+    "Multi-tracker": { "summary": "Model may fire two weapons in the same Shooting phase." },
+    "Target Lock": { "summary": "Model may fire at a different target than the rest of the unit." },
+    "Blacksun Filter": { "summary": "Ignore Night Fighting rules." },
+    "Advanced Stabilisation": { "summary": "Slow and Purposeful (Move and shoot Heavy weapons)." },
+    "Stimulant Injector": { "summary": "Feel No Pain (Ignore wounds on 4+)." },
+    "Positional Relay": { "summary": "Allows reserve rolls to be manipulated (bring on a unit on 2+)." },
+    "Flechette Discharger": { "summary": "Enemies assaulting vehicle take S4 hits." },
+    "Disruption Pod": { "summary": "Vehicle counts as obscured (4+ cover) if > 12\" away." },
+    "Decoy Launchers": { "summary": "Convert 'Immobilised' result to 'Crew Stunned' on 4+." },
+    "Landing Gear": { "summary": "Vehicle may land." },
+    "Networked Markerlight": { "summary": "Markerlight that can be used by the unit firing it." },
+    "Photon Grenades": { "summary": "Defensive grenades. Enemies do not get +1 A for charging." },
+    "EMP Grenades": { "summary": "Haywire grenades. Glancing on 2-5, Penetrating on 6 against vehicles." },
+    "Command-link Drone": { "summary": "Allows one friendly unit within 12\" to re-roll 1s to Hit." },
+    "Advanced Shield Drone": { "summary": "3+ Invulnerable Save." },
+    "Paradox of Duality": { "summary": "Aun'Va has a 5+ Invulnerable save. If failed, roll D6: on 5+, the hit is ignored." }
+  },
+  "weapons": {
+    "Pulse rifle": { "range": "30\"", "S": "5", "AP": "5", "type": "Rapid Fire", "notes": "" },
+    "Pulse carbine": { "range": "18\"", "S": "5", "AP": "5", "type": "Assault 1", "notes": "Pinning" },
+    "Pulse pistol": { "range": "12\"", "S": "5", "AP": "5", "type": "Pistol", "notes": "" },
+    "Kroot rifle": { "range": "24\"", "S": "4", "AP": "6", "type": "Rapid Fire", "notes": "Counts as two CCW in melee" },
+    "Kroot gun": { "range": "48\"", "S": "7", "AP": "4", "type": "Rapid Fire", "notes": "" },
+    "Burst cannon": { "range": "18\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "" },
+    "Missile pod": { "range": "36\"", "S": "7", "AP": "4", "type": "Assault 2", "notes": "" },
+    "Plasma rifle": { "range": "24\"", "S": "6", "AP": "2", "type": "Rapid Fire", "notes": "" },
+    "Fusion blaster": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
+    "Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "" },
+    "Airbursting frag projector": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 1", "notes": "Large Blast, Barrage, No Cover" },
+    "Cyclic ion blaster": { "range": "18\"", "S": "3", "AP": "4", "type": "Assault 5", "notes": "Rending on 6" },
+    "Railgun (Solid)": { "range": "72\"", "S": "10", "AP": "1", "type": "Heavy 1", "notes": "" },
+    "Railgun (Submunition)": { "range": "72\"", "S": "6", "AP": "4", "type": "Heavy 1", "notes": "Large Blast" },
+    "Twin-linked Railgun": { "range": "72\"", "S": "10", "AP": "1", "type": "Heavy 1", "notes": "Twin-linked" },
+    "Ion cannon": { "range": "60\"", "S": "7", "AP": "3", "type": "Heavy 3", "notes": "" },
+    "Smart missile system": { "range": "24\"", "S": "5", "AP": "5", "type": "Heavy 4", "notes": "No LOS required, Ignores Cover" },
+    "Seeker missile": { "range": "Unlimited", "S": "8", "AP": "3", "type": "Heavy 1", "notes": "Requires Markerlight hit to fire." },
+    "Markerlight": { "range": "36\"", "S": "n/a", "AP": "n/a", "type": "Heavy 1", "notes": "Place marker token" },
+    "Networked Markerlight": { "range": "36\"", "S": "n/a", "AP": "n/a", "type": "Heavy 1", "notes": "Can be used by own unit" },
+    "Neutron blaster": { "range": "18\"", "S": "5", "AP": "3", "type": "Assault 1", "notes": "" },
+    "Rail rifle": { "range": "36\"", "S": "6", "AP": "3", "type": "Rapid Fire", "notes": "Pinning" },
+    "Dawn Blade": { "range": "-", "S": "+2", "AP": "2", "type": "Melee", "notes": "Two-handed. User strikes at Initiative." },
+    "Twin-linked fusion blaster": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Twin-linked, Melta" },
+    "Twin-linked burst cannon": { "range": "18\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "Twin-linked" }
+  },
+  "units": [
+    {
+      "id": "hq_commander",
+      "name": "Commander (Shas'el)",
+      "slot": "HQ",
+      "base_points": 50,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 3, "BS": 4, "S": 5, "T": 4, "W": 3, "I": 3, "A": 3, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Battlesuit" ],
+      "special_rules": [ "Independent Character", "Jet Pack" ],
+      "dedicated_transports": ["hq_crisis_bodyguard"],
+      "sub_profiles": {
+        "shaso": { "name": "Shas'o", "WS": 4, "BS": 5, "S": 5, "T": 4, "W": 4, "I": 3, "A": 4, "Ld": 10, "Sv": "3+" },
+        "gun_drone": { "name": "Gun Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "shield_drone": { "name": "Shield Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "marker_drone": { "name": "Marker Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "rank", "group_name": "Rank Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "shaso", "name": "Upgrade to Shas'o", "points": 25 }
+          ]
+        },
+        {
+          "group_id": "hardpoint_1", "group_name": "Hardpoint 1", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "burst", "name": "Burst cannon", "points": 8 },
+            { "id": "missile", "name": "Missile pod", "points": 12 },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20 },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12 },
+            { "id": "cyclic", "name": "Cyclic ion blaster", "points": 15 },
+            { "id": "airburst", "name": "Airbursting frag projector", "points": 20 }
+          ]
+        },
+        {
+          "group_id": "hardpoint_2", "group_name": "Hardpoint 2", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "burst", "name": "Burst cannon", "points": 8 },
+            { "id": "missile", "name": "Missile pod", "points": 12 },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20 },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12 }
+          ]
+        },
+        {
+          "group_id": "hardpoint_3", "group_name": "Hardpoint 3 / Support", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "tracker", "name": "Multi-tracker", "points": 5 },
+            { "id": "lock", "name": "Target lock", "points": 5 },
+            { "id": "shield", "name": "Shield generator", "points": 20 },
+            { "id": "stimulant", "name": "Stimulant injector", "points": 10 },
+            { "id": "burst", "name": "Burst cannon", "points": 8 },
+            { "id": "missile", "name": "Missile pod", "points": 12 },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20 },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12 }
+          ]
+        },
+        {
+          "group_id": "drones_gun", "group_name": "Gun Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "gun_drone", "name": "Gun Drone", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "drones_shield", "group_name": "Shield Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "shield_drone", "name": "Shield Drone", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "drones_marker", "group_name": "Marker Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "marker_drone", "name": "Marker Drone", "points": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_farsight",
+      "name": "Commander Farsight",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 170,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 5, "BS": 5, "S": 5, "T": 4, "W": 4, "I": 4, "A": 4, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Crisis Battlesuit", "Dawn Blade", "Plasma rifle", "Shield Generator" ],
+      "special_rules": [ "Independent Character", "Jet Pack", "Preferred Enemy (Orks)" ],
+      "dedicated_transports": ["hq_crisis_bodyguard"],
+      "options": []
+    },
+    {
+      "id": "hq_crisis_bodyguard",
+      "name": "XV8 Crisis Bodyguard Team",
+      "slot": "HQ",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 1, "max_size": 2, "default_size": 1,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 3, "BS": 3, "S": 5, "T": 4, "W": 2, "I": 3, "A": 2, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Battlesuit" ],
+      "special_rules": [ "Jet Pack" ],
+      "sub_profiles": {
+        "gun_drone": { "name": "Gun Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "shield_drone": { "name": "Shield Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "marker_drone": { "name": "Marker Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "hardpoint_1", "group_name": "Hardpoint 1", "min_select": 0, "max_select": 2, "linked_to_size": true,
+          "choices": [
+            { "id": "burst", "name": "Burst cannon", "points": 8, "points_mode": "flat" },
+            { "id": "missile", "name": "Missile pod", "points": 12, "points_mode": "flat" },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20, "points_mode": "flat" },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12, "points_mode": "flat" },
+            { "id": "flamer", "name": "Flamer", "points": 4, "points_mode": "flat" },
+            { "id": "cyclic", "name": "Cyclic ion blaster", "points": 15, "points_mode": "flat" },
+            { "id": "airburst", "name": "Airbursting frag projector", "points": 20, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "hardpoint_2", "group_name": "Hardpoint 2", "min_select": 0, "max_select": 2, "linked_to_size": true,
+          "choices": [
+            { "id": "burst", "name": "Burst cannon", "points": 8, "points_mode": "flat" },
+            { "id": "missile", "name": "Missile pod", "points": 12, "points_mode": "flat" },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20, "points_mode": "flat" },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12, "points_mode": "flat" },
+            { "id": "flamer", "name": "Flamer", "points": 4, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "hardpoint_3", "group_name": "Hardpoint 3 / Support", "min_select": 0, "max_select": 2, "linked_to_size": true,
+          "choices": [
+            { "id": "tracker", "name": "Multi-tracker", "points": 5, "points_mode": "flat" },
+            { "id": "lock", "name": "Target lock", "points": 5, "points_mode": "flat" },
+            { "id": "shield", "name": "Shield generator", "points": 20, "points_mode": "flat" },
+            { "id": "tl_missile", "name": "Twin-linked Missile pod (upgrade)", "points": 6, "points_mode": "flat" },
+            { "id": "tl_plasma", "name": "Twin-linked Plasma (upgrade)", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "bonding", "group_name": "Team Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "bonding", "name": "Bonding Knife", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_gun", "group_name": "Gun Drones (Max 2/model)", "min_select": 0, "max_select": 4,
+          "choices": [
+            { "id": "gun_drone", "name": "Gun Drone", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_shield", "group_name": "Shield Drones (Max 2/model)", "min_select": 0, "max_select": 4,
+          "choices": [
+            { "id": "shield_drone", "name": "Shield Drone", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_marker", "group_name": "Marker Drones (Max 2/model)", "min_select": 0, "max_select": 4,
+          "choices": [
+            { "id": "marker_drone", "name": "Marker Drone", "points": 30, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_shadowsun",
+      "name": "Commander Shadowsun",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 175,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 4, "BS": 5, "S": 4, "T": 3, "W": 3, "I": 4, "A": 4, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "XV22 Stealth Battlesuit", "Two Fusion Blasters", "Advanced Target Lock", "Drone Controller", "Target Lock", "Multi-tracker" ],
+      "special_rules": [ "Independent Character", "Jet Pack", "Stealth Field", "Infiltrate", "Fearless" ],
+      "sub_profiles": {
+        "command_drone": { "name": "Command-link Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "shield_drone": { "name": "Advanced Shield Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "drones_cmd", "group_name": "Command Drones", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "command_drone", "name": "Command-link Drone", "points": 20 }
+          ]
+        },
+        {
+          "group_id": "drones_shield", "group_name": "Shield Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "shield_drone", "name": "Advanced Shield Drone", "points": 15, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_aunva",
+      "name": "Aun'Va, Master of the Undying Spirit",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 205,
+      "min_size": 3, "max_size": 3, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 2, "S": 3, "T": 3, "W": 3, "I": 4, "A": 3, "Ld": 10, "Sv": "5+" },
+      "wargear": [ "Paradox of Duality" ],
+      "special_rules": [ "Independent Character", "Ethereal", "Inspiring Presence", "Supreme Commander" ],
+      "sub_profiles": {
+        "guard": { "name": "Ethereal Guard", "WS": 4, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 3, "A": 2, "Ld": 8, "Sv": "5+" }
+      },
+      "options": []
+    },
+    {
+      "id": "hq_ethereal",
+      "name": "Ethereal",
+      "slot": "HQ",
+      "base_points": 50,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 2, "I": 3, "A": 2, "Ld": 10, "Sv": "5+" },
+      "wargear": [ "Symbol of Office", "Close combat weapon" ],
+      "special_rules": [ "Independent Character", "Ethereal", "Inspiring Presence", "Fearless" ],
+      "options": [
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "armour", "name": "Blacksun Filter", "points": 3 },
+            { "id": "beacon", "name": "Homing Beacon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "honour", "group_name": "Honour Blade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "blade", "name": "Honour Blade (+2S)", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_crisis_suits",
+      "name": "XV8 Crisis Battlesuit Team",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 25,
+      "min_size": 1, "max_size": 3, "default_size": 1,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 5, "T": 4, "W": 2, "I": 2, "A": 2, "Ld": 8, "Sv": "3+" },
+      "wargear": [ "Battlesuit" ],
+      "special_rules": [ "Jet Pack" ],
+      "sub_profiles": {
+        "leader": { "name": "Team Leader", "WS": 3, "BS": 3, "S": 5, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 9, "Sv": "3+" },
+        "gun_drone": { "name": "Gun Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "shield_drone": { "name": "Shield Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "marker_drone": { "name": "Marker Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "leader", "name": "Team Leader Upgrade", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "hardpoint_1", "group_name": "Hardpoint 1", "min_select": 0, "max_select": 3, "linked_to_size": true,
+          "choices": [
+            { "id": "burst", "name": "Burst cannon", "points": 8, "points_mode": "flat" },
+            { "id": "missile", "name": "Missile pod", "points": 12, "points_mode": "flat" },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20, "points_mode": "flat" },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12, "points_mode": "flat" },
+            { "id": "flamer", "name": "Flamer", "points": 4, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "hardpoint_2", "group_name": "Hardpoint 2", "min_select": 0, "max_select": 3, "linked_to_size": true,
+          "choices": [
+            { "id": "burst", "name": "Burst cannon", "points": 8, "points_mode": "flat" },
+            { "id": "missile", "name": "Missile pod", "points": 12, "points_mode": "flat" },
+            { "id": "plasma", "name": "Plasma rifle", "points": 20, "points_mode": "flat" },
+            { "id": "fusion", "name": "Fusion blaster", "points": 12, "points_mode": "flat" },
+            { "id": "flamer", "name": "Flamer", "points": 4, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "hardpoint_3", "group_name": "Hardpoint 3 / Support", "min_select": 0, "max_select": 3, "linked_to_size": true,
+          "choices": [
+            { "id": "tracker", "name": "Multi-tracker", "points": 5, "points_mode": "flat" },
+            { "id": "lock", "name": "Target lock", "points": 5, "points_mode": "flat" },
+            { "id": "shield", "name": "Shield generator", "points": 20, "points_mode": "flat" },
+            { "id": "tl_missile", "name": "Twin-linked Missile pod (upgrade)", "points": 6, "points_mode": "flat" },
+            { "id": "tl_plasma", "name": "Twin-linked Plasma (upgrade)", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "bonding", "group_name": "Team Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "bonding", "name": "Bonding Knife", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_gun", "group_name": "Gun Drones (Max 2/model)", "min_select": 0, "max_select": 6,
+          "choices": [
+            { "id": "gun_drone", "name": "Gun Drone", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_shield", "group_name": "Shield Drones (Max 2/model)", "min_select": 0, "max_select": 6,
+          "choices": [
+            { "id": "shield_drone", "name": "Shield Drone", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_marker", "group_name": "Marker Drones (Max 2/model)", "min_select": 0, "max_select": 6,
+          "choices": [
+            { "id": "marker_drone", "name": "Marker Drone", "points": 30, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_stealth_suits",
+      "name": "XV15/25 Stealth Team",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 30,
+      "min_size": 3, "max_size": 6, "default_size": 3,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 4, "T": 3, "W": 1, "I": 2, "A": 2, "Ld": 8, "Sv": "3+" },
+      "wargear": [ "Stealth Armour", "Burst cannon" ],
+      "special_rules": [ "Jet Pack", "Infiltrate", "Stealth Field" ],
+      "sub_profiles": {
+        "leader": { "name": "Team Leader", "WS": 3, "BS": 3, "S": 4, "T": 3, "W": 1, "I": 3, "A": 3, "Ld": 9, "Sv": "3+" },
+        "gun_drone": { "name": "Gun Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "marker_drone": { "name": "Marker Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "leader", "name": "Team Leader Upgrade", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "heavy", "group_name": "Heavy Weapon (1 per 3 models)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "fusion", "name": "Upgrade Burst Cannon to Fusion Blaster", "points": 2, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_gun", "group_name": "Gun Drones (Max 2)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "gun_drone", "name": "Gun Drone", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_marker", "group_name": "Marker Drones (Max 2)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "marker_drone", "name": "Marker Drone", "points": 30, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_fire_warriors",
+      "name": "Fire Warrior Team",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 10,
+      "min_size": 6, "max_size": 12, "default_size": 6,
+      "unit_type": "Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 2, "A": 1, "Ld": 7, "Sv": "4+" },
+      "wargear": [ "Combat Armour", "Pulse rifle" ],
+      "dedicated_transports": ["dt_devilfish"],
+      "sub_profiles": {
+        "shasui": { "name": "Shas'ui", "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 3, "A": 2, "Ld": 8, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "shasui", "name": "Upgrade to Shas'ui", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "weapon_swap", "group_name": "Weapon Swap", "min_select": 0, "max_select": 12, "linked_to_size": true,
+          "choices": [
+            { "id": "carbine", "name": "Swap Pulse Rifle for Carbine", "points": 0, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "emp", "name": "EMP Grenades", "points": 3, "points_mode": "per_model" },
+            { "id": "photon", "name": "Photon Grenades", "points": 1, "points_mode": "per_model" },
+            { "id": "bonding", "name": "Bonding Knife", "points": 10, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_kroot",
+      "name": "Kroot Carnivore Squad",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 7,
+      "min_size": 10, "max_size": 20, "default_size": 10,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 3, "S": 4, "T": 3, "W": 1, "I": 3, "A": 1, "Ld": 7, "Sv": "6+" },
+      "wargear": [ "Kroot rifle" ],
+      "special_rules": [ "Infiltrate", "Move Through Cover" ],
+      "sub_profiles": {
+        "shaper": { "name": "Shaper", "WS": 4, "BS": 3, "S": 4, "T": 3, "W": 3, "I": 3, "A": 3, "Ld": 8, "Sv": "6+" },
+        "hound": { "name": "Kroot Hound", "WS": 4, "BS": 0, "S": 3, "T": 3, "W": 1, "I": 5, "A": 2, "Ld": 5, "Sv": "6+" },
+        "krootox": { "name": "Krootox", "WS": 4, "BS": 3, "S": 6, "T": 5, "W": 2, "I": 3, "A": 2, "Ld": 7, "Sv": "6+" }
+      },
+      "options": [
+        {
+          "group_id": "shaper", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "shaper", "name": "Upgrade to Shaper", "points": 21 }
+          ]
+        },
+        {
+          "group_id": "hounds", "group_name": "Kroot Hounds (Max 12)", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "hound", "name": "Kroot Hound", "points": 6, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "krootox", "group_name": "Krootox Riders (Max 3)", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "krootox", "name": "Krootox Rider", "points": 35, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "armor", "group_name": "Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "armor", "name": "Kroot Armour (6+ Sv)", "points": 1, "points_mode": "per_model" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_pathfinders",
+      "name": "Pathfinder Team",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 12,
+      "min_size": 4, "max_size": 8, "default_size": 4,
+      "unit_type": "Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 2, "A": 1, "Ld": 7, "Sv": "4+" },
+      "wargear": [ "Combat Armour", "Pulse carbine", "Markerlight" ],
+      "special_rules": [ "Scouts" ],
+      "dedicated_transports": ["dt_devilfish"],
+      "sub_profiles": {
+        "shasui": { "name": "Shas'ui", "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 3, "A": 2, "Ld": 8, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "shasui", "name": "Upgrade to Shas'ui", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "special", "group_name": "Special Weapons", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "rail", "name": "Rail rifle", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_gun_drones",
+      "name": "Gun Drone Squadron",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 12,
+      "min_size": 4, "max_size": 8, "default_size": 4,
+      "unit_type": "Jet Pack Infantry",
+      "profile": { "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+      "wargear": [ "Twin-linked pulse carbine" ],
+      "special_rules": [ "Jet Pack", "Fearless" ],
+      "options": []
+    },
+    {
+      "id": "fa_vespid",
+      "name": "Vespid Stingwings",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 16,
+      "min_size": 6, "max_size": 12, "default_size": 6,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 6, "Sv": "3+" },
+      "wargear": [ "Neutron blaster" ],
+      "special_rules": [ "Fleet", "Hit and Run", "Move Through Cover", "Skilled Rider" ],
+      "sub_profiles": {
+        "strain": { "name": "Strain Leader", "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "strain", "name": "Upgrade to Strain Leader", "points": 22 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_piranha",
+      "name": "Piranha Light Skimmer Squadron",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 60,
+      "min_size": 1, "max_size": 5, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Fast, Open-topped)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 11, "Side": 10, "Rear": 10, "BS": 3 },
+      "wargear": [ "Burst cannon", "Two Gun Drones" ],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Main Weapon", "min_select": 0, "max_select": 1,
+          "linked_to_size": true,
+          "choices": [
+            { "id": "fusion", "name": "Replace Burst Cannon with Fusion Blaster", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "dp", "name": "Disruption Pod", "points": 5 },
+            { "id": "tl", "name": "Target Lock", "points": 5 },
+            { "id": "sensor", "name": "Blacksun Filter", "points": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_broadside",
+      "name": "XV88 Broadside Battlesuit Team",
+      "slot": "Heavy Support",
+      "base_points": 0, "points_per_model": 70,
+      "min_size": 1, "max_size": 3, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 5, "T": 4, "W": 2, "I": 2, "A": 2, "Ld": 8, "Sv": "2+" },
+      "wargear": [ "Battlesuit", "Twin-linked Railgun", "Smart missile system" ],
+      "special_rules": [ "Slow and Purposeful" ],
+      "sub_profiles": {
+        "leader": { "name": "Team Leader", "WS": 3, "BS": 3, "S": 5, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 9, "Sv": "2+" },
+        "gun_drone": { "name": "Gun Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "shield_drone": { "name": "Shield Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" },
+        "marker_drone": { "name": "Marker Drone", "WS": 2, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "leader", "name": "Team Leader Upgrade", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "support", "group_name": "Support System (Hardpoint)", "min_select": 0, "max_select": 3, "linked_to_size": true,
+          "choices": [
+            { "id": "ass", "name": "Advanced Stabilisation", "points": 10, "points_mode": "flat" },
+            { "id": "shield", "name": "Shield generator", "points": 20, "points_mode": "flat" },
+            { "id": "lock", "name": "Target lock", "points": 5, "points_mode": "flat" },
+            { "id": "multi", "name": "Multi-tracker", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "bonding", "group_name": "Team Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "bonding", "name": "Bonding Knife", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_gun", "group_name": "Gun Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "gun_drone", "name": "Gun Drone", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_shield", "group_name": "Shield Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "shield_drone", "name": "Shield Drone", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "drones_marker", "group_name": "Marker Drones", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "marker_drone", "name": "Marker Drone", "points": 30, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_hammerhead",
+      "name": "Hammerhead Gunship",
+      "slot": "Heavy Support",
+      "base_points": 90, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 13, "Side": 12, "Rear": 10, "BS": 4 },
+      "wargear": [ "Railgun (Solid)", "Railgun (Submunition)", "Twin-linked Burst cannons" ],
+      "options": [
+        {
+          "group_id": "turret", "group_name": "Turret Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "ion", "name": "Replace Railgun with Ion Cannon", "points": -30 }
+          ]
+        },
+        {
+          "group_id": "secondary", "group_name": "Secondary Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "sms", "name": "Replace Burst Cannons with Smart Missile System", "points": 10 },
+            { "id": "drones", "name": "Replace Burst Cannons with 2 Gun Drones", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "vehicle_gear", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "dp", "name": "Disruption Pod", "points": 5 },
+            { "id": "mt", "name": "Multi-tracker", "points": 10 },
+            { "id": "tl", "name": "Target Lock", "points": 5 },
+            { "id": "dl", "name": "Decoy Launchers", "points": 5 },
+            { "id": "sensor", "name": "Blacksun Filter", "points": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_sky_ray",
+      "name": "Sky Ray Missile Defence Gunship",
+      "slot": "Heavy Support",
+      "base_points": 125, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 13, "Side": 12, "Rear": 10, "BS": 3 },
+      "wargear": [ "Two Networked Markerlights", "Six Seeker Missiles", "Twin-linked Burst cannons", "Target Lock" ],
+      "options": [
+        {
+          "group_id": "secondary", "group_name": "Secondary Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "sms", "name": "Replace Burst Cannons with Smart Missile System", "points": 10 },
+            { "id": "drones", "name": "Replace Burst Cannons with 2 Gun Drones", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "vehicle_gear", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "dp", "name": "Disruption Pod", "points": 5 },
+            { "id": "mt", "name": "Multi-tracker", "points": 10 },
+            { "id": "dl", "name": "Decoy Launchers", "points": 5 },
+            { "id": "sensor", "name": "Blacksun Filter", "points": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_sniper_drones",
+      "name": "Sniper Drone Team",
+      "slot": "Heavy Support",
+      "base_points": 80, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 2, "A": 1, "Ld": 7, "Sv": "4+" },
+      "wargear": [ "Rail rifle", "Pulse pistol", "Networked Markerlight" ],
+      "special_rules": [ "Stealth Field", "Pinning" ],
+      "sub_profiles": {
+        "spotter": { "name": "Firesight Spotter", "WS": 2, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 2, "A": 1, "Ld": 7, "Sv": "4+" },
+        "drone": { "name": "Sniper Drone", "WS": 2, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 7, "Sv": "4+" }
+      },
+      "options": []
+    },
+    {
+      "id": "dt_devilfish",
+      "name": "Devilfish Troop Carrier",
+      "slot": "Dedicated Transport",
+      "base_points": 80, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 12, "Side": 11, "Rear": 10, "BS": 3 },
+      "wargear": [ "Burst cannon", "Two Gun Drones" ],
+      "options": [
+        {
+          "group_id": "secondary", "group_name": "Secondary Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "sms", "name": "Replace Drones with Smart Missile System", "points": 20 }
+          ]
+        },
+        {
+          "group_id": "vehicle_gear", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "dp", "name": "Disruption Pod", "points": 5 },
+            { "id": "mt", "name": "Multi-tracker", "points": 10 },
+            { "id": "tl", "name": "Target Lock", "points": 5 },
+            { "id": "sensor", "name": "Blacksun Filter", "points": 3 }
+          ]
+        }
+      ]
+    }
+  ]
+}

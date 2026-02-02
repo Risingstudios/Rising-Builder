@@ -1,0 +1,1005 @@
+{
+  "codex_name": "Eldar (5th Edition) - My Data",
+  "rules": {
+    "Fleet of Foot": { "summary": "Unit may run and then assault in the same turn." },
+    "Independent Character": { "summary": "May join/leave units. Look Out Sir rolls." },
+    "Eternal Warrior": { "summary": "Immune to Instant Death." },
+    "Fearless": { "summary": "Passes Morale/Pinning automatically. Cannot go to Ground." },
+    "Move Through Cover": { "summary": "Roll 3D6 for cover movement, pick highest. Not slowed by difficult terrain when assaulting." },
+    "Infiltrate": { "summary": "May deploy anywhere not within 12\" of enemy (or 18\" if in sight)." },
+    "Scouts": { "summary": "May Outflank. After deployment, may make a free move." },
+    "Stealth": { "summary": "+1 to Cover Saves." },
+    "Masters of Stealth": { "summary": "Unit has Infiltrate, Stealth, and Move Through Cover." },
+    "Pathfinders": { "summary": "Unit has Scouts. Cover saves are improved by +2 (instead of +1 from Stealth). Ignore difficult terrain." },
+    "Skilled Rider": { "summary": "Reroll dangerous terrain tests. +1 to Jink cover saves." },
+    "Tank Hunters": { "summary": "Reroll failed armour penetration rolls against vehicles. +1 to damage chart." },
+    "Crack Shot": { "summary": "Shooting ignores cover saves. Reroll failed To Wound rolls." },
+    "Fast Shot": { "summary": "+1 shot with weapon (e.g. Heavy 2 becomes Heavy 3)." },
+    "Bladestorm": { "summary": "Shoot one extra shot per model. Unit cannot fire next turn." },
+    "Defend": { "summary": "Enemies attacking this unit in melee reduce Attacks by 1 (min 1)." },
+    "War Shout": { "summary": "First round of assault: enemies must pass Morale or fight at WS1." },
+    "Acrobatic": { "summary": "Counter-Attack (gain +1 A if charged)." },
+    "Shadowstrike": { "summary": "Unit gains Infiltrate." },
+    "Stalker": { "summary": "Unit gains Move Through Cover." },
+    "Skyleap": { "summary": "Movement phase: Remove from table. Deep Strike back next turn." },
+    "Intercept": { "summary": "In assault, hit vehicles on 4+ regardless of speed." },
+    "Hit and Run": { "summary": "End of assault phase: roll Initiative to break from combat and move 3D6\"." },
+    "Feel No Pain": { "summary": "Ignore unsaved wounds on 4+ (unless Instant Death/AP1/AP2)." },
+    "Acute Senses": { "summary": "Reroll Night Fighting spotting checks." },
+    "Master Strategist": { "summary": "+1 to Reserve rolls." },
+    "Doomed": { "summary": "Suffer 1 automatic wound at end of game." },
+    "Molten Body": { "summary": "Immune to Melta and Flamer weapons." },
+    "Battle Fate": { "summary": "4+ Invulnerable save." },
+    "Daemon": { "summary": "5+ Invulnerable save, causes Fear." },
+    "Wraithsight": { "summary": "Start of turn: if not within 6\" of Psyker, roll D6. On 1, unit does nothing." },
+    "Spiritseers": { "summary": "Wraithguard become Troops choices." },
+    "Dance of Death": { "summary": "Hit & Run and Furious Charge." },
+    "Psychic Powers": { "summary": "Psyker may use one power per turn. Takes a Psychic Test (Ld check)." },
+    "Doom": { "summary": "Range 24\". Target enemy unit re-rolls failed To Wound rolls." },
+    "Guide": { "summary": "Range 6\". Target friendly unit re-rolls failed To Hit rolls." },
+    "Fortune": { "summary": "Range 6\". Target friendly unit re-rolls failed Saves." },
+    "Eldritch Storm": { "summary": "Range 18\". Large Blast, S3 AP-. Pinning. Vehicles are spun facing." },
+    "Mind War": { "summary": "Range 18\". Target model. Roll D6+Ld vs D6+Ld. Difference = Wounds (no armor/cover saves)." },
+    "Conceal": { "summary": "Warlock and unit have 5+ Cover Save." },
+    "Destructor": { "summary": "Heavy Flamer template (S5 AP4)." },
+    "Embolden": { "summary": "Warlock and unit re-roll failed Morale/Pinning tests." },
+    "Enhance": { "summary": "Warlock and unit have +1 WS and +1 I." },
+    "Divination": { "summary": "Redeploy D3+1 units after deployment (within deployment zone)." }
+  },
+  "wargear": {
+    "Ghosthelm": { "summary": "Ignore Perils of the Warp on a 3+ (take an invulnerable save)." },
+    "Rune Armour": { "summary": "4+ Invulnerable save." },
+    "Spirit Stones": { "summary": "Psyker: Use a second power per turn. Vehicle: Ignore 'Crew Stunned' on 2+." },
+    "Runes of Warding": { "summary": "Enemy psykers roll 3D6 for psychic tests." },
+    "Runes of Witnessing": { "summary": "Psyker rolls 3D6 for psychic tests and discards the highest die." },
+    "Banshee Mask": { "summary": "Negates Initiative bonus from cover. In first round of combat, unit attacks at I10." },
+    "Mandiblasters": { "summary": "Start of each assault phase: roll D6. On 4+, enemy takes S3 hit." },
+    "Plasma Grenades": { "summary": "Assault grenades. No Initiative penalty when charging through cover." },
+    "Haywire Grenades": { "summary": "vs Vehicles: 2-5 = Glancing, 6 = Penetrating." },
+    "Swooping Hawk Wings": { "summary": "Move as Jump Infantry. Can Deep Strike." },
+    "Grenade Pack": { "summary": "Can drop Large Blast S4 AP5 when Deep Striking. Can drop Blast S4 AP5 when moving over unit." },
+    "Warp Jump Generator": { "summary": "Move 12\" ignoring terrain. Can make a second 2D6\" jump in Assault phase." },
+    "Forceshield": { "summary": "4+ Invulnerable save." },
+    "Holo-suit": { "summary": "5+ Invulnerable save." },
+    "Flip Belts": { "summary": "Ignore difficult terrain." },
+    "Holo-fields": { "summary": "Roll 2D6 for armor penetration against this vehicle and pick the lowest." },
+    "Star Engines": { "summary": "Move extra 12\" in Shooting phase (cannot shoot)." },
+    "Vectored Engines": { "summary": "If Immobilised while moving Fast, treat as landed instead of destroyed." },
+    "The Eye of Wrath": { "summary": "Once per game, place Large Blast over Yriel. S6 AP3. Hits all units (friend or foe)." },
+    "The Spear of Twilight": { "summary": "S9 vs Vehicles (Thrown). Counts as Power Weapon that wounds on 2+ in melee." },
+    "Sword of Asur": { "summary": "Power Weapon. Reroll failed To Hit. Wounds with a 5+ (on the dice) cause Instant Death." },
+    "The Silent Death": { "summary": "S4 AP2 Assault 3. Thrown weapon (Range 12\"). Returns to thrower." },
+    "Scorpion's Bite": { "summary": "Mandiblasters that hit on a 3+ (S3)." },
+    "The Fire Axe": { "summary": "Counts as a Power Fist (S+2) but strikes at normal Initiative (not I1). No two-handed bonus." },
+    "Troupe Master": { "summary": "Upgrade Character. +1 WS, +1 W, +1 A, +1 Ld. Equipped with Power Weapon and Fusion Pistol options." },
+    "Shadowseer": { "summary": "Upgrade Character. Psyker. +1 Ld. Has Hallucinogen Grenades. Power: Veil of Tears (2D6x2 spotting distance)." },
+    "Death Jester": { "summary": "Upgrade Character. Equipped with Shrieker Cannon." },
+    "Hallucinogen Grenades": { "summary": "Counts as Assault Grenades. Enemies in cover check Ld; failure = stun/attack own unit." },
+    "Staff of Ulthamar": { "summary": "Force Weapon. Allows Spirit Stones to be used on a 2+." },
+    "Energy Field": { "summary": "Penetrating hits with S > 8 count as S8. Ranged attacks against Front/Side never roll > 1D6 for penetration." }
+  },
+  "weapons": {
+    "Shuriken catapult": { "range": "12\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Shuriken" },
+    "Avenger shuriken catapult": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Shuriken" },
+    "Shuriken pistol": { "range": "12\"", "S": "4", "AP": "5", "type": "Pistol", "notes": "Shuriken" },
+    "Shuriken cannon": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Shuriken" },
+    "Scatter laser": { "range": "36\"", "S": "6", "AP": "6", "type": "Heavy 4", "notes": "" },
+    "Eldar missile launcher": { "range": "48\"", "S": "X", "AP": "X", "type": "Heavy 1", "notes": "Krak (S8 AP3) or Plasma (S4 AP4 Blast Pinning)" },
+    "Starcannon": { "range": "36\"", "S": "6", "AP": "2", "type": "Heavy 2", "notes": "" },
+    "Bright lance": { "range": "36\"", "S": "8", "AP": "2", "type": "Heavy 1", "notes": "Lance" },
+    "Pulse laser": { "range": "48\"", "S": "8", "AP": "2", "type": "Heavy 2", "notes": "" },
+    "Prism cannon": { "range": "60\"", "S": "9/5", "AP": "2/4", "type": "Heavy 1", "notes": "Focused (S9 AP2 Blast) or Dispersed (S5 AP4 Lg Blast)" },
+    "Fusion gun": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
+    "Fusion pistol": { "range": "6\"", "S": "8", "AP": "1", "type": "Pistol", "notes": "Melta" },
+    "Firepike": { "range": "18\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
+    "Dragon's breath flamer": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "" },
+    "Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "" },
+    "Reaper launcher": { "range": "48\"", "S": "5", "AP": "3", "type": "Heavy 2", "notes": "" },
+    "Tempest launcher": { "range": "36\"", "S": "4", "AP": "3", "type": "Heavy 2", "notes": "Blast, Barrage" },
+    "Death spinner": { "range": "12\"", "S": "6", "AP": "-", "type": "Assault 2", "notes": "Monofilament" },
+    "Spinneret rifle": { "range": "18\"", "S": "6", "AP": "1", "type": "Assault 1", "notes": "Pinning" },
+    "Lasblaster": { "range": "24\"", "S": "3", "AP": "5", "type": "Assault 2", "notes": "" },
+    "Hawk's talon": { "range": "24\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "" },
+    "Sunrifle": { "range": "24\"", "S": "3", "AP": "5", "type": "Assault 6", "notes": "Pinning" },
+    "Ranger long rifle": { "range": "36\"", "S": "X", "AP": "6", "type": "Heavy 1", "notes": "Sniper, Pinning. Rending on 6 (or 5+ if Pathfinder)." },
+    "Wraithcannon": { "range": "12\"", "S": "X", "AP": "2", "type": "Assault 1", "notes": "Wound on 2+, ID on 6" },
+    "D-cannon": { "range": "24\"", "S": "X", "AP": "2", "type": "Heavy 1", "notes": "Barrage, Blast, ID on 6" },
+    "Vibro cannon": { "range": "36\"", "S": "Special", "AP": "-", "type": "Heavy 1", "notes": "Vibro" },
+    "Shadow weaver": { "range": "48\"", "S": "6", "AP": "-", "type": "Heavy 1", "notes": "Barrage, Blast, Monofilament" },
+    "Singing spear": { "range": "12\"", "S": "X", "AP": "6", "type": "Assault 1", "notes": "Wound on 2+, S9 vs Vehicles" },
+    "Triskele": { "range": "12\"", "S": "3", "AP": "2", "type": "Assault 3", "notes": "" },
+    "The Wailing Doom (Shooting)": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
+    "The Maugetar": { "range": "36\"", "S": "6", "AP": "5", "type": "Assault 4", "notes": "Rending, Pinning" },
+    "Shrieker Cannon": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Pinning. Bio-explosive ammo." },
+    "Harlequin's Kiss": { "range": "-", "S": "-", "AP": "-", "type": "Melee", "notes": "Rending" },
+    "Twin-linked Shuriken Cannons": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Twin-linked, Shuriken" },
+    "Twin-linked Scatter Lasers": { "range": "36\"", "S": "6", "AP": "6", "type": "Heavy 4", "notes": "Twin-linked" },
+    "Twin-linked Missile Launchers": { "range": "48\"", "S": "X", "AP": "X", "type": "Heavy 1", "notes": "Twin-linked. Krak/Plasma." },
+    "Twin-linked Starcannons": { "range": "36\"", "S": "6", "AP": "2", "type": "Heavy 2", "notes": "Twin-linked" },
+    "Twin-linked Bright Lances": { "range": "36\"", "S": "8", "AP": "2", "type": "Heavy 1", "notes": "Twin-linked, Lance" },
+    "Twin-linked shuriken catapults": { "range": "12\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Twin-linked, Shuriken" }
+  },
+  "units": [
+    {
+      "id": "hq_asurmen",
+      "name": "Asurmen",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 230,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 7, "BS": 7, "S": 4, "T": 4, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Twin Avenger shuriken catapults", "Sword of Asur" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Fearless", "Eternal Warrior", "Defend", "Bladestorm", "Battle Fate" ],
+      "options": []
+    },
+    {
+      "id": "hq_jain_zar",
+      "name": "Jain Zar",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 190,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 7, "BS": 7, "S": 4, "T": 4, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Banshee Mask", "Executioner", "The Silent Death" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Fearless", "Eternal Warrior", "Acrobatic", "War Shout", "Furious Charge" ],
+      "options": []
+    },
+    {
+      "id": "hq_baharroth",
+      "name": "Baharroth",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 200,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 7, "BS": 7, "S": 4, "T": 3, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Swooping Hawk Wings", "Grenade Pack", "Plasma Grenades", "Haywire Grenades", "Power weapon", "Hawk's talon" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Fearless", "Eternal Warrior", "Skyleap", "Intercept", "Hit and Run" ],
+      "options": []
+    },
+    {
+      "id": "hq_karandras",
+      "name": "Karandras",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 215,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 7, "BS": 7, "S": 4, "T": 4, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Scorpion's Bite", "Scorpion chainsword", "Scorpion's claw", "Plasma Grenades" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Fearless", "Eternal Warrior", "Shadowstrike", "Stalker", "Stealth" ],
+      "options": []
+    },
+    {
+      "id": "hq_fuegan",
+      "name": "Fuegan",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 205,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 7, "BS": 7, "S": 4, "T": 4, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Firepike", "The Fire Axe", "Melta bombs" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Fearless", "Eternal Warrior", "Tank Hunters", "Crack Shot", "Feel No Pain" ],
+      "options": []
+    },
+    {
+      "id": "hq_maugan_ra",
+      "name": "Maugan Ra",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 195,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 7, "BS": 7, "S": 4, "T": 4, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "The Maugetar" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Fearless", "Eternal Warrior", "Crack Shot", "Fast Shot", "Acute Senses" ],
+      "options": []
+    },
+    {
+      "id": "hq_eldrad",
+      "name": "Eldrad Ulthran",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 210,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 5, "BS": 5, "S": 3, "T": 4, "W": 3, "I": 5, "A": 1, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Staff of Ulthamar", "Shuriken pistol", "Ghosthelm", "Runes of Warding", "Runes of Witnessing", "Spirit Stones", "Rune Armour" ],
+      "special_rules": [ "Independent Character", "Psychic Powers", "Divination", "Master Strategist" ],
+      "options": []
+    },
+    {
+      "id": "hq_yriel",
+      "name": "Prince Yriel",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 155,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 6, "BS": 6, "S": 3, "T": 3, "W": 3, "I": 7, "A": 4, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "The Spear of Twilight", "The Eye of Wrath", "Forceshield", "Plasma Grenades" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Master Strategist", "Doomed" ],
+      "options": []
+    },
+    {
+      "id": "hq_avatar",
+      "name": "Avatar of Khaine",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 155,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Monstrous Creature",
+      "profile": { "WS": 10, "BS": 5, "S": 6, "T": 6, "W": 4, "I": 6, "A": 4, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "The Wailing Doom" ],
+      "special_rules": [ "Daemon", "Fearless", "Molten Body", "Inspiring" ],
+      "options": []
+    },
+    {
+      "id": "hq_autarch",
+      "name": "Autarch",
+      "slot": "HQ",
+      "base_points": 70,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 6, "BS": 6, "S": 3, "T": 3, "W": 3, "I": 6, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Shuriken pistol", "Plasma Grenades", "Haywire Grenades", "Forceshield" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Master Strategist" ],
+      "options": [
+        {
+          "group_id": "mobility", "group_name": "Mobility Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "wings", "name": "Swooping Hawk Wings", "points": 20 },
+            { "id": "jump_gen", "name": "Warp Jump Generator", "points": 25 },
+            { "id": "jetbike", "name": "Eldar jetbike", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "masks", "group_name": "Wargear", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "banshee_mask", "name": "Banshee Mask", "points": 3 },
+            { "id": "mandiblasters", "name": "Mandiblasters", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "weapons_1", "group_name": "Single-handed Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "power_weapon", "name": "Power weapon", "points": 10 },
+            { "id": "scorpion_chainsword", "name": "Scorpion chainsword", "points": 5 },
+            { "id": "laser_lance", "name": "Laser lance (requires Jetbike)", "points": 20 }
+          ]
+        },
+        {
+          "group_id": "weapons_2", "group_name": "Two-handed Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "avenger_catapult", "name": "Avenger shuriken catapult", "points": 2 },
+            { "id": "death_spinner", "name": "Death spinner", "points": 5 },
+            { "id": "fusion_gun", "name": "Fusion gun", "points": 10 },
+            { "id": "lasblaster", "name": "Lasblaster", "points": 1 },
+            { "id": "reaper_launcher", "name": "Reaper launcher", "points": 25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_farseer",
+      "name": "Farseer",
+      "slot": "HQ",
+      "base_points": 55,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 3, "I": 5, "A": 1, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Ghosthelm", "Shuriken pistol", "Witchblade", "Rune Armour" ],
+      "special_rules": [ "Independent Character", "Fleet of Foot", "Psychic Powers" ],
+      "options": [
+        {
+          "group_id": "wargear", "group_name": "Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "singing_spear", "name": "Singing spear (replace Witchblade)", "points": 3 },
+            { "id": "runes_warding", "name": "Runes of Warding", "points": 15 },
+            { "id": "runes_witnessing", "name": "Runes of Witnessing", "points": 10 },
+            { "id": "spirit_stones", "name": "Spirit Stones", "points": 20 },
+            { "id": "jetbike", "name": "Eldar jetbike", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "powers", "group_name": "Psychic Powers", "min_select": 1, "max_select": 4,
+          "choices": [
+            { "id": "doom", "name": "Doom", "points": 25 },
+            { "id": "eldritch_storm", "name": "Eldritch Storm", "points": 20 },
+            { "id": "fortune", "name": "Fortune", "points": 30 },
+            { "id": "guide", "name": "Guide", "points": 20 },
+            { "id": "mind_war", "name": "Mind War", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_warlocks",
+      "name": "Warlock Council",
+      "slot": "HQ",
+      "base_points": 0, "points_per_model": 25,
+      "min_size": 3, "max_size": 10, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "3+" },
+      "wargear": [ "Rune Armour", "Shuriken pistol", "Witchblade" ],
+      "special_rules": [ "Warlock Powers", "Fleet of Foot", "Spiritseers" ],
+      "options": [
+        {
+          "group_id": "powers", "group_name": "Psychic Powers", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "conceal", "name": "Conceal", "points": 15 },
+            { "id": "destructor", "name": "Destructor", "points": 10 },
+            { "id": "embolden", "name": "Embolden", "points": 5 },
+            { "id": "enhance", "name": "Enhance", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "upgrades", "group_name": "Upgrades", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "singing_spear", "name": "Singing spear", "points": 3 }
+          ]
+        },
+        {
+          "group_id": "ride", "group_name": "Transport", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "jetbikes", "name": "Ride Eldar Jetbikes (All models)", "points": 20, "points_mode": "per_model" }
+          ]
+        },
+        {
+          "group_id": "leader", "group_name": "Spiritseer Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "spiritseer", "name": "Upgrade one Warlock to Spiritseer", "points": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_harlequin_troupe",
+      "name": "Harlequin Troupe",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 18,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 5, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "-" },
+      "wargear": [ "Shuriken pistol", "Close combat weapon", "Flip Belts", "Holo-suit" ],
+      "special_rules": [ "Dance of Death", "Fleet of Foot" ],
+      "sub_profiles": {
+        "troupe_master": { "name": "Troupe Master", "WS": 5, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 6, "A": 3, "Ld": 10, "Sv": "-" },
+        "death_jester": { "name": "Death Jester", "WS": 5, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "-" },
+        "shadowseer": { "name": "Shadowseer", "WS": 5, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "-" }
+      },
+      "options": [
+        {
+          "group_id": "combat_weapons", "group_name": "Combat Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "kiss", "name": "Harlequin's Kiss", "points": 4 }
+          ]
+        },
+        {
+          "group_id": "pistols", "group_name": "Pistol Upgrades", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "fusion", "name": "Fusion pistol", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "characters", "group_name": "Characters", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "troupe_master", "name": "Troupe Master", "points": 20 },
+            { "id": "death_jester", "name": "Death Jester", "points": 10 },
+            { "id": "shadowseer", "name": "Shadowseer", "points": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_rangers",
+      "name": "Rangers",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 19,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 3, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "5+" },
+      "wargear": [ "Ranger long rifle", "Shuriken pistol" ],
+      "special_rules": [ "Fleet of Foot", "Masters of Stealth" ],
+      "options": [
+        {
+          "group_id": "pathfinders", "group_name": "Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "pathfinders", "name": "Upgrade to Pathfinders", "points": 5, "points_mode": "per_model" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_guardian_defenders",
+      "name": "Guardian Defenders",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 8,
+      "min_size": 10, "max_size": 20, "default_size": 10,
+      "unit_type": "Infantry",
+      "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "5+" },
+      "wargear": [ "Shuriken catapult" ],
+      "special_rules": [ "Fleet of Foot" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "warlock": { "name": "Warlock", "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "-" }
+      },
+      "options": [
+        {
+          "group_id": "heavy_weapon", "group_name": "Heavy Weapon Platform (Max 1)", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "bright_lance", "name": "Bright lance", "points": 30 },
+            { "id": "missile", "name": "Eldar missile launcher", "points": 20 },
+            { "id": "scatter", "name": "Scatter laser", "points": 15 },
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
+            { "id": "starcannon", "name": "Starcannon", "points": 25 }
+          ]
+        },
+        {
+          "group_id": "warlock", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "warlock", "name": "Warlock Leader", "points": 25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_storm_guardians",
+      "name": "Storm Guardians",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 8,
+      "min_size": 10, "max_size": 20, "default_size": 10,
+      "unit_type": "Infantry",
+      "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "5+" },
+      "wargear": [ "Shuriken pistol", "Close combat weapon" ],
+      "special_rules": [ "Fleet of Foot" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "warlock": { "name": "Warlock", "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "-" }
+      },
+      "options": [
+        {
+          "group_id": "special_weapons", "group_name": "Special Weapons (Max 2)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "fusion", "name": "Fusion gun", "points": 6 },
+            { "id": "flamer", "name": "Flamer", "points": 6 }
+          ]
+        },
+        {
+          "group_id": "warlock", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "warlock", "name": "Warlock Leader", "points": 25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_dire_avengers",
+      "name": "Dire Avengers",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 12,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "4+" },
+      "wargear": [ "Avenger shuriken catapult" ],
+      "special_rules": [ "Fleet of Foot" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "dual_catapult", "name": "Two Avenger catapults", "points": 5 },
+            { "id": "diresword", "name": "Diresword & pistol", "points": 10 },
+            { "id": "shield", "name": "Power weapon & Shimmershield", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "defend", "name": "Defend", "points": 15 },
+            { "id": "bladestorm", "name": "Bladestorm", "points": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_jetbikes",
+      "name": "Guardian Jetbike Squadron",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 22,
+      "min_size": 3, "max_size": 12, "default_size": 3,
+      "unit_type": "Jetbike",
+      "profile": { "WS": 3, "BS": 3, "S": 3, "T": 4, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "3+" },
+      "wargear": [ "Twin-linked shuriken catapults" ],
+      "special_rules": [],
+      "sub_profiles": {
+        "warlock": { "name": "Warlock", "WS": 4, "BS": 4, "S": 3, "T": 4, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "-" }
+      },
+      "options": [
+        {
+          "group_id": "heavy", "group_name": "Heavy Weapons (1 per 3 models)", "min_select": 0, "max_select": 4,
+          "choices": [
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "warlock", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "warlock", "name": "Warlock (Jetbike)", "points": 45 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_howling_banshees",
+      "name": "Howling Banshees",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 16,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "4+" },
+      "wargear": [ "Banshee Mask", "Shuriken pistol", "Power weapon" ],
+      "special_rules": [ "Fleet of Foot" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "executioner", "name": "Executioner", "points": 10 },
+            { "id": "triskele", "name": "Triskele", "points": 5 },
+            { "id": "mirrorswords", "name": "Mirrorswords", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "war_shout", "name": "War Shout", "points": 5 },
+            { "id": "acrobatic", "name": "Acrobatic", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_striking_scorpions",
+      "name": "Striking Scorpions",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 16,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Shuriken pistol", "Scorpion chainsword", "Mandiblasters", "Plasma Grenades" ],
+      "special_rules": [ "Fleet of Foot", "Infiltrate", "Move Through Cover" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 4, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "claw", "name": "Scorpion's Claw", "points": 15 },
+            { "id": "biting", "name": "Biting Blade", "points": 5 },
+            { "id": "chainsabres", "name": "Chainsabres", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "stalker", "name": "Stalker", "points": 5 },
+            { "id": "shadowstrike", "name": "Shadowstrike", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_fire_dragons",
+      "name": "Fire Dragons",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 16,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Fusion gun", "Melta bombs" ],
+      "special_rules": [ "Fleet of Foot" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 5, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "firepike", "name": "Firepike", "points": 8 },
+            { "id": "breath", "name": "Dragon's Breath Flamer", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "crack_shot", "name": "Crack Shot", "points": 5 },
+            { "id": "tank_hunters", "name": "Tank Hunters", "points": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_wraithguard",
+      "name": "Wraithguard",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 3, "max_size": 10, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 6, "W": 1, "I": 4, "A": 1, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Wraithcannon" ],
+      "special_rules": [ "Fearless", "Wraithsight" ],
+      "dedicated_transports": ["dt_wave_serpent"],
+      "sub_profiles": {
+        "warlock": { "name": "Warlock", "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "-" },
+        "spiritseer": { "name": "Spiritseer", "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 9, "Sv": "-" }
+      },
+      "options": [
+        {
+          "group_id": "warlock", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "warlock", "name": "Warlock Leader", "points": 25 },
+            { "id": "spiritseer", "name": "Spiritseer Leader", "points": 31 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_swooping_hawks",
+      "name": "Swooping Hawks",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 21,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "4+" },
+      "wargear": [ "Lasblaster", "Plasma Grenades", "Haywire Grenades", "Grenade Pack", "Swooping Hawk Wings" ],
+      "special_rules": [ "Fleet of Foot", "Deep Strike" ],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "talon", "name": "Hawk's Talon", "points": 10 },
+            { "id": "sunrifle", "name": "Sunrifle", "points": 15 },
+            { "id": "power", "name": "Power Weapon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "skyleap", "name": "Skyleap", "points": 15 },
+            { "id": "intercept", "name": "Intercept", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_warp_spiders",
+      "name": "Warp Spiders",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 22,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Death spinner", "Warp Jump Generator" ],
+      "special_rules": [ "Fleet of Foot" ],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "dual_spinner", "name": "Twin Death Spinners", "points": 5 },
+            { "id": "spinneret", "name": "Spinneret Rifle", "points": 5 },
+            { "id": "blades", "name": "Powerblades", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "surprise", "name": "Surprise Assault", "points": 10 },
+            { "id": "withdraw", "name": "Withdraw", "points": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_shining_spears",
+      "name": "Shining Spears",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 3, "max_size": 5, "default_size": 3,
+      "unit_type": "Jetbike",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 4, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Laser lance", "Twin-linked shuriken catapults" ],
+      "special_rules": [],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 4, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "star", "name": "Star Lance", "points": 15 },
+            { "id": "power", "name": "Power Weapon", "points": 0 },
+            { "id": "cannon", "name": "Shuriken Cannon (Jetbike)", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "skilled", "name": "Skilled Rider", "points": 10 },
+            { "id": "withdraw", "name": "Withdraw", "points": 25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_vyper",
+      "name": "Vyper Squadron",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 45,
+      "min_size": 1, "max_size": 3, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Fast, Open-Topped)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 10, "Side": 10, "Rear": 10, "BS": 3 },
+      "wargear": [ "Twin-linked shuriken catapults" ],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Heavy Weapon", "min_select": 1, "max_select": 1, "linked_to_size": true,
+          "choices": [
+            { "id": "scatter", "name": "Scatter laser", "points": 15 },
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
+            { "id": "missile", "name": "Eldar missile launcher", "points": 20 },
+            { "id": "starcannon", "name": "Starcannon", "points": 25 },
+            { "id": "lance", "name": "Bright Lance", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "chin", "group_name": "Upgrade Shuriken Catapults", "min_select": 0, "max_select": 1, "linked_to_size": true,
+          "choices": [
+            { "id": "cannon", "name": "Shuriken cannon", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_dark_reapers",
+      "name": "Dark Reapers",
+      "slot": "Heavy Support",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 3, "max_size": 5, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Reaper launcher" ],
+      "sub_profiles": {
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 5, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
+          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+        },
+        {
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "tempest", "name": "Tempest Launcher", "points": 20 },
+            { "id": "missile", "name": "Eldar Missile Launcher", "points": 10 },
+            { "id": "cannon", "name": "Shuriken Cannon", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "fast", "name": "Fast Shot", "points": 20 },
+            { "id": "crack", "name": "Crack Shot", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_wraithlord",
+      "name": "Wraithlord",
+      "slot": "Heavy Support",
+      "base_points": 90, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Monstrous Creature",
+      "profile": { "WS": 4, "BS": 4, "S": 10, "T": 8, "W": 3, "I": 4, "A": 2, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Two Power Fists" ],
+      "special_rules": [ "Fearless", "Wraithsight", "Monstrous Creature" ],
+      "options": [
+        {
+          "group_id": "arms", "group_name": "Arm Weapons", "min_select": 1, "max_select": 1,
+          "choices": [
+            { "id": "cat_flamer", "name": "Catapult & Flamer", "points": 0 },
+            { "id": "two_cats", "name": "Two Catapults", "points": 0 },
+            { "id": "two_flamers", "name": "Two Flamers", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "shoulder", "group_name": "Shoulder Weapons", "min_select": 1, "max_select": 2,
+          "choices": [
+            { "id": "bright_lance", "name": "Bright lance", "points": 40 },
+            { "id": "missile", "name": "Eldar missile launcher", "points": 25 },
+            { "id": "scatter", "name": "Scatter laser", "points": 20 },
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 10 },
+            { "id": "starcannon", "name": "Starcannon", "points": 30 },
+            { "id": "sword", "name": "Wraithsword", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_war_walker",
+      "name": "War Walker Squadron",
+      "slot": "Heavy Support",
+      "base_points": 0, "points_per_model": 30,
+      "min_size": 1, "max_size": 3, "default_size": 1,
+      "unit_type": "Walker",
+      "profile_type": "walker",
+      "profile": { "WS": 3, "BS": 3, "S": 5, "I": 4, "A": 2, "Front": 10, "Side": 10, "Rear": 10 },
+      "special_rules": [ "Scouts" ],
+      "options": [
+        {
+          "group_id": "left_weapon", "group_name": "Left Weapon", "min_select": 1, "max_select": 1, "linked_to_size": true,
+          "choices": [
+            { "id": "scatter", "name": "Scatter laser", "points": 15 },
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
+            { "id": "starcannon", "name": "Starcannon", "points": 25 },
+            { "id": "missile", "name": "Missile Launcher", "points": 20 },
+            { "id": "lance", "name": "Bright Lance", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "right_weapon", "group_name": "Right Weapon", "min_select": 1, "max_select": 1, "linked_to_size": true,
+          "choices": [
+            { "id": "scatter", "name": "Scatter laser", "points": 15 },
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
+            { "id": "starcannon", "name": "Starcannon", "points": 25 },
+            { "id": "missile", "name": "Missile Launcher", "points": 20 },
+            { "id": "lance", "name": "Bright Lance", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "stones", "group_name": "Upgrades", "min_select": 0, "max_select": 3, "linked_to_size": true,
+          "choices": [
+            { "id": "stones", "name": "Spirit Stones", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_falcon",
+      "name": "Falcon",
+      "slot": "Heavy Support",
+      "base_points": 115, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 12, "Side": 12, "Rear": 10, "BS": 3 },
+      "wargear": [ "Pulse Laser", "Twin-linked shuriken catapults" ],
+      "options": [
+        {
+          "group_id": "turret", "group_name": "Secondary Weapon", "min_select": 1, "max_select": 1,
+          "choices": [
+            { "id": "scatter", "name": "Scatter laser", "points": 15 },
+            { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
+            { "id": "missile", "name": "Missile Launcher", "points": 20 },
+            { "id": "starcannon", "name": "Starcannon", "points": 25 },
+            { "id": "lance", "name": "Bright Lance", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "upgrades", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "shuriken_upgrade", "name": "Upgrade Catapults to Cannon", "points": 10 },
+            { "id": "holo", "name": "Holo-fields", "points": 35 },
+            { "id": "stones", "name": "Spirit Stones", "points": 10 },
+            { "id": "vec", "name": "Vectored Engines", "points": 20 },
+            { "id": "star", "name": "Star Engines", "points": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_fire_prism",
+      "name": "Fire Prism",
+      "slot": "Heavy Support",
+      "base_points": 115, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 12, "Side": 12, "Rear": 10, "BS": 4 },
+      "wargear": [ "Prism Cannon", "Twin-linked shuriken catapults" ],
+      "options": [
+        {
+          "group_id": "upgrades", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "shuriken_upgrade", "name": "Upgrade Catapults to Cannon", "points": 10 },
+            { "id": "holo", "name": "Holo-fields", "points": 35 },
+            { "id": "stones", "name": "Spirit Stones", "points": 10 },
+            { "id": "vec", "name": "Vectored Engines", "points": 20 },
+            { "id": "star", "name": "Star Engines", "points": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dt_wave_serpent",
+      "name": "Wave Serpent",
+      "slot": "Dedicated Transport",
+      "base_points": 90, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 12, "Side": 12, "Rear": 10, "BS": 3 },
+      "wargear": [ "Twin-linked shuriken catapults", "Energy Field" ],
+      "options": [
+        {
+          "group_id": "turret", "group_name": "Turret Weapon", "min_select": 1, "max_select": 1,
+          "choices": [
+            { "id": "tl_cannon", "name": "Twin-linked Shuriken Cannons", "points": 10 },
+            { "id": "tl_scatter", "name": "Twin-linked Scatter Lasers", "points": 25 },
+            { "id": "tl_missile", "name": "Twin-linked Missile Launchers", "points": 30 },
+            { "id": "tl_star", "name": "Twin-linked Starcannons", "points": 35 },
+            { "id": "tl_lance", "name": "Twin-linked Bright Lances", "points": 45 }
+          ]
+        },
+        {
+          "group_id": "upgrades", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "shuriken_upgrade", "name": "Upgrade Catapults to Cannon", "points": 10 },
+            { "id": "stones", "name": "Spirit Stones", "points": 10 },
+            { "id": "vec", "name": "Vectored Engines", "points": 20 },
+            { "id": "star", "name": "Star Engines", "points": 15 }
+          ]
+        }
+      ]
+    }
+  ]
+}

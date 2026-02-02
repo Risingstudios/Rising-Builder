@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import uuid
 from pathlib import Path
-from PIL import Image  # <--- Added this import
+from PIL import Image
 from reports import write_roster_pdf
 
 # --- Setup & Configuration ---
@@ -10,8 +10,8 @@ BASE_DIR = Path(__file__).parent
 CODEX_DIR = BASE_DIR / "codexes"
 CODEX_DIR.mkdir(exist_ok=True)
 
-# Try to load the custom icon, fallback to moon emoji if missing
-icon_path = BASE_DIR / "RisingBuilder.ico"
+# Load Icon
+icon_path = BASE_DIR / "app_icon.ico"
 if icon_path.exists():
     app_icon = Image.open(icon_path)
 else:
@@ -72,8 +72,22 @@ def calculate_roster():
             
     return total_pts, counts
 
-# --- Sidebar: Codex, Save/Load, PDF, Feedback ---
+# --- Sidebar ---
 with st.sidebar:
+    # --- LOGO & BRANDING ---
+    # This creates two columns: one for the logo, one for the text
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if icon_path.exists():
+            st.image(app_icon, width=60)
+        else:
+            st.write("🌙")
+    with col2:
+        st.title("Rising Builder")
+        
+    st.divider()
+    
+    # --- SETTINGS ---
     st.header("Settings")
     
     # 1. Codex Loader
@@ -363,4 +377,3 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")
-

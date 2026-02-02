@@ -1,6 +1,11 @@
 {
   "codex_name": "Orks (My Data)",
   "rules": {
+    "Prophet of the Waaagh!": { "summary": "Ghazghkull gives the whole army Fearless for a turn. He gets a 2+ Invuln save that turn." },
+    "One Scalpel Short of a Medpack": { "summary": "Grotsnik is Fearless and has Rampage. He must always move towards the nearest enemy." },
+    "Zog's Curse": { "summary": "Psychic Power. Turn an enemy independent character into a Squig on a roll of 4+." },
+    "Da Vulcha's Klaws": { "summary": "Zagstruk strikes at Initiative 1, but on the turn he Deep Strikes, he strikes at Initiative 4." },
+    "Ambush": { "summary": "Snikrot and his unit can move on from any table edge." }
     "Mob Rule": { "summary": "Units can use the number of models in the squad as their Leadership value (Max 10). If >10 models, they are Fearless." },
     "Furious Charge": { "summary": "+1 Strength and +1 Initiative on the turn they assault." },
     "Waaagh!": { "summary": "Once per game, declare Waaagh! Infantry units gain Fleet. If they roll a 1 for Fleet, they take a wound. Affects Run moves." },
@@ -10,6 +15,12 @@
     "Boarding Planks": { "summary": "Models can assault from this vehicle even if it moved (up to 12\"). Adds 2\" to disembark/assault range." }
   },
   "wargear": {
+    "Adamantium Skull": { "summary": "Ghazghkull has a 2+ Invulnerable save on the turn he calls the Waaagh!" },
+    "Dok's Tools": { "summary": "Counts as a Poisoned (4+) weapon." },
+    "Bike of the Aporkalypse": { "summary": "Warbike. Can fire the Dakkacannon (S8 AP4 Assault 4) and still assault." },
+    "Da Ripper": { "summary": "Badrukk's Gun: Range 24\" S7 AP2 Assault 3, Gets Hot." },
+    "Goldtoof Armour": { "summary": "3+ Armor Save. 5+ Invulnerable Save (improves to 3+ vs Shooting)." },
+    "Nest of Vipers": { "summary": "Zogwort attacks with 2D6 poison attacks in melee." }
     "Bosspole": { "summary": "Allows unit to re-roll failed Morale/Pinning tests. Usually requires taking a wound." },
     "Cybork Body": { "summary": "5+ Invulnerable Save." },
     "Attack Squig": { "summary": "Adds +1 Attack to profile." },
@@ -43,6 +54,105 @@
     "Snazzgun": { "range": "24\"", "S": "5", "AP": "D6", "type": "Assault 1", "notes": "" }
   },
   "units": [
+    {
+      "id": "hq_ghazghkull",
+      "name": "Ghazghkull Thraka",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 225,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 6, "BS": 2, "S": 5, "T": 5, "W": 4, "I": 4, "A": 5, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Mega Armour", "Power Klaw", "Twin-linked Big Shoota", "Adamantium Skull", "Bosspole", "Stikkbombs", "Cybork Body" ],
+      "special_rules": [ "Independent Character", "Eternal Warrior", "Prophet of the Waaagh!", "Mob Rule", "Furious Charge" ],
+      "dedicated_transports": ["hs_battlewagon"],
+      "options": []
+    },
+    {
+      "id": "hq_grotsnik",
+      "name": "Mad Dok Grotsnik",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 160,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 5, "BS": 2, "S": 4, "T": 4, "W": 3, "I": 3, "A": 4, "Ld": 9, "Sv": "6+" },
+      "wargear": [ "Power Klaw", "Slugga", "Dok's Tools", "'Urty Syringe", "Cybork Body" ],
+      "special_rules": [ "Independent Character", "Feel No Pain", "One Scalpel Short of a Medpack", "Mob Rule", "Furious Charge" ],
+      "options": []
+    },
+    {
+      "id": "hq_wazdakka",
+      "name": "Wazdakka Gutsmek",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 180,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Bike (Character)",
+      "profile": { "WS": 5, "BS": 2, "S": 5, "T": 5, "W": 3, "I": 3, "A": 3, "Ld": 9, "Sv": "4+" },
+      "wargear": [ "Power Klaw", "Slugga", "Mek's Tools", "Bike of the Aporkalypse" ],
+      "special_rules": [ "Independent Character", "Mob Rule", "Furious Charge" ],
+      "options": []
+    },
+    {
+      "id": "hq_zogwort",
+      "name": "Old Zogwort",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 145,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 3, "I": 3, "A": 3, "Ld": 8, "Sv": "6+" },
+      "wargear": [ "Nest of Vipers" ],
+      "special_rules": [ "Independent Character", "Psyker", "Zog's Curse", "Mob Rule" ],
+      "options": []
+    },
+    {
+      "id": "hq_badrukk",
+      "name": "Kaptin Badrukk",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 135,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 5, "BS": 2, "S": 4, "T": 4, "W": 3, "I": 3, "A": 3, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Da Ripper", "Goldtoof Armour", "Power Klaw", "Slugga", "Stikkbombs" ],
+      "special_rules": [ "Independent Character", "Mob Rule", "Furious Charge" ],
+      "options": [
+         {
+          "group_id": "ammo", "group_name": "Ammo Runts (Max 3)", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "runt", "name": "Ammo Runt", "points": 3, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_zagstruk",
+      "name": "Boss Zagstruk",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 85,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Jump Infantry (Character)",
+      "profile": { "WS": 5, "BS": 2, "S": 4, "T": 4, "W": 3, "I": 3, "A": 3, "Ld": 9, "Sv": "6+" },
+      "wargear": [ "Slugga", "Choppa", "Da Vulcha's Klaws", "Cybork Body" ],
+      "special_rules": [ "Independent Character", "Mob Rule", "Furious Charge", "Deep Strike" ],
+      "options": []
+    },
+    {
+      "id": "hq_snikrot",
+      "name": "Boss Snikrot",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 85,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 5, "BS": 2, "S": 5, "T": 4, "W": 2, "I": 4, "A": 4, "Ld": 9, "Sv": "6+" },
+      "wargear": [ "Two Kustom Choppas (+2 S)", "Stikkbombs" ],
+      "special_rules": [ "Independent Character", "Mob Rule", "Furious Charge", "Ambush", "Move Through Cover" ],
+      "options": []
+    }
     {
       "id": "hq_warboss",
       "name": "Warboss",

@@ -1,0 +1,424 @@
+{
+  "codex_name": "Necrons (My Data)",
+  "rules": {
+    "Reanimation Protocols": { "summary": "When a model is removed as a casualty, place a counter. At end of phase, roll D6. On 5+, model returns with 1 wound. (See Codex for full modifiers)." },
+    "Living Metal": { "summary": "Ignore Crew Shaken and Crew Stunned results on a 2+." },
+    "Tesla": { "summary": "To Hit rolls of 6 cause 2 additional hits." },
+    "Gauss": { "summary": "To Wound rolls of 6 against vehicles cause a Glancing Hit automatically (unless it would penetrate)." },
+    "Entropic Strike": { "summary": "Melee hits that wound (or penetrate) strip Armour Save (or AV) from target for the rest of the game." },
+    "Quantum Shielding": { "summary": "Vehicle counts as AV13 Front/Side until it suffers its first penetrating hit." },
+    "Mindshackle Scarabs": { "summary": "In assault, enemy model in base contact must pass Ld test on 3d6 or strike their own unit." },
+    "Phase Shifter": { "summary": "Model has a 3+ Invulnerable save." },
+    "Ever-living": { "summary": "If killed, place a token. On 5+ next turn, returns to play." },
+    "Resurrection Orb": { "summary": "Reanimation Protocols passed on 4+ instead of 5+." }
+  },
+  "wargear": {
+    "Warscythe": { "summary": "S+2, AP1, Two-handed. Rolls 2D6 for Armor Pen." },
+    "Hyperphase Sword": { "summary": "Power Weapon (AP3)." },
+    "Voidblade": { "summary": "Rending, Entropic Strike." },
+    "Rod of Covenant": { "summary": "Power Weapon. Shooting: 12\" S8 AP2 Assault 1." },
+    "Staff of Light": { "summary": "Power Weapon. Shooting: 12\" S5 AP3 Assault 3." },
+    "Dispersion Shield": { "summary": "3+ Invulnerable Save. Can reflect shooting attacks." },
+    "Sempiternal Weave": { "summary": "2+ Armor Save." },
+    "Phylactery": { "summary": "Once per game, D3 wounds restored." },
+    "Fabricator Claw": { "summary": "Repair vehicles on 4+." },
+    "Gloom Prism": { "summary": "Nullify psychic power on 4+ within 12\"." }
+  },
+  "weapons": {
+    "Gauss flayer": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "Gauss" },
+    "Gauss blaster": { "range": "24\"", "S": "5", "AP": "4", "type": "Rapid Fire", "notes": "Gauss" },
+    "Gauss cannon": { "range": "24\"", "S": "6", "AP": "3", "type": "Assault 2", "notes": "Gauss" },
+    "Heavy gauss cannon": { "range": "36\"", "S": "9", "AP": "2", "type": "Heavy 1", "notes": "Gauss" },
+    "Tesla carbine": { "range": "24\"", "S": "5", "AP": "-", "type": "Assault 1", "notes": "Tesla" },
+    "Tesla cannon": { "range": "24\"", "S": "6", "AP": "-", "type": "Assault 2", "notes": "Tesla" },
+    "Tesla destructor": { "range": "24\"", "S": "7", "AP": "-", "type": "Assault 4", "notes": "Tesla, Arcing" },
+    "Particle caster": { "range": "12\"", "S": "6", "AP": "5", "type": "Pistol", "notes": "" },
+    "Particle beamer": { "range": "24\"", "S": "6", "AP": "5", "type": "Heavy 1", "notes": "Blast" },
+    "Staff of Light": { "range": "12\"", "S": "5", "AP": "3", "type": "Assault 3", "notes": "" },
+    "Eldritch Lance": { "range": "36\"", "S": "8", "AP": "2", "type": "Assault 1", "notes": "" },
+    "Tachyon Arrow": { "range": "Unlimited", "S": "10", "AP": "1", "type": "Heavy 1", "notes": "One shot per game" },
+    "Doomsday cannon": { "range": "72\"", "S": "9", "AP": "1", "type": "Heavy 1", "notes": "Large Blast. S7 if moved." },
+    "Death Ray": { "range": "12\"-24\"", "S": "10", "AP": "1", "type": "Heavy 1", "notes": "Draw line, hits units under it." }
+  },
+  "units": [
+    {
+      "id": "hq_overlord",
+      "name": "Necron Overlord",
+      "slot": "HQ",
+      "base_points": 90,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 3, "I": 2, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Staff of Light" ],
+      "special_rules": [ "Independent Character", "Reanimation Protocols", "Ever-living" ],
+      "dedicated_transports": ["dt_catacomb_barge", "hq_royal_court"],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Weapon Swap", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "hyperphase", "name": "Hyperphase Sword", "points": 0 },
+            { "id": "voidblade", "name": "Voidblade", "points": 0 },
+            { "id": "warscythe", "name": "Warscythe", "points": 10 },
+            { "id": "gauss", "name": "Gauss Cannon", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "orb", "name": "Resurrection Orb", "points": 30 },
+            { "id": "mss", "name": "Mindshackle Scarabs", "points": 20 },
+            { "id": "phase", "name": "Phase Shifter", "points": 45 },
+            { "id": "phylactery", "name": "Phylactery", "points": 15 },
+            { "id": "weave", "name": "Sempiternal Weave (2+ Sv)", "points": 15 },
+            { "id": "arrow", "name": "Tachyon Arrow", "points": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_royal_court",
+      "name": "Royal Court (Retinue)",
+      "slot": "HQ",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 1, "max_size": 5,
+      "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 1, "I": 2, "A": 2, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Staff of Light" ],
+      "special_rules": [ "Reanimation Protocols" ],
+      "sub_profiles": {
+        "lord": { "name": "Necron Lord", "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 1, "I": 2, "A": 2, "Ld": 10, "Sv": "3+" },
+        "cryptek": { "name": "Cryptek", "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 2, "A": 1, "Ld": 10, "Sv": "4+" }
+      },
+      "options": [
+        {
+          "group_id": "type", "group_name": "Model Type (Base is Lord)", "min_select": 0, "max_select": 5, "linked_to_size": true,
+          "choices": [
+            { "id": "cryptek", "name": "Replace Lord with Cryptek (Base)", "points": -10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "cryptek_upgrade", "group_name": "Cryptek Harbingers", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "destruct", "name": "Harbinger of Destruction (Eldritch Lance)", "points": 10, "points_mode": "flat" },
+            { "id": "eternity", "name": "Harbinger of Eternity (Aeonstave)", "points": 0, "points_mode": "flat" },
+            { "id": "transmog", "name": "Harbinger of Transmogrification (Tremorstave)", "points": 0, "points_mode": "flat" },
+            { "id": "storm", "name": "Harbinger of the Storm (Voltaic Staff)", "points": 0, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "lord_gear", "group_name": "Lord Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "warscythe", "name": "Warscythe", "points": 10, "points_mode": "flat" },
+            { "id": "mss", "name": "Mindshackle Scarabs", "points": 15, "points_mode": "flat" },
+            { "id": "orb", "name": "Resurrection Orb", "points": 30, "points_mode": "flat" },
+            { "id": "weave", "name": "Sempiternal Weave", "points": 15, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_imotekh",
+      "name": "Imotekh the Stormlord",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 225,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 5, "BS": 5, "S": 5, "T": 5, "W": 3, "I": 2, "A": 3, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Staff of the Destroyer", "Gauntlet of Fire", "Phase Shifter", "Sempiternal Weave", "Phylactery" ],
+      "special_rules": [ "Independent Character", "Lord of the Storm", "Bloodswarm Nanoscarabs", "Hyperlogic Strategy" ],
+      "dedicated_transports": ["dt_catacomb_barge", "hq_royal_court"],
+      "options": []
+    },
+    {
+      "id": "hq_trazyn",
+      "name": "Trazyn the Infinite",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 175,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 5, "BS": 5, "S": 5, "T": 5, "W": 3, "I": 2, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Empathic Obliterator", "Mindshackle Scarabs", "Sempiternal Weave" ],
+      "special_rules": [ "Independent Character", "Surrogate Hosts", "Ancient Collector (Scoring Unit)" ],
+      "dedicated_transports": ["dt_catacomb_barge", "hq_royal_court"],
+      "options": []
+    },
+    {
+      "id": "hq_destroyer_lord",
+      "name": "Destroyer Lord",
+      "slot": "HQ",
+      "base_points": 125,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Jump Infantry (Jet Pack)",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 6, "W": 3, "I": 2, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Warscythe" ],
+      "special_rules": [ "Independent Character", "Preferred Enemy (Everyone!)", "Reanimation Protocols" ],
+      "options": [
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
+          "choices": [
+             { "id": "mss", "name": "Mindshackle Scarabs", "points": 20 },
+             { "id": "weave", "name": "Sempiternal Weave", "points": 15 },
+             { "id": "orb", "name": "Resurrection Orb", "points": 30 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_warriors",
+      "name": "Necron Warriors",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 13,
+      "min_size": 5, "max_size": 20, "default_size": 10,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 2, "A": 1, "Ld": 10, "Sv": "4+" },
+      "wargear": [ "Gauss flayer" ],
+      "special_rules": [ "Reanimation Protocols" ],
+      "dedicated_transports": ["dt_ghost_ark", "dt_night_scythe"],
+      "options": []
+    },
+    {
+      "id": "tr_immortals",
+      "name": "Immortals",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 17,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 2, "A": 1, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Gauss blaster" ],
+      "special_rules": [ "Reanimation Protocols" ],
+      "dedicated_transports": ["dt_night_scythe"],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Weapon Swap", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "tesla", "name": "Swap Gauss Blaster for Tesla Carbine", "points": 0, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_lychguard",
+      "name": "Lychguard",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 40,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 1, "I": 2, "A": 2, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Warscythe" ],
+      "special_rules": [ "Reanimation Protocols" ],
+      "dedicated_transports": ["dt_night_scythe"],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Weapon Swap (Entire Squad)", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "sword", "name": "Hyperphase Sword & Dispersion Shield", "points": 5, "points_mode": "per_model" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_deathmarks",
+      "name": "Deathmarks",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 19,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 2, "A": 1, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Synaptic Disintegrator (Sniper, Rapid Fire)" ],
+      "special_rules": [ "Reanimation Protocols", "Deep Strike", "Hunters from Hyperspace (Mark target on 2+)" ],
+      "dedicated_transports": ["dt_night_scythe"],
+      "options": []
+    },
+    {
+      "id": "el_ctan",
+      "name": "C'tan Shard",
+      "slot": "Elites",
+      "base_points": 185, "points_per_model": 0,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Monstrous Creature",
+      "profile": { "WS": 5, "BS": 5, "S": 7, "T": 7, "W": 4, "I": 4, "A": 4, "Ld": 10, "Sv": "4+" },
+      "wargear": [ "Necrodermis (4+ Invuln)" ],
+      "special_rules": [ "Eternal Warrior", "Fearless", "Ignores Terrain" ],
+      "options": [
+        {
+          "group_id": "powers", "group_name": "Powers of the C'tan (Must choose 2)", "min_select": 2, "max_select": 2,
+          "choices": [
+            { "id": "gaze", "name": "Gaze of Death", "points": 0 },
+            { "id": "grand", "name": "Grand Illusion (Redeploy)", "points": 10 },
+            { "id": "writhing", "name": "Writhing Worldscape (Dangerous Terrain)", "points": 35 },
+            { "id": "trans", "name": "Transdimensional Thunderbolt", "points": 10 },
+            { "id": "spirit", "name": "Spirit Dust (Assault Grenades + Stealth)", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_wraiths",
+      "name": "Canoptek Wraiths",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 1, "max_size": 6, "default_size": 3,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 3, "BS": 0, "S": 6, "T": 4, "W": 2, "I": 2, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Phase Shifter (3+ Invuln)" ],
+      "special_rules": [ "Fearless", "Wraithflight (Move through anything)" ],
+      "options": [
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 6, "linked_to_size": true,
+          "choices": [
+            { "id": "whip", "name": "Whip Coil (Enemies strike at I1)", "points": 10, "points_mode": "flat" },
+            { "id": "particle", "name": "Particle Caster (Pistol)", "points": 5, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_scarabs",
+      "name": "Canoptek Scarabs",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 15,
+      "min_size": 3, "max_size": 10, "default_size": 3,
+      "unit_type": "Beasts (Swarm)",
+      "profile": { "WS": 2, "BS": 0, "S": 3, "T": 3, "W": 3, "I": 2, "A": 3, "Ld": 10, "Sv": "6+" },
+      "wargear": [],
+      "special_rules": [ "Fearless", "Swarm", "Entropic Strike" ],
+      "options": []
+    },
+    {
+      "id": "fa_destroyers",
+      "name": "Necron Destroyers",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 40,
+      "min_size": 1, "max_size": 5, "default_size": 1,
+      "unit_type": "Jump Infantry (Jet Pack)",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 1, "I": 2, "A": 1, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Gauss Cannon", "Targeting Array" ],
+      "special_rules": [ "Reanimation Protocols", "Preferred Enemy" ],
+      "options": [
+        {
+          "group_id": "heavy", "group_name": "Heavy Destroyer Upgrade", "min_select": 0, "max_select": 3,
+          "choices": [
+             { "id": "heavy", "name": "Upgrade to Heavy Destroyer (Heavy Gauss Cannon)", "points": 20, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_annihilation",
+      "name": "Annihilation Barge",
+      "slot": "Heavy Support",
+      "base_points": 90,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank, Open-topped)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 13, "Side": 13, "Rear": 11, "BS": 4 },
+      "wargear": [ "Twin-linked Tesla Destructor", "Tesla Cannon", "Quantum Shielding", "Living Metal" ],
+      "options": [
+        {
+          "group_id": "secondary", "group_name": "Under-slung Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "gauss", "name": "Swap Tesla Cannon for Gauss Cannon", "points": 0 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_monolith",
+      "name": "Monolith",
+      "slot": "Heavy Support",
+      "base_points": 200,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank, Heavy)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 14, "Side": 14, "Rear": 14, "BS": 4 },
+      "wargear": [ "Four Gauss Flux Arcs", "Particle Whip", "Living Metal" ],
+      "special_rules": [ "Eternity Gate (Teleport units)" ],
+      "options": []
+    },
+    {
+      "id": "hs_doom_scythe",
+      "name": "Doom Scythe",
+      "slot": "Heavy Support",
+      "base_points": 175,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Flyer)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 11, "Side": 11, "Rear": 11, "BS": 4 },
+      "wargear": [ "Death Ray", "Twin-linked Tesla Destructor", "Supersonic", "Living Metal" ],
+      "options": []
+    },
+    {
+      "id": "hs_spyder",
+      "name": "Canoptek Spyders",
+      "slot": "Heavy Support",
+      "base_points": 0, "points_per_model": 50,
+      "min_size": 1, "max_size": 3, "default_size": 1,
+      "unit_type": "Monstrous Creature",
+      "profile": { "WS": 3, "BS": 3, "S": 6, "T": 6, "W": 3, "I": 2, "A": 2, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Scarab Hive (Spawn Scarabs)" ],
+      "special_rules": [ "Fearless", "Construct" ],
+      "options": [
+        {
+          "group_id": "gear", "group_name": "Upgrades (Any Model)", "min_select": 0, "max_select": 3, "linked_to_size": true,
+          "choices": [
+            { "id": "claw", "name": "Fabricator Claw Array (Repair)", "points": 10, "points_mode": "flat" },
+            { "id": "prism", "name": "Gloom Prism (Anti-Psyker)", "points": 15, "points_mode": "flat" },
+            { "id": "gun", "name": "Twin-linked Particle Beamer", "points": 25, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dt_ghost_ark",
+      "name": "Ghost Ark",
+      "slot": "Dedicated Transport",
+      "base_points": 115,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank, Open-topped)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 13, "Side": 13, "Rear": 11, "BS": 4 },
+      "wargear": [ "Two Gauss Flayer Arrays", "Quantum Shielding", "Living Metal" ],
+      "special_rules": [ "Repair Barge (Restore Warriors)" ],
+      "options": []
+    },
+    {
+      "id": "dt_night_scythe",
+      "name": "Night Scythe",
+      "slot": "Dedicated Transport",
+      "base_points": 100,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Flyer)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 11, "Side": 11, "Rear": 11, "BS": 4 },
+      "wargear": [ "Twin-linked Tesla Destructor", "Supersonic", "Living Metal" ],
+      "special_rules": [ "Invasion Beams (Deploy without landing)" ],
+      "options": []
+    },
+    {
+      "id": "dt_catacomb_barge",
+      "name": "Catacomb Command Barge",
+      "slot": "Dedicated Transport",
+      "base_points": 80,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Skimmer, Tank, Open-topped)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 13, "Side": 13, "Rear": 11, "BS": 4 },
+      "wargear": [ "Tesla Cannon", "Quantum Shielding", "Living Metal" ],
+      "special_rules": [ "Symbiotic Repair" ],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Main Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "gauss", "name": "Swap Tesla Cannon for Gauss Cannon", "points": 0 }
+          ]
+        }
+      ]
+    }
+  ]
+}

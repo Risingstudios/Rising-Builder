@@ -112,6 +112,10 @@ with st.sidebar:
         submitted = st.form_submit_button("Submit Feedback")
         
         if submitted and feedback_msg:
+            # --- FIX: Calculate points right now for the report ---
+            report_pts, _ = calculate_roster()
+            # ------------------------------------------------------
+
             # 1. Get Secrets
             try:
                 token = st.secrets["github"]["token"]
@@ -129,7 +133,9 @@ with st.sidebar:
                 context_str = "\n\n**Context:**\n"
                 if "codex_data" in st.session_state:
                     context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
-                context_str += f"- Points: {curr_pts}/{points_limit}\n"
+                
+                # Use the locally calculated 'report_pts' variable here
+                context_str += f"- Points: {report_pts}/{points_limit}\n"
                 context_str += f"- Unit Count: {len(st.session_state.roster)}"
                 body_text += context_str
 
@@ -144,7 +150,7 @@ with st.sidebar:
                 "body": body_text
             }
             
-            import requests # Make sure this is imported at top of file
+            import requests 
             response = requests.post(api_url, json=payload, headers=headers)
             
             if response.status_code == 201:
@@ -321,4 +327,5 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 else:
 
     st.info("Please select a Codex from the sidebar to begin.")
+
 

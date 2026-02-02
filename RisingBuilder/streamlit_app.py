@@ -103,7 +103,7 @@ with st.sidebar:
     st.subheader("Report an Issue")
     
     with st.form("feedback_form"):
-        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Feature Request"])
+        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
         feedback_msg = st.text_area("Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
         
         # Optional: Attach current roster state context
@@ -321,3 +321,4 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 else:
 
     st.info("Please select a Codex from the sidebar to begin.")
+

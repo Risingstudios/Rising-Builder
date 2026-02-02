@@ -98,6 +98,60 @@ with st.sidebar:
         )
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, file_name="roster.pdf", mime="application/pdf")
+    # --- Feedback / Bug Report ---
+    st.divider()
+    st.subheader("Report an Issue")
+    
+    with st.form("feedback_form"):
+        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Feature Request"])
+        feedback_msg = st.text_area("Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
+        
+        # Optional: Attach current roster state context
+        include_context = st.checkbox("Include current roster data (helps debugging)", value=True)
+        
+        submitted = st.form_submit_button("Submit Feedback")
+        
+        if submitted and feedback_msg:
+            # 1. Get Secrets
+            try:
+                token = st.secrets["github"]["token"]
+                owner = st.secrets["github"]["owner"]
+                repo = st.secrets["github"]["repo"]
+            except FileNotFoundError:
+                st.error("Secrets file not found. Feedback cannot be sent.")
+                st.stop()
+
+            # 2. Build the Issue Body
+            body_text = f"**Type:** {feedback_type}\n\n**User Report:**\n{feedback_msg}"
+            
+            if include_context:
+                # Add a summary of what they were building
+                context_str = "\n\n**Context:**\n"
+                if "codex_data" in st.session_state:
+                    context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
+                context_str += f"- Points: {curr_pts}/{points_limit}\n"
+                context_str += f"- Unit Count: {len(st.session_state.roster)}"
+                body_text += context_str
+
+            # 3. Send to GitHub API
+            api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+            headers = {
+                "Authorization": f"token {token}",
+                "Accept": "application/vnd.github.v3+json"
+            }
+            payload = {
+                "title": f"[{feedback_type}] Feedback from App",
+                "body": body_text
+            }
+            
+            import requests # Make sure this is imported at top of file
+            response = requests.post(api_url, json=payload, headers=headers)
+            
+            if response.status_code == 201:
+                st.success("Feedback sent! Check your GitHub Issues.")
+            else:
+                st.error(f"Failed to send. Error: {response.status_code}")
+                st.error(response.text)
 
 # --- Main Page ---
 if "codex_data" in st.session_state and st.session_state.codex_data:
@@ -265,4 +319,5 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                         st.rerun()
 
 else:
+
     st.info("Please select a Codex from the sidebar to begin.")

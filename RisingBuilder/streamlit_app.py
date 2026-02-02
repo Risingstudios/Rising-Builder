@@ -5,7 +5,8 @@ from pathlib import Path
 from reports import write_roster_pdf
 
 # --- Setup & Configuration ---
-st.set_page_config(page_title="OldHammer Builder", page_icon="⚔️", layout="wide")
+# UPDATED: Title and Icon
+st.set_page_config(page_title="Rising Builder", page_icon="🌙", layout="wide")
 
 BASE_DIR = Path(__file__).parent
 CODEX_DIR = BASE_DIR / "codexes"
@@ -46,6 +47,7 @@ def calculate_roster():
             if not opt_def: continue
             
             for choice in opt_def.get("choices", []):
+                # Count how many times this choice is in the picks list
                 c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
                 if c_qty > 0:
                     pts = choice.get("points", 0)
@@ -207,7 +209,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     
     st.divider()
 
-    # --- 1. CURRENT ROSTER DISPLAY (Moved to Top) ---
+    # --- 1. CURRENT ROSTER DISPLAY (Top) ---
     st.header(f"Current Roster ({len(st.session_state.roster)} Units)")
     
     parents = [e for e in st.session_state.roster if not e.get("parent_id")]
@@ -317,7 +319,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 with st.container():
                     st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
                     with st.expander(f"Edit {uc['name']}", expanded=False):
-                        # (We could add option editing here too if needed, simplified for cleaner UI)
                         if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
                             st.session_state.roster.remove(child)
                             st.rerun()
@@ -327,24 +328,20 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     # --- 2. ADD NEW UNIT SECTION (Tabs) ---
     st.subheader("Add New Unit")
     
-    # Define slots and tabs
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     tabs = st.tabs(slots_map)
 
     for i, slot_name in enumerate(slots_map):
         with tabs[i]:
-            # Filter units for this slot
             slot_units = [u for u in data.get("units", []) if u.get("slot") == slot_name]
             
             if not slot_units:
                 st.caption(f"No units found for {slot_name}")
             else:
-                # Create a selectbox + add button for each slot
                 unit_options = [u["name"] for u in slot_units]
                 selected_unit = st.selectbox(f"Select {slot_name}", unit_options, key=f"sel_{slot_name}")
                 
                 if st.button(f"Add {selected_unit}", key=f"btn_add_{slot_name}"):
-                    # Find unit ID
                     uid = next(u["id"] for u in slot_units if u["name"] == selected_unit)
                     unit_def = get_unit_by_id(uid)
                     new_entry = {

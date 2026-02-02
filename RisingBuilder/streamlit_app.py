@@ -46,23 +46,50 @@ def calculate_roster():
         u = get_unit_by_id(entry["unit_id"])
         if not u: continue
         
-        # Points
+        # 1. Base Points
         cost = u.get("base_points", 0) + u.get("points_per_model", 0) * entry.get("size", 1)
+        
+        # 2. Options Calculation
+        # We track selections to check for Twin-Linking later
+        # Structure: { "weapon_id": { "count": 0, "points": 12 } }
+        selection_tracker = {}
+        
         for gid, picks in entry.get("selected", {}).items():
-            # Find the option definition
             opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
             if not opt_def: continue
             
             for choice in opt_def.get("choices", []):
-                # Count how many times this choice is in the picks list
+                # Count how many of this specific item were picked
                 c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
+                
                 if c_qty > 0:
                     pts = choice.get("points", 0)
+                    
+                    # Per-model points (like Grenades) are simple multiplication
                     if choice.get("points_mode") == "per_model":
                         cost += pts * entry.get("size", 1)
                     else:
+                        # Flat points (like Weapons) might get discounted
                         cost += pts * c_qty
-        
+                        
+                        # Track for Twin-Link check
+                        cid = choice["id"]
+                        if cid not in selection_tracker:
+                            selection_tracker[cid] = {"count": 0, "points": pts}
+                        selection_tracker[cid]["count"] += c_qty
+
+        # 3. Apply Twin-Link Discount
+        # If the JSON says this unit can twin-link, we look for pairs.
+        if u.get("enable_twin_link_discount"):
+            for cid, data in selection_tracker.items():
+                # For every pair (2), we assume it's a Twin-Linked weapon.
+                # The cost of TL is usually 1.5x Base. We charged 2x Base.
+                # So we refund 0.5x Base for every pair.
+                pairs = data["count"] // 2
+                if pairs > 0:
+                    discount = pairs * (data["points"] * 0.5)
+                    cost -= discount
+
         entry["calculated_cost"] = cost
         total_pts += cost
         
@@ -345,3 +372,4 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")
+

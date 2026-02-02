@@ -2,15 +2,22 @@ import streamlit as st
 import json
 import uuid
 from pathlib import Path
+from PIL import Image  # <--- Added this import
 from reports import write_roster_pdf
 
 # --- Setup & Configuration ---
-# UPDATED: Title and Icon
-st.set_page_config(page_title="Rising Builder", page_icon="🌙", layout="wide")
-
 BASE_DIR = Path(__file__).parent
 CODEX_DIR = BASE_DIR / "codexes"
 CODEX_DIR.mkdir(exist_ok=True)
+
+# Try to load the custom icon, fallback to moon emoji if missing
+icon_path = BASE_DIR / "RisingBuilder.ico"
+if icon_path.exists():
+    app_icon = Image.open(icon_path)
+else:
+    app_icon = "🌙"
+
+st.set_page_config(page_title="Rising Builder", page_icon=app_icon, layout="wide")
 
 if "roster" not in st.session_state:
     st.session_state.roster = []
@@ -356,3 +363,4 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")
+

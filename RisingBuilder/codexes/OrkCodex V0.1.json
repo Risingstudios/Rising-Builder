@@ -1,0 +1,476 @@
+{
+  "codex_name": "Orks (My Data)",
+  "rules": {
+    "Mob Rule": { "summary": "Units can use the number of models in the squad as their Leadership value (Max 10). If >10 models, they are Fearless." },
+    "Furious Charge": { "summary": "+1 Strength and +1 Initiative on the turn they assault." },
+    "Waaagh!": { "summary": "Once per game, declare Waaagh! Infantry units gain Fleet. If they roll a 1 for Fleet, they take a wound. Affects Run moves." },
+    "Ramshackle": { "summary": "When vehicle is wrecked, roll on Ramshackle table. It might careen forward or explode harmlessly." },
+    "Power of the Waaagh!": { "summary": "Weirdboyz determine psychic power randomly at start of turn by rolling D6." },
+    "Eere We Go!": { "summary": "Deep Striking unit ignores dangerous terrain tests. If they scatter onto impassable/units, reduce scatter distance to avoid mishap." },
+    "Boarding Planks": { "summary": "Models can assault from this vehicle even if it moved (up to 12\"). Adds 2\" to disembark/assault range." }
+  },
+  "wargear": {
+    "Bosspole": { "summary": "Allows unit to re-roll failed Morale/Pinning tests. Usually requires taking a wound." },
+    "Cybork Body": { "summary": "5+ Invulnerable Save." },
+    "Attack Squig": { "summary": "Adds +1 Attack to profile." },
+    "Kustom Force Field": { "summary": "5+ Cover Save for all units within 6\"." },
+    "Grot Oiler": { "summary": "Re-roll a repair roll." },
+    "Ammo Runt": { "summary": "Re-roll one To Hit roll shooting." },
+    "Mega Armour": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
+    "Stikkbombs": { "summary": "Frag grenades (strike at initiative in cover)." },
+    "Tankbusta Bombs": { "summary": "S8 AP- melee attacks vs vehicles." },
+    "Deff Rolla": { "summary": "Tank Shock causes D6 S10 hits." },
+    "Grot Riggers": { "summary": "Vehicle has 'It Will Not Die' equivalent (Fix Immobilised on 6)." },
+    "Red Paint Job": { "summary": "+1\" movement." }
+  },
+  "weapons": {
+    "Slugga": { "range": "12\"", "S": "4", "AP": "6", "type": "Pistol", "notes": "" },
+    "Choppa": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "" },
+    "Shoota": { "range": "18\"", "S": "4", "AP": "6", "type": "Assault 2", "notes": "" },
+    "Big Shoota": { "range": "36\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "" },
+    "Rokkit Launcha": { "range": "24\"", "S": "8", "AP": "3", "type": "Assault 1", "notes": "" },
+    "Kustom Mega-blasta": { "range": "24\"", "S": "8", "AP": "2", "type": "Assault 1", "notes": "Gets Hot" },
+    "Burna": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "Power Weapon in assault" },
+    "Skorcha": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "" },
+    "Deffgun": { "range": "48\"", "S": "7", "AP": "4", "type": "Heavy D3", "notes": "" },
+    "Shokk Attack Gun": { "range": "60\"", "S": "2D6", "AP": "2", "type": "Ordnance 1", "notes": "Large Blast. Roll on table for doubles." },
+    "Zzap Gun": { "range": "36\"", "S": "2D6", "AP": "2", "type": "Heavy 1", "notes": "Roll for Strength each time." },
+    "Kannon (Frag)": { "range": "36\"", "S": "4", "AP": "5", "type": "Heavy 1", "notes": "Blast" },
+    "Kannon (Shell)": { "range": "36\"", "S": "8", "AP": "3", "type": "Heavy 1", "notes": "" },
+    "Lobba": { "range": "48\"", "S": "5", "AP": "5", "type": "Heavy 1", "notes": "Barrage, Blast" },
+    "Power Klaw": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy (I1)" },
+    "Big Choppa": { "range": "-", "S": "+2", "AP": "-", "type": "Melee", "notes": "Two-handed" },
+    "Snazzgun": { "range": "24\"", "S": "5", "AP": "D6", "type": "Assault 1", "notes": "" }
+  },
+  "units": [
+    {
+      "id": "hq_warboss",
+      "name": "Warboss",
+      "slot": "HQ",
+      "base_points": 60,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 5, "BS": 2, "S": 5, "T": 5, "W": 3, "I": 4, "A": 4, "Ld": 9, "Sv": "6+" },
+      "wargear": [ "Slugga", "Choppa", "Stikkbombs" ],
+      "special_rules": [ "Independent Character", "Mob Rule", "Waaagh!", "Furious Charge" ],
+      "dedicated_transports": ["dt_trukk", "hs_battlewagon"],
+      "options": [
+        {
+          "group_id": "weapon_melee", "group_name": "Melee Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "bigchoppa", "name": "Big Choppa", "points": 5 },
+            { "id": "pk", "name": "Power Klaw", "points": 25 }
+          ]
+        },
+        {
+          "group_id": "weapon_ranged", "group_name": "Ranged Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "shoota", "name": "Shoota", "points": 0 },
+            { "id": "kombi_scorcha", "name": "Kombi-skorcha", "points": 5 },
+            { "id": "kombi_rokkit", "name": "Kombi-rokkit", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "armour", "group_name": "Armour", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "eavy", "name": "'Eavy Armour (4+ Sv)", "points": 5 },
+            { "id": "mega", "name": "Mega Armour (2+ Sv, PK, TL-Shoota)", "points": 40 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "cybork", "name": "Cybork Body", "points": 10 },
+            { "id": "pole", "name": "Bosspole", "points": 5 },
+            { "id": "squig", "name": "Attack Squig", "points": 15 },
+            { "id": "bike", "name": "Warbike (+1T, 4+ Cover)", "points": 40 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_bigmek",
+      "name": "Big Mek",
+      "slot": "HQ",
+      "base_points": 35,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 8, "Sv": "6+" },
+      "wargear": [ "Slugga", "Choppa", "Stikkbombs", "Mek's Tools" ],
+      "special_rules": [ "Independent Character", "Mob Rule" ],
+      "dedicated_transports": ["dt_trukk", "hs_battlewagon"],
+      "options": [
+        {
+          "group_id": "tech", "group_name": "Big Mek Toys (Max 1)", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "kff", "name": "Kustom Force Field", "points": 50 },
+            { "id": "sag", "name": "Shokk Attack Gun", "points": 60 }
+          ]
+        },
+        {
+          "group_id": "weapon_melee", "group_name": "Weapons", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "pk", "name": "Power Klaw", "points": 25 },
+            { "id": "burna", "name": "Burna", "points": 20 },
+            { "id": "kustom", "name": "Kustom Mega-blasta", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "cybork", "name": "Cybork Body", "points": 10 },
+            { "id": "pole", "name": "Bosspole", "points": 5 },
+            { "id": "eavy", "name": "'Eavy Armour", "points": 5 },
+            { "id": "oiler", "name": "Grot Oiler (Max 3)", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_nobz",
+      "name": "Nobz Mob",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 20,
+      "min_size": 3, "max_size": 10, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 7, "Sv": "6+" },
+      "wargear": [ "Slugga", "Choppa", "Stikkbombs" ],
+      "special_rules": [ "Mob Rule", "Furious Charge" ],
+      "dedicated_transports": ["dt_trukk", "hs_battlewagon"],
+      "sub_profiles": {
+        "painboy": { "name": "Painboy", "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 7, "Sv": "6+" }
+      },
+      "options": [
+        {
+          "group_id": "painboy", "group_name": "Painboy Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "doc", "name": "Upgrade one Nob to Painboy", "points": 30 }
+          ]
+        },
+        {
+          "group_id": "weapons_pk", "group_name": "Power Klaws", "min_select": 0, "max_select": 10,
+          "choices": [
+            { "id": "pk", "name": "Power Klaw", "points": 25, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "weapons_bc", "group_name": "Big Choppas", "min_select": 0, "max_select": 10,
+          "choices": [
+            { "id": "bc", "name": "Big Choppa", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "weapons_kombi", "group_name": "Kombi-Weapons", "min_select": 0, "max_select": 10,
+          "choices": [
+            { "id": "ks", "name": "Kombi-skorcha", "points": 5, "points_mode": "flat" },
+            { "id": "kr", "name": "Kombi-rokkit", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Unit Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "bike", "name": "Warbikes (Entire Squad)", "points": 25, "points_mode": "per_model" },
+            { "id": "eavy", "name": "'Eavy Armour (4+ Sv)", "points": 5, "points_mode": "per_model" },
+            { "id": "cybork", "name": "Cybork Bodies (5+ Inv)", "points": 5, "points_mode": "per_model" },
+            { "id": "waaagh", "name": "Waaagh! Banner", "points": 15, "points_mode": "flat" },
+            { "id": "pole", "name": "Bosspole", "points": 5, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_meganobz",
+      "name": "Meganobz",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 40,
+      "min_size": 3, "max_size": 10, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 7, "Sv": "2+" },
+      "wargear": [ "Mega Armour", "Power Klaw", "Twin-linked Shoota", "Stikkbombs" ],
+      "special_rules": [ "Mob Rule", "Furious Charge" ],
+      "dedicated_transports": ["dt_trukk", "hs_battlewagon"],
+      "options": [
+        {
+          "group_id": "weap", "group_name": "Weapon Upgrades", "min_select": 0, "max_select": 10,
+          "choices": [
+            { "id": "kombi", "name": "Replace TL Shoota with Kombi-skorcha/rokkit", "points": 5, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_lootas",
+      "name": "Lootas",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 15,
+      "min_size": 5, "max_size": 15, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 2, "S": 3, "T": 4, "W": 1, "I": 2, "A": 2, "Ld": 7, "Sv": "6+" },
+      "wargear": [ "Deffgun" ],
+      "special_rules": [ "Mob Rule", "Furious Charge" ],
+      "options": [
+        {
+          "group_id": "mek", "group_name": "Mekboy Upgrade", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "mek", "name": "Upgrade to Mek (Kustom Mega-blasta)", "points": 0, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_boyz",
+      "name": "Ork Boyz Mob",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 6,
+      "min_size": 10, "max_size": 30, "default_size": 10,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 2, "S": 3, "T": 4, "W": 1, "I": 2, "A": 2, "Ld": 7, "Sv": "6+" },
+      "wargear": [ "Slugga", "Choppa", "Stikkbombs" ],
+      "special_rules": [ "Mob Rule", "Furious Charge", "Waaagh!" ],
+      "dedicated_transports": ["dt_trukk"],
+      "sub_profiles": {
+        "nob": { "name": "Nob", "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 7, "Sv": "6+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "nob", "name": "Upgrade to Nob", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "nob_weps", "group_name": "Nob Wargear", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "pk", "name": "Nob: Power Klaw", "points": 25 },
+            { "id": "bc", "name": "Nob: Big Choppa", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "nob_gear", "group_name": "Nob Equipment", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "pole", "name": "Nob: Bosspole", "points": 5 },
+            { "id": "eavy", "name": "Nob: 'Eavy Armour", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "main_wep", "group_name": "Weapon Swap (Entire Squad)", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "shootas", "name": "Swap Slugga/Choppa for Shootas", "points": 0, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "heavy", "group_name": "Heavy Weapons (1 per 10 models)", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "bs", "name": "Big Shoota", "points": 5, "points_mode": "flat" },
+            { "id": "rokkit", "name": "Rokkit Launcha", "points": 10, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_gretchin",
+      "name": "Gretchin",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 3,
+      "min_size": 10, "max_size": 30, "default_size": 10,
+      "unit_type": "Infantry",
+      "profile": { "WS": 2, "BS": 3, "S": 2, "T": 2, "W": 1, "I": 2, "A": 1, "Ld": 5, "Sv": "-" },
+      "wargear": [ "Grot Blasta" ],
+      "special_rules": [ "It's a Grot!" ],
+      "sub_profiles": {
+        "herd": { "name": "Runtherd", "WS": 4, "BS": 2, "S": 3, "T": 3, "W": 1, "I": 2, "A": 2, "Ld": 7, "Sv": "6+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Runtherd (1 per 10 Grot)", "min_select": 1, "max_select": 3,
+          "choices": [
+            { "id": "herd", "name": "Runtherd", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "herd_gear", "group_name": "Runtherd Gear", "min_select": 0, "max_select": 3,
+          "choices": [
+             { "id": "squig", "name": "Squig Hound", "points": 5, "points_mode": "flat" },
+             { "id": "prod", "name": "Grot Prod", "points": 5, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_stormboyz",
+      "name": "Stormboyz",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 12,
+      "min_size": 5, "max_size": 20, "default_size": 5,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 4, "BS": 2, "S": 3, "T": 4, "W": 1, "I": 2, "A": 2, "Ld": 7, "Sv": "6+" },
+      "wargear": [ "Slugga", "Choppa", "Stikkbombs", "Jump Pack" ],
+      "special_rules": [ "Mob Rule", "Furious Charge", "Waaagh!" ],
+      "sub_profiles": {
+        "nob": { "name": "Nob", "WS": 4, "BS": 2, "S": 4, "T": 4, "W": 2, "I": 3, "A": 3, "Ld": 7, "Sv": "6+" }
+      },
+      "options": [
+        {
+          "group_id": "leader", "group_name": "Leader", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "nob", "name": "Upgrade to Nob", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "nob_gear", "group_name": "Nob Wargear", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "pk", "name": "Nob: Power Klaw", "points": 25 },
+            { "id": "bc", "name": "Nob: Big Choppa", "points": 5 },
+            { "id": "pole", "name": "Nob: Bosspole", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_deffkoptas",
+      "name": "Deffkoptas",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 1, "max_size": 5, "default_size": 1,
+      "unit_type": "Jetbike",
+      "profile": { "WS": 4, "BS": 2, "S": 3, "T": 4, "W": 2, "I": 2, "A": 2, "Ld": 7, "Sv": "4+" },
+      "wargear": [ "Twin-linked Big Shoota", "Choppa" ],
+      "special_rules": [ "Mob Rule", "Furious Charge", "Scouts", "Hit and Run" ],
+      "options": [
+        {
+          "group_id": "wep", "group_name": "Weapon Swap", "min_select": 0, "max_select": 5, "linked_to_size": true,
+          "choices": [
+            { "id": "rokkit", "name": "TL Rokkit Launcha", "points": 10, "points_mode": "flat" },
+            { "id": "kmb", "name": "TL Kustom Mega-blasta", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "bomb", "group_name": "Bombs", "min_select": 0, "max_select": 5, "linked_to_size": true,
+          "choices": [
+            { "id": "bomb", "name": "Bigbomm", "points": 15, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_battlewagon",
+      "name": "Battlewagon",
+      "slot": "Heavy Support",
+      "base_points": 90,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank, Open-topped)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 14, "Side": 12, "Rear": 10, "BS": 2 },
+      "wargear": [],
+      "is_transport": true,
+      "options": [
+        {
+          "group_id": "main", "group_name": "Main Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "kill", "name": "Killkannon (Reduces Capacity to 12)", "points": 60 },
+            { "id": "zzap", "name": "Zzap Gun", "points": 15 },
+            { "id": "kannon", "name": "Kannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "bigshootas", "group_name": "Big Shootas (Max 4)", "min_select": 0, "max_select": 4,
+          "choices": [
+             { "id": "bs", "name": "Big Shoota", "points": 5, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Vehicle Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "red", "name": "Red Paint Job", "points": 5 },
+            { "id": "rolla", "name": "Deff Rolla", "points": 20 },
+            { "id": "riggers", "name": "Grot Riggers", "points": 5 },
+            { "id": "plates", "name": "Armour Plates", "points": 10 },
+            { "id": "ram", "name": "Reinforced Ram", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_dread",
+      "name": "Deff Dread",
+      "slot": "Heavy Support",
+      "base_points": 75,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Walker)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 12, "Side": 12, "Rear": 10, "WS": 4, "BS": 2, "S": 5, "I": 2, "A": 3 },
+      "wargear": [ "Two Big Shootas", "Two Dreadnought Close Combat Weapons" ],
+      "options": [
+        {
+          "group_id": "arm1", "group_name": "Replace Big Shoota 1", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "rokkit", "name": "Rokkit Launcha", "points": 5 },
+            { "id": "skorcha", "name": "Skorcha", "points": 5 },
+            { "id": "ccw", "name": "Dreadnought CCW (+1 A)", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "arm2", "group_name": "Replace Big Shoota 2", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "rokkit", "name": "Rokkit Launcha", "points": 5 },
+            { "id": "skorcha", "name": "Skorcha", "points": 5 },
+            { "id": "ccw", "name": "Dreadnought CCW (+1 A)", "points": 15 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "riggers", "name": "Grot Riggers", "points": 5 },
+            { "id": "plates", "name": "Armour Plates", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_kans",
+      "name": "Killa Kans",
+      "slot": "Heavy Support",
+      "base_points": 0, "points_per_model": 35,
+      "min_size": 1, "max_size": 3, "default_size": 1,
+      "unit_type": "Vehicle (Walker)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 11, "Side": 11, "Rear": 10, "WS": 2, "BS": 3, "S": 5, "I": 2, "A": 2 },
+      "wargear": [ "Dreadnought Close Combat Weapon" ],
+      "options": [
+        {
+          "group_id": "arm", "group_name": "Weapon Arm (Must Choose 1)", "min_select": 1, "max_select": 1, "linked_to_size": true,
+          "choices": [
+            { "id": "bs", "name": "Big Shoota", "points": 0, "points_mode": "flat" },
+            { "id": "rokkit", "name": "Rokkit Launcha", "points": 15, "points_mode": "flat" },
+            { "id": "grotzooka", "name": "Grotzooka", "points": 10, "points_mode": "flat" },
+            { "id": "skorcha", "name": "Skorcha", "points": 5, "points_mode": "flat" },
+            { "id": "kmb", "name": "Kustom Mega-blasta", "points": 20, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dt_trukk",
+      "name": "Trukk",
+      "slot": "Dedicated Transport",
+      "base_points": 35,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Fast, Open-topped)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 10, "Side": 10, "Rear": 10, "BS": 2 },
+      "wargear": [ "Big Shoota", "Ramshackle" ],
+      "options": [
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "red", "name": "Red Paint Job", "points": 5 },
+            { "id": "ram", "name": "Reinforced Ram", "points": 5 },
+            { "id": "planks", "name": "Boarding Planks", "points": 5 },
+            { "id": "rokkit", "name": "Upgrade Big Shoota to Rokkit Launcha", "points": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

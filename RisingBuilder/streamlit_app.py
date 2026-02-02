@@ -46,7 +46,6 @@ def calculate_roster():
             if not opt_def: continue
             
             for choice in opt_def.get("choices", []):
-                # Count how many times this choice is in the picks list
                 c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
                 if c_qty > 0:
                     pts = choice.get("points", 0)
@@ -72,7 +71,6 @@ with st.sidebar:
     available_codexes = list(CODEX_DIR.glob("*.json"))
     codex_names = [p.name for p in available_codexes]
     
-    # Determine index for selectbox (to keep state if page refreshes)
     index = 0
     if "current_codex_name" in st.session_state:
         if st.session_state.current_codex_name in codex_names:
@@ -97,8 +95,7 @@ with st.sidebar:
     # 2. Save / Load System
     st.subheader("Save / Load List")
     
-    # SAVE BUTTON
-    # We package the roster AND the codex name so we can check compatibility later
+    # SAVE
     save_data = {
         "roster": st.session_state.roster,
         "codex_file": selected_codex_name,
@@ -114,20 +111,16 @@ with st.sidebar:
         help="Save your current list to your device."
     )
 
-    # LOAD BUTTON
+    # LOAD
     uploaded_file = st.file_uploader("📂 Load Roster File", type=["json"])
     if uploaded_file is not None:
         try:
             data = json.load(uploaded_file)
-            # Validation: Check if the loaded file matches the current Codex
             saved_codex = data.get("codex_file")
             if saved_codex and saved_codex != selected_codex_name:
-                st.error(f"⚠️ Codex Mismatch! This file is for '{saved_codex}', but you have '{selected_codex_name}' loaded. Please switch Codex first.")
+                st.error(f"⚠️ Codex Mismatch! This file is for '{saved_codex}', but you have '{selected_codex_name}' loaded.")
             else:
                 st.session_state.roster = data.get("roster", [])
-                # Optional: Update points limit if present
-                # (Note: Updating widgets programmatically in Streamlit requires session state tricks, 
-                # effectively we rely on the user to adjust points if needed, or we just load the roster data)
                 st.success("List loaded successfully!")
                 st.rerun()
         except Exception as e:
@@ -160,10 +153,7 @@ with st.sidebar:
         submitted = st.form_submit_button("Submit Feedback")
         
         if submitted and feedback_msg:
-            # Calculate points NOW for the report context
             report_pts, _ = calculate_roster()
-
-            # 1. Get Secrets
             try:
                 token = st.secrets["github"]["token"]
                 owner = st.secrets["github"]["owner"]
@@ -175,7 +165,6 @@ with st.sidebar:
                 st.error("Secrets configuration error. Check your .streamlit/secrets.toml.")
                 st.stop()
 
-            # 2. Build the Issue Body
             body_text = f"**Type:** {feedback_type}\n\n**User Report:**\n{feedback_msg}"
             
             if include_context:
@@ -186,16 +175,9 @@ with st.sidebar:
                 context_str += f"- Unit Count: {len(st.session_state.roster)}"
                 body_text += context_str
 
-            # 3. Send to GitHub API
             api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
-            headers = {
-                "Authorization": f"token {token}",
-                "Accept": "application/vnd.github.v3+json"
-            }
-            payload = {
-                "title": f"[{feedback_type}] Feedback from App",
-                "body": body_text
-            }
+            headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+            payload = {"title": f"[{feedback_type}] Feedback from App", "body": body_text}
             
             import requests 
             response = requests.post(api_url, json=payload, headers=headers)
@@ -205,6 +187,7 @@ with st.sidebar:
             else:
                 st.error(f"Failed to send. Error: {response.status_code}")
                 st.error(response.text)
+
 
 # --- Main Page ---
 if "codex_data" in st.session_state and st.session_state.codex_data:
@@ -224,142 +207,155 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     
     st.divider()
 
-    # --- Add Unit Section ---
-    st.subheader("Add Unit")
-    add_cols = st.columns([3, 1])
-    
-    unit_opts = [(u["name"], u["id"]) for u in data.get("units", []) 
-                 if u.get("slot") != "Dedicated Transport"] 
-    
-    # Safe lookup for selectbox
-    selected_unit_name = add_cols[0].selectbox("Choose Unit", [u[0] for u in unit_opts], label_visibility="collapsed")
-    
-    if add_cols[1].button("Add to Roster", use_container_width=True):
-        uid = next(u[1] for u in unit_opts if u[0] == selected_unit_name)
-        unit_def = get_unit_by_id(uid)
-        new_entry = {
-            "id": str(uuid.uuid4()),
-            "unit_id": uid,
-            "size": int(unit_def.get("default_size", 1)),
-            "selected": {},
-            "parent_id": None
-        }
-        st.session_state.roster.append(new_entry)
-        st.rerun()
-
-    # --- Roster Display ---
-    st.header("Current Roster")
+    # --- 1. CURRENT ROSTER DISPLAY (Moved to Top) ---
+    st.header(f"Current Roster ({len(st.session_state.roster)} Units)")
     
     parents = [e for e in st.session_state.roster if not e.get("parent_id")]
     
     if not parents:
-        st.info("Your roster is empty. Add a unit above!")
+        st.info("Your roster is empty. Add a unit below!")
+    else:
+        for entry in parents:
+            u = get_unit_by_id(entry["unit_id"])
+            if not u: continue
 
-    for entry in parents:
-        u = get_unit_by_id(entry["unit_id"])
-        if not u: continue
-
-        with st.expander(f"[{u['slot']}] {u['name']} ({entry.get('calculated_cost', 0)} pts)", expanded=True):
-            
-            # --- Squad Size ---
-            min_s = int(u.get("min_size", 1))
-            max_s = int(u.get("max_size", 1))
-            if min_s != max_s:
-                entry["size"] = st.number_input(f"Squad Size ({min_s}-{max_s})", 
-                                                min_value=min_s, max_value=max_s, 
-                                                value=int(entry.get("size", min_s)), 
-                                                key=f"size_{entry['id']}")
-
-            # --- Options Logic ---
-            for opt in u.get("options", []):
-                gid = opt["group_id"]
-                st.caption(f"**{opt.get('group_name', 'Options')}**")
+            with st.expander(f"[{u['slot']}] {u['name']} ({entry.get('calculated_cost', 0)} pts)", expanded=False):
                 
-                current_picks = entry["selected"].get(gid, [])
-                choices = opt.get("choices", [])
-                max_sel = opt.get("max_select", 1)
-                if opt.get("linked_to_size"): max_sel = entry["size"]
-                
-                # Counter Logic
-                if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
-                    for c in choices:
-                        cid = c["id"]
-                        qty = current_picks.count(cid)
-                        new_qty = st.number_input(f"{c['name']} (+{c['points']} pts)", 
-                                                  min_value=0, max_value=max_sel, value=qty, 
-                                                  key=f"opt_{entry['id']}_{gid}_{cid}")
-                        
-                        current_picks = [x for x in current_picks if x != cid]
-                        current_picks.extend([cid] * new_qty)
-                        entry["selected"][gid] = current_picks
+                # --- Squad Size ---
+                min_s = int(u.get("min_size", 1))
+                max_s = int(u.get("max_size", 1))
+                if min_s != max_s:
+                    entry["size"] = st.number_input(f"Squad Size ({min_s}-{max_s})", 
+                                                    min_value=min_s, max_value=max_s, 
+                                                    value=int(entry.get("size", min_s)), 
+                                                    key=f"size_{entry['id']}")
 
-                # Radio Logic
-                elif max_sel == 1:
-                    opts = ["(None)"] + [f"{c['name']} (+{c['points']})" for c in choices]
-                    current_idx = 0
-                    if current_picks:
-                        curr_id = current_picks[0]
-                        for i, c in enumerate(choices):
-                            if c["id"] == curr_id: current_idx = i + 1; break
-                            
-                    sel = st.selectbox("", opts, index=current_idx, key=f"opt_{entry['id']}_{gid}", label_visibility="collapsed")
+                # --- Options Logic ---
+                for opt in u.get("options", []):
+                    gid = opt["group_id"]
+                    st.caption(f"**{opt.get('group_name', 'Options')}**")
                     
-                    if sel == "(None)": entry["selected"][gid] = []
-                    else:
-                        idx = opts.index(sel) - 1
-                        entry["selected"][gid] = [choices[idx]["id"]]
+                    current_picks = entry["selected"].get(gid, [])
+                    choices = opt.get("choices", [])
+                    max_sel = opt.get("max_select", 1)
+                    if opt.get("linked_to_size"): max_sel = entry["size"]
+                    
+                    # Counter Logic
+                    if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
+                        for c in choices:
+                            cid = c["id"]
+                            qty = current_picks.count(cid)
+                            new_qty = st.number_input(f"{c['name']} (+{c['points']} pts)", 
+                                                      min_value=0, max_value=max_sel, value=qty, 
+                                                      key=f"opt_{entry['id']}_{gid}_{cid}")
+                            
+                            current_picks = [x for x in current_picks if x != cid]
+                            current_picks.extend([cid] * new_qty)
+                            entry["selected"][gid] = current_picks
 
-                # Checkbox Logic
-                else:
-                    for c in choices:
-                        cid = c["id"]
-                        is_checked = cid in current_picks
-                        if st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=f"opt_{entry['id']}_{gid}_{cid}"):
-                            if cid not in current_picks: 
-                                if len(current_picks) < max_sel: entry["selected"].setdefault(gid, []).append(cid)
+                    # Radio Logic
+                    elif max_sel == 1:
+                        opts = ["(None)"] + [f"{c['name']} (+{c['points']})" for c in choices]
+                        current_idx = 0
+                        if current_picks:
+                            curr_id = current_picks[0]
+                            for i, c in enumerate(choices):
+                                if c["id"] == curr_id: current_idx = i + 1; break
+                                
+                        sel = st.selectbox("", opts, index=current_idx, key=f"opt_{entry['id']}_{gid}", label_visibility="collapsed")
+                        
+                        if sel == "(None)": entry["selected"][gid] = []
                         else:
-                            if cid in current_picks: entry["selected"][gid].remove(cid)
+                            idx = opts.index(sel) - 1
+                            entry["selected"][gid] = [choices[idx]["id"]]
 
-            # --- Add Attachment Button ---
-            valid_transports = u.get("dedicated_transports", [])
-            if valid_transports:
+                    # Checkbox Logic
+                    else:
+                        for c in choices:
+                            cid = c["id"]
+                            is_checked = cid in current_picks
+                            if st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=f"opt_{entry['id']}_{gid}_{cid}"):
+                                if cid not in current_picks: 
+                                    if len(current_picks) < max_sel: entry["selected"].setdefault(gid, []).append(cid)
+                            else:
+                                if cid in current_picks: entry["selected"][gid].remove(cid)
+
+                # --- Add Attachment Button ---
+                valid_transports = u.get("dedicated_transports", [])
+                if valid_transports:
+                    st.divider()
+                    cols = st.columns([3, 1])
+                    t_opts = [get_unit_by_id(tid) for tid in valid_transports]
+                    t_opts = [t for t in t_opts if t] 
+                    
+                    t_names = [t["name"] for t in t_opts]
+                    sel_t = cols[0].selectbox("Add Attachment", t_names, key=f"trans_sel_{entry['id']}")
+                    
+                    if cols[1].button("Add", key=f"add_trans_{entry['id']}"):
+                        tid = next(t["id"] for t in t_opts if t["name"] == sel_t)
+                        child_entry = {
+                            "id": str(uuid.uuid4()),
+                            "unit_id": tid,
+                            "size": 1,
+                            "selected": {},
+                            "parent_id": entry["id"]
+                        }
+                        st.session_state.roster.append(child_entry)
+                        st.rerun()
+
                 st.divider()
-                cols = st.columns([3, 1])
-                t_opts = [get_unit_by_id(tid) for tid in valid_transports]
-                t_opts = [t for t in t_opts if t] 
-                
-                t_names = [t["name"] for t in t_opts]
-                sel_t = cols[0].selectbox("Add Attachment", t_names, key=f"trans_sel_{entry['id']}")
-                
-                if cols[1].button("Add", key=f"add_trans_{entry['id']}"):
-                    tid = next(t["id"] for t in t_opts if t["name"] == sel_t)
-                    child_entry = {
-                        "id": str(uuid.uuid4()),
-                        "unit_id": tid,
-                        "size": 1,
-                        "selected": {},
-                        "parent_id": entry["id"]
-                    }
-                    st.session_state.roster.append(child_entry)
+                if st.button("Remove Unit", key=f"del_{entry['id']}", type="primary"):
+                    ids_to_remove = [entry["id"]] + [c["id"] for c in st.session_state.roster if c.get("parent_id") == entry["id"]]
+                    st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
                     st.rerun()
 
-            st.divider()
-            if st.button("Remove Unit", key=f"del_{entry['id']}", type="primary"):
-                ids_to_remove = [entry["id"]] + [c["id"] for c in st.session_state.roster if c.get("parent_id") == entry["id"]]
-                st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
-                st.rerun()
+            # --- Display Children ---
+            children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
+            for child in children:
+                uc = get_unit_by_id(child["unit_id"])
+                if not uc: continue
+                with st.container():
+                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
+                    with st.expander(f"Edit {uc['name']}", expanded=False):
+                        # (We could add option editing here too if needed, simplified for cleaner UI)
+                        if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
+                            st.session_state.roster.remove(child)
+                            st.rerun()
 
-        # --- Display Children ---
-        children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
-        for child in children:
-            uc = get_unit_by_id(child["unit_id"])
-            if not uc: continue
-            with st.container():
-                st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
-                with st.expander(f"Edit {uc['name']}", expanded=False):
-                    if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
-                        st.session_state.roster.remove(child)
-                        st.rerun()
+    st.divider()
+
+    # --- 2. ADD NEW UNIT SECTION (Tabs) ---
+    st.subheader("Add New Unit")
+    
+    # Define slots and tabs
+    slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
+    tabs = st.tabs(slots_map)
+
+    for i, slot_name in enumerate(slots_map):
+        with tabs[i]:
+            # Filter units for this slot
+            slot_units = [u for u in data.get("units", []) if u.get("slot") == slot_name]
+            
+            if not slot_units:
+                st.caption(f"No units found for {slot_name}")
+            else:
+                # Create a selectbox + add button for each slot
+                unit_options = [u["name"] for u in slot_units]
+                selected_unit = st.selectbox(f"Select {slot_name}", unit_options, key=f"sel_{slot_name}")
+                
+                if st.button(f"Add {selected_unit}", key=f"btn_add_{slot_name}"):
+                    # Find unit ID
+                    uid = next(u["id"] for u in slot_units if u["name"] == selected_unit)
+                    unit_def = get_unit_by_id(uid)
+                    new_entry = {
+                        "id": str(uuid.uuid4()),
+                        "unit_id": uid,
+                        "size": int(unit_def.get("default_size", 1)),
+                        "selected": {},
+                        "parent_id": None
+                    }
+                    st.session_state.roster.append(new_entry)
+                    st.rerun()
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")

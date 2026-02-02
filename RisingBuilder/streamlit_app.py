@@ -2,10 +2,10 @@ import streamlit as st
 import json
 import uuid
 from pathlib import Path
-from reports import write_roster_pdf  # We reuse your existing PDF engine!
+from reports import write_roster_pdf
 
 # --- Setup & Configuration ---
-st.set_page_config(page_title="Rising Builder", page_icon="⚔️", layout="wide")
+st.set_page_config(page_title="OldHammer Builder", page_icon="⚔️", layout="wide")
 
 BASE_DIR = Path(__file__).parent
 CODEX_DIR = BASE_DIR / "codexes"
@@ -64,14 +64,21 @@ def calculate_roster():
             
     return total_pts, counts
 
-# --- Sidebar: Codex Selection & PDF Export ---
+# --- Sidebar: Codex, Save/Load, PDF, Feedback ---
 with st.sidebar:
     st.header("Settings")
     
-    # Codex Loader
+    # 1. Codex Loader
     available_codexes = list(CODEX_DIR.glob("*.json"))
     codex_names = [p.name for p in available_codexes]
-    selected_codex_name = st.selectbox("Select Codex", codex_names)
+    
+    # Determine index for selectbox (to keep state if page refreshes)
+    index = 0
+    if "current_codex_name" in st.session_state:
+        if st.session_state.current_codex_name in codex_names:
+            index = codex_names.index(st.session_state.current_codex_name)
+
+    selected_codex_name = st.selectbox("Select Codex", codex_names, index=index)
     
     if selected_codex_name:
         path = CODEX_DIR / selected_codex_name
@@ -79,15 +86,57 @@ with st.sidebar:
         if st.session_state.get("current_codex_path") != str(path):
             st.session_state.codex_data = load_codex(path)
             st.session_state.current_codex_path = str(path)
+            st.session_state.current_codex_name = selected_codex_name
             st.session_state.roster = [] # Reset roster on change
             st.rerun()
 
-    points_limit = st.number_input("Points Limit", value=1500, step=250)
+    points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
     st.divider()
+
+    # 2. Save / Load System
+    st.subheader("Save / Load List")
     
-    # PDF Export
-    if st.button("Generate PDF Roster"):
+    # SAVE BUTTON
+    # We package the roster AND the codex name so we can check compatibility later
+    save_data = {
+        "roster": st.session_state.roster,
+        "codex_file": selected_codex_name,
+        "points_limit": points_limit
+    }
+    roster_json = json.dumps(save_data, indent=2)
+    
+    st.download_button(
+        label="💾 Download Roster File",
+        data=roster_json,
+        file_name="my_army_list.json",
+        mime="application/json",
+        help="Save your current list to your device."
+    )
+
+    # LOAD BUTTON
+    uploaded_file = st.file_uploader("📂 Load Roster File", type=["json"])
+    if uploaded_file is not None:
+        try:
+            data = json.load(uploaded_file)
+            # Validation: Check if the loaded file matches the current Codex
+            saved_codex = data.get("codex_file")
+            if saved_codex and saved_codex != selected_codex_name:
+                st.error(f"⚠️ Codex Mismatch! This file is for '{saved_codex}', but you have '{selected_codex_name}' loaded. Please switch Codex first.")
+            else:
+                st.session_state.roster = data.get("roster", [])
+                # Optional: Update points limit if present
+                # (Note: Updating widgets programmatically in Streamlit requires session state tricks, 
+                # effectively we rely on the user to adjust points if needed, or we just load the roster data)
+                st.success("List loaded successfully!")
+                st.rerun()
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
+
+    st.divider()
+    
+    # 3. PDF Export
+    if st.button("📄 Generate PDF Roster"):
         pdf_path = BASE_DIR / "temp_roster.pdf"
         write_roster_pdf(
             st.session_state.roster, 
@@ -98,7 +147,8 @@ with st.sidebar:
         )
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, file_name="roster.pdf", mime="application/pdf")
-    # --- Feedback / Bug Report ---
+
+    # 4. Feedback / Bug Report
     st.divider()
     st.subheader("Report an Issue")
     
@@ -106,15 +156,12 @@ with st.sidebar:
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
         feedback_msg = st.text_area("Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
         
-        # Optional: Attach current roster state context
-        include_context = st.checkbox("Include current roster data (helps debugging)", value=True)
-        
+        include_context = st.checkbox("Include roster data", value=True)
         submitted = st.form_submit_button("Submit Feedback")
         
         if submitted and feedback_msg:
-            # --- FIX: Calculate points right now for the report ---
+            # Calculate points NOW for the report context
             report_pts, _ = calculate_roster()
-            # ------------------------------------------------------
 
             # 1. Get Secrets
             try:
@@ -124,17 +171,17 @@ with st.sidebar:
             except FileNotFoundError:
                 st.error("Secrets file not found. Feedback cannot be sent.")
                 st.stop()
+            except KeyError:
+                st.error("Secrets configuration error. Check your .streamlit/secrets.toml.")
+                st.stop()
 
             # 2. Build the Issue Body
             body_text = f"**Type:** {feedback_type}\n\n**User Report:**\n{feedback_msg}"
             
             if include_context:
-                # Add a summary of what they were building
                 context_str = "\n\n**Context:**\n"
                 if "codex_data" in st.session_state:
                     context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
-                
-                # Use the locally calculated 'report_pts' variable here
                 context_str += f"- Points: {report_pts}/{points_limit}\n"
                 context_str += f"- Unit Count: {len(st.session_state.roster)}"
                 body_text += context_str
@@ -181,10 +228,10 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     st.subheader("Add Unit")
     add_cols = st.columns([3, 1])
     
-    # Filter units for dropdown
     unit_opts = [(u["name"], u["id"]) for u in data.get("units", []) 
-                 if u.get("slot") != "Dedicated Transport"] # Don't show DTs in main list
+                 if u.get("slot") != "Dedicated Transport"] 
     
+    # Safe lookup for selectbox
     selected_unit_name = add_cols[0].selectbox("Choose Unit", [u[0] for u in unit_opts], label_visibility="collapsed")
     
     if add_cols[1].button("Add to Roster", use_container_width=True):
@@ -203,13 +250,15 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     # --- Roster Display ---
     st.header("Current Roster")
     
-    # Sort and Group logic for display (Parent -> Child)
     parents = [e for e in st.session_state.roster if not e.get("parent_id")]
     
+    if not parents:
+        st.info("Your roster is empty. Add a unit above!")
+
     for entry in parents:
         u = get_unit_by_id(entry["unit_id"])
-        
-        # Card Container
+        if not u: continue
+
         with st.expander(f"[{u['slot']}] {u['name']} ({entry.get('calculated_cost', 0)} pts)", expanded=True):
             
             # --- Squad Size ---
@@ -226,49 +275,41 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 gid = opt["group_id"]
                 st.caption(f"**{opt.get('group_name', 'Options')}**")
                 
-                # Get current picks for this group
                 current_picks = entry["selected"].get(gid, [])
-                
-                # Logic: Checkboxes, Radios, or Counters?
                 choices = opt.get("choices", [])
                 max_sel = opt.get("max_select", 1)
                 if opt.get("linked_to_size"): max_sel = entry["size"]
                 
-                # CASE A: Counters (Mix & Match)
-                # If linked to size AND multiple choices (e.g. Crisis Weapons) OR single choice with high max (e.g. Grenades)
+                # Counter Logic
                 if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
                     for c in choices:
                         cid = c["id"]
-                        # Count existing
                         qty = current_picks.count(cid)
                         new_qty = st.number_input(f"{c['name']} (+{c['points']} pts)", 
                                                   min_value=0, max_value=max_sel, value=qty, 
                                                   key=f"opt_{entry['id']}_{gid}_{cid}")
                         
-                        # Update logic: Remove all old instances of this ID, add new count
                         current_picks = [x for x in current_picks if x != cid]
                         current_picks.extend([cid] * new_qty)
                         entry["selected"][gid] = current_picks
 
-                # CASE B: Radio (Pick 1)
+                # Radio Logic
                 elif max_sel == 1:
                     opts = ["(None)"] + [f"{c['name']} (+{c['points']})" for c in choices]
                     current_idx = 0
                     if current_picks:
-                        # Find index of currently selected ID
                         curr_id = current_picks[0]
                         for i, c in enumerate(choices):
                             if c["id"] == curr_id: current_idx = i + 1; break
                             
-                    sel = st.selectbox("", opts, index=current_idx, key=f"opt_{entry['id']}_{gid}")
+                    sel = st.selectbox("", opts, index=current_idx, key=f"opt_{entry['id']}_{gid}", label_visibility="collapsed")
                     
                     if sel == "(None)": entry["selected"][gid] = []
                     else:
-                        # Find ID from name match (simple parsing)
                         idx = opts.index(sel) - 1
                         entry["selected"][gid] = [choices[idx]["id"]]
 
-                # CASE C: Checkboxes (Pick up to N unique)
+                # Checkbox Logic
                 else:
                     for c in choices:
                         cid = c["id"]
@@ -285,7 +326,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 st.divider()
                 cols = st.columns([3, 1])
                 t_opts = [get_unit_by_id(tid) for tid in valid_transports]
-                t_opts = [t for t in t_opts if t] # filter nones
+                t_opts = [t for t in t_opts if t] 
                 
                 t_names = [t["name"] for t in t_opts]
                 sel_t = cols[0].selectbox("Add Attachment", t_names, key=f"trans_sel_{entry['id']}")
@@ -302,30 +343,23 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                     st.session_state.roster.append(child_entry)
                     st.rerun()
 
-            # --- Remove Button ---
             st.divider()
             if st.button("Remove Unit", key=f"del_{entry['id']}", type="primary"):
-                # Remove self AND children
                 ids_to_remove = [entry["id"]] + [c["id"] for c in st.session_state.roster if c.get("parent_id") == entry["id"]]
                 st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
                 st.rerun()
 
-        # --- Display Children (Attachments) ---
+        # --- Display Children ---
         children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
         for child in children:
             uc = get_unit_by_id(child["unit_id"])
+            if not uc: continue
             with st.container():
                 st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
-                # Minimal editor for child
-                with st.expander("Edit Attachment"):
-                    # (Simplified option logic reuse or copy-paste the option loop here if you want full editing for children)
-                    # For brevity in this snippet, I'll just put a delete button, but you can copy the Option loop above here too.
+                with st.expander(f"Edit {uc['name']}", expanded=False):
                     if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
                         st.session_state.roster.remove(child)
                         st.rerun()
 
 else:
-
-    st.info("Please select a Codex from the sidebar to begin.")
-
-
+    st.info("⬅️ Please select a Codex from the sidebar to begin.")

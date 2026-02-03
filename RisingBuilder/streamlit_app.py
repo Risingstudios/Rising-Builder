@@ -21,6 +21,7 @@ else:
 
 st.set_page_config(page_title="Rising Builder", page_icon=app_icon, layout="wide")
 
+# Initialize Session State
 if "roster" not in st.session_state:
     st.session_state.roster = []
 if "roster_name" not in st.session_state:
@@ -240,11 +241,13 @@ with st.sidebar:
     
     if selected_codex_name:
         path = CODEX_DIR / selected_codex_name
+        # Only load if changed AND not suppressed by load_file event
         if st.session_state.get("current_codex_path") != str(path):
             st.session_state.codex_data = load_codex(path)
             st.session_state.current_codex_path = str(path)
             st.session_state.current_codex_name = selected_codex_name
             
+            # WIPE ROSTER only if we are NOT loading a file
             if not st.session_state.get("is_loading_file", False):
                 st.session_state.roster = [] 
                 st.session_state.roster_name = "My Army List" # Reset name on codex swap
@@ -387,7 +390,7 @@ with st.sidebar:
 if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
     
-    # Custom Title in App
+    # Custom Title in App (Uses the new variable)
     st.title(f"{st.session_state.roster_name}")
     st.caption(f"Using Codex: {data.get('codex_name', 'Army')}")
     

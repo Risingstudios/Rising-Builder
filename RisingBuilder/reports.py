@@ -20,7 +20,9 @@ class PDF(FPDF):
         self.ln(4)
 
 def draw_profile_table(pdf, profiles_list):
+    """Draws a clean, grid-based statline table."""
     if not profiles_list: return
+
     master_keys = ["WS", "BS", "S", "T", "W", "I", "A", "Ld", "Sv", "Front", "Side", "Rear"]
     active_keys = []
     for k in master_keys:
@@ -28,18 +30,22 @@ def draw_profile_table(pdf, profiles_list):
             if k in p:
                 active_keys.append(k)
                 break
+    
     if not active_keys: return
 
+    # Table Config
     pdf.set_font("Arial", 'B', 8)
     stat_width = 9
     name_width = 40
-    pdf.set_fill_color(230, 230, 230)
     
+    # Header
+    pdf.set_fill_color(230, 230, 230)
     pdf.cell(name_width, 5, "Model", 1, 0, 'L', True)
     for k in active_keys:
         pdf.cell(stat_width, 5, k, 1, 0, 'C', True)
     pdf.ln()
 
+    # Rows
     pdf.set_font("Arial", '', 9)
     for name, stats in profiles_list:
         display_name = "Standard" if name == "Unit Profile" else name
@@ -50,99 +56,114 @@ def draw_profile_table(pdf, profiles_list):
         pdf.ln()
 
 def draw_game_reference_tables(pdf):
-    """Draws the 5th Ed Reference Charts (BS, WS, S vs T)."""
+    """Draws compact 5th Ed Reference Charts side-by-side."""
     pdf.add_page()
     pdf.chapter_title("Game Reference Tables (5th Edition)")
     
-    # --- 1. BALLISTIC SKILL (SHOOTING) ---
+    # Settings for compact grids
+    pdf.set_font("Arial", size=8)
+    col_w = 6      # Narrow columns for 1-10
+    row_h = 5      # Standard row height
+    head_w = 18    # Header column width
+    
+    # --- 1. BALLISTIC SKILL (Top) ---
     pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 8, "To Hit: Shooting (Ballistic Skill)", ln=True)
+    pdf.cell(0, 6, "Shooting To Hit (Roll D6)", ln=True)
+    pdf.ln(1)
     
-    pdf.set_font("Arial", '', 9)
-    pdf.set_fill_color(240, 240, 240)
-    
-    # Headers
-    w = 15
-    pdf.cell(30, 6, "BS of Firer", 1, 0, 'L', True)
+    # Header
+    pdf.set_font("Arial", 'B', 8)
+    pdf.set_fill_color(220, 220, 220)
+    pdf.cell(head_w, row_h, "BS", 1, 0, 'C', True)
     for i in range(1, 11):
-        pdf.cell(w, 6, str(i), 1, 0, 'C', True)
+        pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
     pdf.ln()
     
-    # Values
-    pdf.cell(30, 6, "D6 Score needed", 1, 0, 'L')
+    # Data
+    pdf.set_font("Arial", '', 8)
+    pdf.cell(head_w, row_h, "To Hit", 1, 0, 'C')
     bs_vals = {1: "6+", 2: "5+", 3: "4+", 4: "3+"}
     for i in range(1, 11):
-        if i < 5: val = bs_vals[i]
-        else: val = "2+" 
-        pdf.cell(w, 6, val, 1, 0, 'C')
-    pdf.ln(12)
-
-    # --- 2. WEAPON SKILL (ASSAULT) ---
+        val = bs_vals.get(i, "2+")
+        pdf.cell(col_w, row_h, val, 1, 0, 'C')
+    
+    pdf.ln(10) # Spacer before main tables
+    
+    # --- SETUP SIDE-BY-SIDE ---
+    y_start = pdf.get_y()
+    x_left = 10
+    x_right = 10 + head_w + (10 * col_w) + 15 # 15mm gap between tables
+    
+    # --- 2. WEAPON SKILL (Left) ---
+    pdf.set_xy(x_left, y_start)
     pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 8, "To Hit: Assault (Attacker WS vs Defender WS)", ln=True)
+    pdf.cell(head_w + (10*col_w), 6, "Assault (To Hit)", 0, 1, 'L')
+    pdf.ln(1)
     
-    # Grid Config
-    cell_size = 10
-    header_w = 25
-    
-    # Top Header (Defender WS)
-    pdf.set_font("Arial", 'B', 8)
+    # Header Row (Defender)
+    pdf.set_xy(x_left + head_w, pdf.get_y())
+    pdf.set_font("Arial", 'B', 7)
     pdf.set_fill_color(220, 220, 220)
-    pdf.cell(header_w, cell_size, "Attacker WS", 1, 0, 'C', True)
-    for d_ws in range(1, 11):
-        pdf.cell(cell_size, 5, f"Def {d_ws}", 1, 0, 'C', True)
-    pdf.ln(5)
-    
-    # Rows (Attacker WS)
-    pdf.set_font("Arial", '', 9)
-    for a_ws in range(1, 11):
-        # Row Header
-        pdf.set_fill_color(240, 240, 240)
-        pdf.cell(header_w, 5, f"WS {a_ws}", 1, 0, 'C', True) # No fill for now
-        
-        # Cells
-        for d_ws in range(1, 11):
-            # 5th Ed Rule:
-            # Defender > 2x Attacker: 5+
-            # Attacker > Defender: 3+
-            # Else: 4+
-            if d_ws > (2 * a_ws): score = "5+"
-            elif a_ws > d_ws: score = "3+"
-            else: score = "4+"
-            
-            pdf.cell(cell_size, 5, score, 1, 0, 'C')
-        pdf.ln()
-    pdf.ln(8)
-
-    # --- 3. STRENGTH VS TOUGHNESS (WOUNDING) ---
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 8, "To Wound (Attacker Strength vs Defender Toughness)", ln=True)
-    
-    # Top Header (Defender T)
-    pdf.set_font("Arial", 'B', 8)
-    pdf.set_fill_color(220, 220, 220)
-    pdf.cell(header_w, 5, "Attacker Str", 1, 0, 'C', True)
-    for t_val in range(1, 11):
-        pdf.cell(cell_size, 5, f"T {t_val}", 1, 0, 'C', True)
+    for i in range(1, 11):
+        pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
     pdf.ln()
     
-    # Rows (Attacker S)
-    pdf.set_font("Arial", '', 9)
-    for s_val in range(1, 11):
+    # Corner Label ("Atk \ Def")
+    current_y = pdf.get_y()
+    pdf.set_xy(x_left, current_y - row_h)
+    pdf.cell(head_w, row_h, "Atk\\Def", 1, 0, 'C', True)
+    pdf.set_xy(x_left, current_y)
+
+    # Rows
+    pdf.set_font("Arial", '', 8)
+    for a_ws in range(1, 11):
+        pdf.set_x(x_left)
         pdf.set_fill_color(240, 240, 240)
-        pdf.cell(header_w, 5, f"Str {s_val}", 1, 0, 'C', True)
+        pdf.cell(head_w, row_h, f"WS {a_ws}", 1, 0, 'C', True)
         
-        for t_val in range(1, 11):
-            diff = s_val - t_val
-            
-            if diff >= 2: score = "2+"
-            elif diff == 1: score = "3+"
-            elif diff == 0: score = "4+"
-            elif diff == -1: score = "5+"
-            elif diff == -2: score = "6+"
-            else: score = "-" # Impossible
-            
-            pdf.cell(cell_size, 5, score, 1, 0, 'C')
+        for d_ws in range(1, 11):
+            if d_ws > (2 * a_ws): val = "5+"
+            elif a_ws > d_ws: val = "3+"
+            else: val = "4+"
+            pdf.cell(col_w, row_h, val, 1, 0, 'C')
+        pdf.ln()
+
+    # --- 3. STRENGTH vs TOUGHNESS (Right) ---
+    pdf.set_xy(x_right, y_start)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(head_w + (10*col_w), 6, "Wounding (To Wound)", 0, 1, 'L')
+    pdf.ln(1)
+    
+    # Header Row (Toughness)
+    pdf.set_xy(x_right + head_w, pdf.get_y())
+    pdf.set_font("Arial", 'B', 7)
+    pdf.set_fill_color(220, 220, 220)
+    for i in range(1, 11):
+        pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
+    pdf.ln()
+    
+    # Corner Label ("Str \ T")
+    current_y = pdf.get_y()
+    pdf.set_xy(x_right, current_y - row_h)
+    pdf.cell(head_w, row_h, "Str\\T", 1, 0, 'C', True)
+    pdf.set_xy(x_right, current_y)
+    
+    # Rows
+    pdf.set_font("Arial", '', 8)
+    for s in range(1, 11):
+        pdf.set_x(x_right)
+        pdf.set_fill_color(240, 240, 240)
+        pdf.cell(head_w, row_h, f"Str {s}", 1, 0, 'C', True)
+        
+        for t in range(1, 11):
+            diff = s - t
+            if diff >= 2: val = "2+"
+            elif diff == 1: val = "3+"
+            elif diff == 0: val = "4+"
+            elif diff == -1: val = "5+"
+            elif diff == -2: val = "6+"
+            else: val = "-"
+            pdf.cell(col_w, row_h, val, 1, 0, 'C')
         pdf.ln()
 
 def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False):
@@ -197,6 +218,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         for entry in slot_units:
             u = get_unit_callback(entry['unit_id'])
             
+            # Unit Bar
             pdf.set_font("Arial", 'B', 11)
             pdf.set_fill_color(240, 240, 240)
             name_str = f"{u['name']}"
@@ -205,6 +227,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             pdf.cell(40, 7, f"{entry.get('calculated_cost', 0)} pts", 1, 1, 'C', True)
             pdf.ln(1)
 
+            # Profiles
             profiles_to_print = []
             if "profile" in u: profiles_to_print.append( ("Unit Profile", u["profile"]) )
             if "sub_profiles" in u and "selected" in entry:
@@ -218,6 +241,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             draw_profile_table(pdf, profiles_to_print)
             pdf.ln(2)
 
+            # Options / Rules
             pdf.set_font("Arial", size=10)
             options_text = []
             if u.get("wargear"): options_text.append("Base: " + ", ".join(u["wargear"]))
@@ -236,6 +260,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                 pdf.set_font("Arial", 'I', 9)
                 pdf.multi_cell(0, 5, "   Rules: " + ", ".join(u["special_rules"]))
 
+            # Children
             children = [c for c in roster if c.get("parent_id") == entry["id"]]
             for child in children:
                 uc = get_unit_callback(child['unit_id'])

@@ -44,30 +44,36 @@ def get_unit_by_id(unit_id):
     return None
 
 def get_tooltip(item_name, codex_data):
-    """Generates a tooltip string for a given item name by looking up stats/rules."""
-    if not codex_data: return None
+    """
+    Generates a tooltip string by fuzzy searching Weapons, Wargear, and Rules.
+    Case-insensitive and handles partial matches.
+    """
+    if not codex_data or not item_name: return None
     
-    # 1. Check Weapons
+    # Normalize query
+    query = item_name.lower().strip()
+    
+    # 1. Search Weapons
     weps = codex_data.get("weapons", {})
-    # Exact match
-    if item_name in weps:
-        w = weps[item_name]
-        return f"[Weapon] Rng: {w.get('range', '-')}, S: {w.get('S', '-')}, AP: {w.get('AP', '-')}, Type: {w.get('type', '-')}. {w.get('notes', '')}"
-    
-    # Partial match (e.g. Twin-linked Shuriken Catapult -> Shuriken Catapult)
-    for k, v in weps.items():
-        if k in item_name:
-             return f"[{k}] Rng: {v.get('range', '-')}, S: {v.get('S', '-')}, AP: {v.get('AP', '-')}, Type: {v.get('type', '-')}. {v.get('notes', '')}"
+    for name, stats in weps.items():
+        n = name.lower()
+        # Check for match in either direction (e.g. "Twin-linked Shuriken" contains "Shuriken")
+        if n == query or n in query or query in n:
+            return f"⚔️ [Weapon] Rng: {stats.get('range', '-')}, S: {stats.get('S', '-')}, AP: {stats.get('AP', '-')}, Type: {stats.get('type', '-')}. {stats.get('notes', '')}"
 
-    # 2. Check Wargear
+    # 2. Search Wargear
     gear = codex_data.get("wargear", {})
-    if item_name in gear:
-        return f"[Wargear] {gear[item_name].get('summary', '')}"
-        
-    # 3. Check Rules
+    for name, data in gear.items():
+        n = name.lower()
+        if n == query or n in query or query in n:
+            return f"⚙️ [Wargear] {data.get('summary', 'No description available.')}"
+            
+    # 3. Search Rules
     rules = codex_data.get("rules", {})
-    if item_name in rules:
-        return f"[Rule] {rules[item_name].get('summary', '')}"
+    for name, data in rules.items():
+        n = name.lower()
+        if n == query or n in query or query in n:
+            return f"📜 [Rule] {data.get('summary', 'No description available.')}"
     
     return None
 
@@ -184,7 +190,9 @@ def render_unit_options(entry, unit, codex_data):
                   key=k_name,
                   on_change=cb_update_custom_name, args=(entry, k_name))
 
-    st.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
+    col_pts, col_tip = st.columns([1, 1])
+    col_pts.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
+    col_tip.caption("ℹ️ Hover over the **?** icons for rules.")
     
     # Size
     min_s = int(unit.get("min_size", 1))
@@ -213,14 +221,16 @@ def render_unit_options(entry, unit, codex_data):
                 cid = c["id"]
                 qty = current_picks.count(cid)
                 k = f"opt_{entry['id']}_{gid}_{cid}"
+                # TOOLTIP: Fuzzy match
                 tooltip = get_tooltip(c["name"], codex_data)
                 
                 st.number_input(f"{c['name']} (+{c['points']} pts)", 
                                 min_value=0, max_value=max_sel, value=qty, 
                                 key=k,
-                                help=tooltip, # TOOLTIP HERE
+                                help=tooltip, 
                                 on_change=cb_update_counter, args=(entry, gid, cid, k))
         elif max_sel == 1:
+            # DROPDOWN LOGIC
             name_map = {}
             opts_display = ["(None)"]
             for c in choices:
@@ -228,15 +238,31 @@ def render_unit_options(entry, unit, codex_data):
                 name_map[d_name] = c['id']
                 opts_display.append(d_name)
             current_idx = 0
+            
+            # Find selected item
+            current_selected_name = "(None)"
             if current_picks:
                 curr_id = current_picks[0]
                 for d_name, d_id in name_map.items():
                     if d_id == curr_id and d_name in opts_display:
                         current_idx = opts_display.index(d_name)
+                        current_selected_name = d_name
                         break
+            
             k = f"opt_{entry['id']}_{gid}"
-            st.selectbox("", opts_display, index=current_idx, key=k, label_visibility="collapsed",
+            
+            # Render Selectbox
+            selected = st.selectbox("", opts_display, index=current_idx, key=k, label_visibility="collapsed",
                          on_change=cb_update_radio, args=(entry, gid, name_map, k))
+            
+            # Dynamic Description for Dropdown (Since they don't have hover icons)
+            if selected != "(None)":
+                # Strip points cost for lookup: "Banshee Mask (+5)" -> "Banshee Mask"
+                clean_name = selected.split(" (+")[0]
+                desc = get_tooltip(clean_name, codex_data)
+                if desc:
+                    st.caption(f"↳ {desc}")
+
         else:
             for c in choices:
                 cid = c["id"]
@@ -245,7 +271,7 @@ def render_unit_options(entry, unit, codex_data):
                 tooltip = get_tooltip(c["name"], codex_data)
                 
                 st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=k,
-                            help=tooltip, # TOOLTIP HERE
+                            help=tooltip,
                             on_change=cb_update_checkbox, args=(entry, gid, cid, k))
 
 
@@ -445,7 +471,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']})"
 
             with st.expander(display_title, expanded=False):
-                # Pass Codex Data for Tooltips
                 render_unit_options(entry, u, data)
 
                 valid_transports = u.get("dedicated_transports", [])

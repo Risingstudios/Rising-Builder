@@ -224,12 +224,13 @@ with st.sidebar:
             st.session_state.codex_data = load_codex(path)
             st.session_state.current_codex_path = str(path)
             st.session_state.current_codex_name = selected_codex_name
-            # If we just loaded a file, don't wipe the roster!
-            if not st.session_state.get("file_loaded_flag", False):
+            
+            # WIPE ROSTER only if we are NOT loading a file
+            if not st.session_state.get("is_loading_file", False):
                 st.session_state.roster = [] 
             
-            # Clear flag after check
-            st.session_state.file_loaded_flag = False
+            # Clear flag
+            st.session_state.is_loading_file = False
             st.rerun()
 
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
@@ -247,27 +248,31 @@ with st.sidebar:
     st.download_button("💾 Download Roster File", roster_json, "my_army_list.json", "application/json")
 
     uploaded_file = st.file_uploader("📂 Load Roster File", type=["json"])
+    
     if uploaded_file is not None:
-        try:
-            data = json.load(uploaded_file)
-            saved_codex = data.get("codex_file")
-            
-            # --- FIX: ROSTER LOADING ---
-            # Set flag to prevent wipe
-            st.session_state.file_loaded_flag = True
-            
-            # Set Codex Name to force selectbox update on rerun
-            if saved_codex:
-                st.session_state.current_codex_name = saved_codex
-                # Also pre-set path so loader logic works
-                st.session_state.current_codex_path = str(CODEX_DIR / saved_codex)
-                st.session_state.codex_data = load_codex(CODEX_DIR / saved_codex)
+        # Check if we already loaded this specific file to prevent re-reading on refresh
+        if uploaded_file.file_id != st.session_state.get("last_loaded_file_id"):
+            try:
+                # Reset file pointer to beginning to ensure clean read
+                uploaded_file.seek(0)
+                data = json.load(uploaded_file)
+                saved_codex = data.get("codex_file")
+                
+                # Setup Flags to prevent wipe
+                st.session_state.is_loading_file = True
+                st.session_state.last_loaded_file_id = uploaded_file.file_id
+                
+                # Pre-load Codex State
+                if saved_codex:
+                    st.session_state.current_codex_name = saved_codex
+                    st.session_state.current_codex_path = str(CODEX_DIR / saved_codex)
+                    st.session_state.codex_data = load_codex(CODEX_DIR / saved_codex)
 
-            st.session_state.roster = data.get("roster", [])
-            st.success("List loaded successfully!")
-            st.rerun()
-            
-        except Exception as e: st.error(f"Error reading file: {e}")
+                st.session_state.roster = data.get("roster", [])
+                st.success("List loaded successfully!")
+                st.rerun()
+                
+            except Exception as e: st.error(f"Error reading file: {e}")
 
     st.divider()
     
@@ -300,12 +305,9 @@ with st.sidebar:
                 icon = "✅" if i["state"] == "closed" else "🔴"
                 st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
 
-    # 5. Feedback (FIXED)
+    # 5. Feedback
     st.divider()
     st.subheader("Report an Issue")
-    
-    # Using Session State to manage form inputs if needed, but native form usually works.
-    # The key fix is ensuring 'requests' is imported and secrets exist.
     
     with st.form("feedback_form"):
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
@@ -323,39 +325,36 @@ with st.sidebar:
             else:
                 report_pts, _ = calculate_roster()
                 try:
-                    # Check secrets first
+                    # Robust check for secrets
                     if "github" not in st.secrets:
-                        st.error("GitHub secrets not configured!")
-                        st.stop()
+                        st.error("GitHub secrets missing in .streamlit/secrets.toml")
+                    else:
+                        token = st.secrets["github"]["token"]
+                        owner = st.secrets["github"]["owner"]
+                        repo = st.secrets["github"]["repo"]
                         
-                    token = st.secrets["github"]["token"]
-                    owner = st.secrets["github"]["owner"]
-                    repo = st.secrets["github"]["repo"]
-                    
-                    final_title = f"[{feedback_type}] {feedback_title}"
-                    if feedback_name:
-                        final_title += f" (by {feedback_name})"
+                        final_title = f"[{feedback_type}] {feedback_title}"
+                        if feedback_name:
+                            final_title += f" (by {feedback_name})"
 
-                    body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
-                    
-                    if include_context:
-                        context_str = "\n\n**Context:**\n"
-                        if "codex_data" in st.session_state:
-                            context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
-                        context_str += f"- Points: {report_pts}/{points_limit}\n"
-                        context_str += f"- Unit Count: {len(st.session_state.roster)}"
-                        body_text += context_str
+                        body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
+                        
+                        if include_context:
+                            context_str = "\n\n**Context:**\n"
+                            if "codex_data" in st.session_state:
+                                context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
+                            context_str += f"- Points: {report_pts}/{points_limit}\n"
+                            context_str += f"- Unit Count: {len(st.session_state.roster)}"
+                            body_text += context_str
 
-                    api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
-                    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
-                    payload = {"title": final_title, "body": body_text}
-                    
-                    # Debug print if it fails
-                    response = requests.post(api_url, json=payload, headers=headers)
-                    
-                    if response.status_code == 201: st.success("Feedback sent!")
-                    else: 
-                        st.error(f"Error {response.status_code}: {response.text}")
+                        api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+                        headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+                        payload = {"title": final_title, "body": body_text}
+                        
+                        response = requests.post(api_url, json=payload, headers=headers)
+                        
+                        if response.status_code == 201: st.success("Feedback sent!")
+                        else: st.error(f"Error {response.status_code}: {response.text}")
                 except Exception as e:
                     st.error(f"Error sending feedback: {e}")
 

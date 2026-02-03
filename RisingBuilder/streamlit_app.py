@@ -264,9 +264,19 @@ with st.sidebar:
     st.divider()
     
     # 3. PDF Export
+    st.write("### Export Options")
+    include_tables = st.checkbox("Include Game Reference Tables", value=True)
+    
     if st.button("📄 Generate PDF Roster"):
         pdf_path = BASE_DIR / "temp_roster.pdf"
-        write_roster_pdf(st.session_state.roster, st.session_state.codex_data, points_limit, str(pdf_path), get_unit_by_id)
+        write_roster_pdf(
+            st.session_state.roster, 
+            st.session_state.codex_data, 
+            points_limit, 
+            str(pdf_path), 
+            get_unit_by_id,
+            include_ref_tables=include_tables
+        )
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
 
@@ -426,3 +436,4 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")
+

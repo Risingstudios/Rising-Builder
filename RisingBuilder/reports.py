@@ -57,7 +57,7 @@ def draw_profile_table(pdf, profiles_list):
 
 def draw_game_reference_tables(pdf):
     """
-    Draws 5th Ed Reference Charts: Infantry (Top Row) and Vehicles (Bottom Row).
+    Draws 5th Ed Reference Charts: Infantry (Row 1) and Vehicles (Row 2).
     """
     pdf.add_page()
     pdf.chapter_title("Game Reference Tables (5th Edition)")
@@ -71,7 +71,7 @@ def draw_game_reference_tables(pdf):
     y_start = pdf.get_y()
     
     # ==========================================
-    # ROW 1: INFANTRY TABLES (BS, WS, S vs T)
+    # ROW 1: INFANTRY TABLES
     # ==========================================
 
     # --- TABLE 1: SHOOTING (Vertical) ---
@@ -169,31 +169,36 @@ def draw_game_reference_tables(pdf):
         pdf.ln()
 
     # ==========================================
-    # ROW 2: VEHICLE DAMAGE
+    # ROW 2: VEHICLE DAMAGE (SAFE LAYOUT)
     # ==========================================
     
-    # Move Cursor down below the longest table (Shooting is roughly 50mm, others are 50mm too)
-    pdf.set_xy(x_start, y_start + 65)
+    # Reset cursor to below the tables
+    # The tables end roughly at Y = start + 55mm
+    # We force the cursor down to be safe.
     
+    pdf.set_y(y_start + 65) 
+    pdf.set_x(x_start)
+    
+    # Check for space (Need approx 60mm)
+    if pdf.get_y() > 220: # If near bottom
+        pdf.add_page()
+        pdf.set_y(20) # Top margin
+    
+    # Vehicle Header
     pdf.set_font("Arial", 'B', 12)
     pdf.set_fill_color(200, 220, 255)
     pdf.cell(0, 8, "Vehicle Damage", 0, 1, 'L', True)
     pdf.ln(2)
     
-    y_veh = pdf.get_y()
+    # Save Top Y for columns
+    y_veh_top = pdf.get_y()
     
-    # --- TABLE 4: DAMAGE ROLL ---
-    # Layout: Roll (15mm) | Result (35mm) | Effect (Remainder)
-    
+    # --- LEFT COL: DAMAGE TABLE ---
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(15, 6, "Roll", 1, 0, 'C', True)
     pdf.cell(35, 6, "Result", 1, 0, 'L', True)
-    pdf.cell(80, 6, "Effect", 1, 0, 'L', True)
-    pdf.cell(50, 6, "Modifiers (Add/Sub to D6)", 1, 1, 'L', True) # Side Column Header
-    
-    # Save Y position to draw the Modifiers box later
-    y_table_start = pdf.get_y()
+    pdf.cell(80, 6, "Effect", 1, 1, 'L', True)
     
     pdf.set_font("Arial", '', 8)
     damage_rows = [
@@ -208,13 +213,17 @@ def draw_game_reference_tables(pdf):
     for roll, res, eff in damage_rows:
         pdf.cell(15, 6, roll, 1, 0, 'C')
         pdf.cell(35, 6, res, 1, 0, 'L')
-        pdf.cell(80, 6, eff, 1, 0, 'L')
-        pdf.cell(50, 6, "", 0, 1) # Empty space for the Modifiers box
+        pdf.cell(80, 6, eff, 1, 1, 'L')
     
-    # --- MODIFIERS BOX (Right of Table) ---
-    pdf.set_xy(x_start + 130 + 2, y_table_start) # 130 = width of table cols
+    # --- RIGHT COL: MODIFIERS BOX ---
+    # Move back up to header level
+    pdf.set_xy(x_start + 135, y_veh_top)
+    
+    pdf.set_font("Arial", 'B', 9)
+    pdf.set_fill_color(220, 220, 220)
+    pdf.cell(50, 6, "Modifiers (Add/Sub to D6)", 1, 1, 'L', True)
+    
     pdf.set_font("Arial", '', 8)
-    
     modifiers = [
         "-2  Glancing Hit",
         "-1  AP - Weapon",
@@ -223,8 +232,8 @@ def draw_game_reference_tables(pdf):
     ]
     
     for mod in modifiers:
-        pdf.set_x(x_start + 130 + 2)
-        pdf.cell(48, 6, mod, 1, 1, 'L')
+        pdf.set_x(x_start + 135)
+        pdf.cell(50, 6, mod, 1, 1, 'L')
 
 
 def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False):

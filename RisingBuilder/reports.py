@@ -56,71 +56,77 @@ def draw_profile_table(pdf, profiles_list):
         pdf.ln()
 
 def draw_game_reference_tables(pdf):
-    """Draws compact 5th Ed Reference Charts side-by-side."""
+    """
+    Draws 5th Ed Reference Charts in a single row (3-up layout).
+    """
     pdf.add_page()
     pdf.chapter_title("Game Reference Tables (5th Edition)")
     
-    # Settings for compact grids
-    pdf.set_font("Arial", size=8)
-    col_w = 6      # Narrow columns for 1-10
-    row_h = 5      # Standard row height
-    head_w = 18    # Header column width
+    # --- CONFIGURATION ---
+    pdf.set_font("Arial", size=7) # Small font to fit everything
+    row_h = 4.5
     
-    # --- 1. BALLISTIC SKILL (Top) ---
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 6, "Shooting To Hit (Roll D6)", ln=True)
-    pdf.ln(1)
+    # Margins and Start Positions
+    x_start = 10
+    y_start = pdf.get_y()
+    
+    # --- TABLE 1: SHOOTING (Vertical Layout) ---
+    # Width: 25mm
+    bs_x = x_start
+    pdf.set_xy(bs_x, y_start)
+    
+    # Title
+    pdf.set_font("Arial", 'B', 8)
+    pdf.cell(25, 6, "Shooting", 0, 1, 'C')
     
     # Header
-    pdf.set_font("Arial", 'B', 8)
     pdf.set_fill_color(220, 220, 220)
-    pdf.cell(head_w, row_h, "BS", 1, 0, 'C', True)
-    for i in range(1, 11):
-        pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
-    pdf.ln()
+    pdf.cell(10, row_h, "BS", 1, 0, 'C', True)
+    pdf.cell(15, row_h, "To Hit", 1, 1, 'C', True)
     
-    # Data
-    pdf.set_font("Arial", '', 8)
-    pdf.cell(head_w, row_h, "To Hit", 1, 0, 'C')
+    # Rows 1-10
+    pdf.set_font("Arial", '', 7)
     bs_vals = {1: "6+", 2: "5+", 3: "4+", 4: "3+"}
     for i in range(1, 11):
+        pdf.set_x(bs_x)
         val = bs_vals.get(i, "2+")
-        pdf.cell(col_w, row_h, val, 1, 0, 'C')
+        pdf.cell(10, row_h, str(i), 1, 0, 'C')
+        pdf.cell(15, row_h, val, 1, 1, 'C')
+
+    # --- TABLE 2: ASSAULT (Matrix) ---
+    # Width: 18mm header + (6mm * 10 cols) = 78mm
+    ws_x = bs_x + 30 # 5mm gap from BS table
+    pdf.set_xy(ws_x, y_start)
     
-    pdf.ln(10) # Spacer before main tables
+    col_w = 6
+    head_w = 18
     
-    # --- SETUP SIDE-BY-SIDE ---
-    y_start = pdf.get_y()
-    x_left = 10
-    x_right = 10 + head_w + (10 * col_w) + 15 # 15mm gap between tables
-    
-    # --- 2. WEAPON SKILL (Left) ---
-    pdf.set_xy(x_left, y_start)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(head_w + (10*col_w), 6, "Assault (To Hit)", 0, 1, 'L')
-    pdf.ln(1)
+    # Title
+    pdf.set_font("Arial", 'B', 8)
+    pdf.cell(head_w + (10*col_w), 6, "Assault To Hit (D6)", 0, 1, 'C')
     
     # Header Row (Defender)
-    pdf.set_xy(x_left + head_w, pdf.get_y())
-    pdf.set_font("Arial", 'B', 7)
+    pdf.set_x(ws_x + head_w)
     pdf.set_fill_color(220, 220, 220)
     for i in range(1, 11):
         pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
     pdf.ln()
     
-    # Corner Label ("Atk \ Def")
-    current_y = pdf.get_y()
-    pdf.set_xy(x_left, current_y - row_h)
+    # Corner Label
+    curr_y = pdf.get_y()
+    pdf.set_xy(ws_x, curr_y - row_h)
+    pdf.set_font("Arial", 'B', 7)
     pdf.cell(head_w, row_h, "Atk\\Def", 1, 0, 'C', True)
-    pdf.set_xy(x_left, current_y)
-
-    # Rows
-    pdf.set_font("Arial", '', 8)
+    pdf.set_xy(ws_x, curr_y)
+    
+    # Matrix Rows
+    pdf.set_font("Arial", '', 7)
     for a_ws in range(1, 11):
-        pdf.set_x(x_left)
+        pdf.set_x(ws_x)
+        # Row Header
         pdf.set_fill_color(240, 240, 240)
         pdf.cell(head_w, row_h, f"WS {a_ws}", 1, 0, 'C', True)
-        
+        # Data
         for d_ws in range(1, 11):
             if d_ws > (2 * a_ws): val = "5+"
             elif a_ws > d_ws: val = "3+"
@@ -128,33 +134,37 @@ def draw_game_reference_tables(pdf):
             pdf.cell(col_w, row_h, val, 1, 0, 'C')
         pdf.ln()
 
-    # --- 3. STRENGTH vs TOUGHNESS (Right) ---
-    pdf.set_xy(x_right, y_start)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(head_w + (10*col_w), 6, "Wounding (To Wound)", 0, 1, 'L')
-    pdf.ln(1)
+    # --- TABLE 3: WOUNDING (Matrix) ---
+    # Width: 78mm
+    st_x = ws_x + 78 + 5 # 5mm gap
+    pdf.set_xy(st_x, y_start)
+    
+    # Title
+    pdf.set_font("Arial", 'B', 8)
+    pdf.cell(head_w + (10*col_w), 6, "To Wound (D6)", 0, 1, 'C')
     
     # Header Row (Toughness)
-    pdf.set_xy(x_right + head_w, pdf.get_y())
-    pdf.set_font("Arial", 'B', 7)
+    pdf.set_x(st_x + head_w)
     pdf.set_fill_color(220, 220, 220)
     for i in range(1, 11):
         pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
     pdf.ln()
     
-    # Corner Label ("Str \ T")
-    current_y = pdf.get_y()
-    pdf.set_xy(x_right, current_y - row_h)
+    # Corner Label
+    curr_y = pdf.get_y()
+    pdf.set_xy(st_x, curr_y - row_h)
+    pdf.set_font("Arial", 'B', 7)
     pdf.cell(head_w, row_h, "Str\\T", 1, 0, 'C', True)
-    pdf.set_xy(x_right, current_y)
+    pdf.set_xy(st_x, curr_y)
     
-    # Rows
-    pdf.set_font("Arial", '', 8)
+    # Matrix Rows
+    pdf.set_font("Arial", '', 7)
     for s in range(1, 11):
-        pdf.set_x(x_right)
+        pdf.set_x(st_x)
+        # Row Header
         pdf.set_fill_color(240, 240, 240)
         pdf.cell(head_w, row_h, f"Str {s}", 1, 0, 'C', True)
-        
+        # Data
         for t in range(1, 11):
             diff = s - t
             if diff >= 2: val = "2+"
@@ -241,7 +251,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             draw_profile_table(pdf, profiles_to_print)
             pdf.ln(2)
 
-            # Options / Rules
+            # Options
             pdf.set_font("Arial", size=10)
             options_text = []
             if u.get("wargear"): options_text.append("Base: " + ", ".join(u["wargear"]))
@@ -343,7 +353,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             pdf.multi_cell(0, 5, desc)
             pdf.ln(2)
 
-    # --- 5. OPTIONAL GAME TABLES ---
+    # --- 5. GAME TABLES ---
     if include_ref_tables:
         draw_game_reference_tables(pdf)
 

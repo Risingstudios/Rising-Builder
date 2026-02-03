@@ -2,11 +2,8 @@ from fpdf import FPDF
 
 class PDF(FPDF):
     def header(self):
-        self.set_font('Arial', 'B', 16)
-        self.cell(0, 10, 'Rising Builder - Army Roster', 0, 1, 'C')
-        self.set_line_width(0.5)
-        self.line(10, 20, 200, 20)
-        self.ln(10)
+        # We don't print title in header anymore, we do it in the body to allow custom names
+        pass
 
     def footer(self):
         self.set_y(-15)
@@ -30,6 +27,7 @@ def draw_profile_table(pdf, profiles_list):
             if k in p:
                 active_keys.append(k)
                 break
+    
     if not active_keys: return
 
     # Table Config
@@ -56,8 +54,7 @@ def draw_profile_table(pdf, profiles_list):
 
 def draw_game_reference_tables(pdf):
     """
-    Draws 5th Ed Reference Charts.
-    Infantry Tables on top. Vehicle Table forced below.
+    Draws 5th Ed Reference Charts: Infantry (Row 1) and Vehicles (Row 2).
     """
     pdf.add_page()
     pdf.chapter_title("Game Reference Tables (5th Edition)")
@@ -74,9 +71,11 @@ def draw_game_reference_tables(pdf):
     
     pdf.set_font("Arial", 'B', 8)
     pdf.cell(25, 6, "Shooting", 0, 1, 'C')
+    
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(10, row_h, "BS", 1, 0, 'C', True)
     pdf.cell(15, row_h, "To Hit", 1, 1, 'C', True)
+    
     pdf.set_font("Arial", '', 7)
     bs_vals = {1: "6+", 2: "5+", 3: "4+", 4: "3+"}
     for i in range(1, 11):
@@ -110,9 +109,9 @@ def draw_game_reference_tables(pdf):
         pdf.set_fill_color(240, 240, 240)
         pdf.cell(head_w, row_h, f"WS {a_ws}", 1, 0, 'C', True)
         for d_ws in range(1, 11):
-            val = "4+"
             if d_ws > (2 * a_ws): val = "5+"
             elif a_ws > d_ws: val = "3+"
+            else: val = "4+"
             pdf.cell(col_w, row_h, val, 1, 0, 'C')
         pdf.ln()
 
@@ -149,22 +148,13 @@ def draw_game_reference_tables(pdf):
             pdf.cell(col_w, row_h, val, 1, 0, 'C')
         pdf.ln()
 
-    # ==========================================
-    # VEHICLE DAMAGE SECTION
-    # ==========================================
-    
-    # We forcefully move down. 
-    # Calculate bottom of previous tables: y_start + (11 * 4.5) + header ~ 60mm
-    # So we set Y to y_start + 65. 
-    # If that is too low on the page (> 250), we add a page.
-    
+    # --- ROW 2: VEHICLE DAMAGE ---
     new_y = y_start + 65
     if new_y > 250:
         pdf.add_page()
         new_y = 20
     
     pdf.set_xy(x_start, new_y)
-    
     pdf.set_font("Arial", 'B', 12)
     pdf.set_fill_color(200, 220, 255)
     pdf.cell(0, 8, "Vehicle Damage", 0, 1, 'L', True)
@@ -172,7 +162,7 @@ def draw_game_reference_tables(pdf):
     
     veh_start_y = pdf.get_y()
     
-    # --- DAMAGE TABLE (Left) ---
+    # Table
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(15, 6, "Roll", 1, 0, 'C', True)
@@ -183,10 +173,10 @@ def draw_game_reference_tables(pdf):
     damage_rows = [
         ("1", "Crew Shaken", "Vehicle can only move (No Shooting)."),
         ("2", "Crew Stunned", "Vehicle cannot move or shoot."),
-        ("3", "Weapon Destroyed", "One weapon destroyed."),
-        ("4", "Immobilised", "Cannot move."),
-        ("5", "Wrecked", "Destroyed. Becomes Wreck."),
-        ("6+", "Explodes!", "Destroyed. Models within D6\" take S3 hit.")
+        ("3", "Weapon Destroyed", "One weapon destroyed (Random/Owner choice)."),
+        ("4", "Immobilised", "Cannot move. (If moving Flat Out = Wrecked)."),
+        ("5", "Wrecked", "Destroyed. Becomes Wreck (Difficult Terrain)."),
+        ("6+", "Explodes!", "Destroyed. Removed. Models within D6\" take S3 hit.")
     ]
     
     for roll, res, eff in damage_rows:
@@ -194,7 +184,7 @@ def draw_game_reference_tables(pdf):
         pdf.cell(35, 6, res, 1, 0, 'L')
         pdf.cell(80, 6, eff, 1, 1, 'L')
 
-    # --- MODIFIERS (Right) ---
+    # Modifiers
     pdf.set_xy(x_start + 135, veh_start_y)
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
@@ -213,7 +203,7 @@ def draw_game_reference_tables(pdf):
         pdf.set_x(x_start + 135)
         pdf.cell(55, 6, mod, 1, 1, 'L')
 
-def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False):
+def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False, roster_name="Army Roster"):
     pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
@@ -247,6 +237,13 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                     elif picks == choice["id"]: collect_refs([choice["name"]])
 
     # --- 2. HEADER ---
+    # Custom Roster Name Title
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(0, 10, roster_name, 0, 1, 'C')
+    pdf.set_line_width(0.5)
+    pdf.line(10, 20, 200, 20)
+    pdf.ln(5)
+
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 8, f"Codex: {codex_data.get('codex_name', 'Unknown Army')}", ln=True)
     pdf.set_font("Arial", 'B', 10)
@@ -265,11 +262,16 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         for entry in slot_units:
             u = get_unit_callback(entry['unit_id'])
             
-            # Unit Bar
+            # --- Unit Name (Custom vs Default) ---
             pdf.set_font("Arial", 'B', 11)
             pdf.set_fill_color(240, 240, 240)
+            
             name_str = f"{u['name']}"
+            if entry.get("custom_name"):
+                name_str = f"{entry['custom_name']} ({u['name']})"
+            
             if entry.get("size", 1) > 1: name_str += f" (x{entry['size']})"
+            
             pdf.cell(150, 7, name_str, 1, 0, 'L', True)
             pdf.cell(40, 7, f"{entry.get('calculated_cost', 0)} pts", 1, 1, 'C', True)
             pdf.ln(1)
@@ -314,7 +316,13 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                 pdf.ln(2)
                 pdf.set_font("Arial", 'B', 10)
                 pdf.cell(10, 5, "  >", 0, 0)
-                pdf.cell(0, 5, f"Attached: {uc['name']} ({child.get('calculated_cost', 0)} pts)", ln=True)
+                
+                # Child Custom Name
+                c_name = uc['name']
+                if child.get("custom_name"):
+                    c_name = f"{child['custom_name']} ({uc['name']})"
+                
+                pdf.cell(0, 5, f"Attached: {c_name} ({child.get('calculated_cost', 0)} pts)", ln=True)
                 
                 c_profs = []
                 if "profile" in uc: c_profs.append( ("Profile", uc["profile"]) )

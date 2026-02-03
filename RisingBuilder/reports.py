@@ -21,46 +21,53 @@ class PDF(FPDF):
 
 def draw_profile_table(pdf, profiles_list):
     """
-    Draws a statline table for one or more profiles.
-    profiles_list is a list of tuples: [("Name", {stats}), ...]
+    Draws a clean, grid-based statline table using Arial.
     """
     if not profiles_list: return
 
-    # Define the master order of keys for columns
-    # We check all profiles to see which columns are actually needed
+    # Master list of keys to look for
     master_keys = ["WS", "BS", "S", "T", "W", "I", "A", "Ld", "Sv", "Front", "Side", "Rear"]
     
-    # Identify which keys exist across ANY of the profiles provided
+    # Identify active keys (columns) for this specific unit
     active_keys = []
     for k in master_keys:
         for _, p in profiles_list:
             if k in p:
                 active_keys.append(k)
-                break # Key exists in at least one profile, so add it
+                break
     
     if not active_keys: return
 
-    # Setup Font for Table
-    pdf.set_font("Courier", 'B', 8)
+    # --- Table Settings ---
+    pdf.set_font("Arial", 'B', 8)
+    stat_width = 9   # Width of each stat column
+    name_width = 40  # Width of the name column
     
-    # 1. Header Row
-    # Name column width is dynamic, stats are fixed
-    stat_width = 8
-    name_width = 45
+    # --- 1. Header Row ---
+    pdf.set_fill_color(230, 230, 230) # Light Grey background for headers
     
-    # Draw Headers
-    pdf.cell(name_width, 5, "", 0, 0) # Empty space above names
+    # 'Model' Header
+    pdf.cell(name_width, 5, "Model", 1, 0, 'L', True)
+    
+    # Stat Headers (WS, BS, etc.)
     for k in active_keys:
-        pdf.cell(stat_width, 5, k, 0, 0, 'C')
+        pdf.cell(stat_width, 5, k, 1, 0, 'C', True)
     pdf.ln()
 
-    # 2. Data Rows
-    pdf.set_font("Courier", '', 9)
+    # --- 2. Data Rows ---
+    pdf.set_font("Arial", '', 9)
+    
     for name, stats in profiles_list:
-        pdf.cell(name_width, 5, name, 0, 0, 'L')
+        # Clean up generic name
+        display_name = "Standard" if name == "Unit Profile" else name
+        
+        # Name Cell
+        pdf.cell(name_width, 5, display_name, 1, 0, 'L')
+        
+        # Stat Cells
         for k in active_keys:
             val = str(stats.get(k, "-"))
-            pdf.cell(stat_width, 5, val, 0, 0, 'C')
+            pdf.cell(stat_width, 5, val, 1, 0, 'C')
         pdf.ln()
 
 def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback):
@@ -68,10 +75,9 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    # --- 1. COLLECT DATA ---
+    # --- 1. DATA COLLECTION ---
     total_pts = 0
     slot_counts = {"HQ": 0, "Troops": 0, "Elites": 0, "Fast Attack": 0, "Heavy Support": 0}
-    
     active_weapons = set()
     active_rules = set()
     
@@ -81,7 +87,6 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             elif name in codex_data.get('rules', {}): active_rules.add(name)
             elif name in codex_data.get('wargear', {}): active_rules.add(name)
 
-    # First pass: Totals and References
     for entry in roster:
         u = get_unit_callback(entry['unit_id'])
         if not u: continue
@@ -98,6 +103,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                 opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
                 if not opt_def: continue
                 for choice in opt_def.get("choices", []):
+                    # Check if selected (list or single)
                     if isinstance(picks, list) and choice["id"] in picks:
                         collect_refs([choice["name"]])
                     elif picks == choice["id"]:
@@ -124,16 +130,16 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         for entry in slot_units:
             u = get_unit_callback(entry['unit_id'])
             
-            # --- Unit Header ---
+            # --- Unit Header Bar ---
             pdf.set_font("Arial", 'B', 11)
-            pdf.set_fill_color(240, 240, 240)
+            pdf.set_fill_color(240, 240, 240) # Light Grey Unit Bar
             name_str = f"{u['name']}"
             if entry.get("size", 1) > 1: name_str += f" (x{entry['size']})"
             pdf.cell(150, 7, name_str, 1, 0, 'L', True)
             pdf.cell(40, 7, f"{entry.get('calculated_cost', 0)} pts", 1, 1, 'C', True)
             pdf.ln(1)
 
-            # --- PROFILES (Main + Sub) ---
+            # --- PROFILES TABLE (New Look) ---
             profiles_to_print = []
             
             # 1. Main Profile
@@ -142,19 +148,16 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             
             # 2. Sub Profiles (Check selections)
             if "sub_profiles" in u and "selected" in entry:
-                # Flatten all selected IDs into a list
                 all_picked_ids = []
                 for picks in entry["selected"].values():
                     if isinstance(picks, list): all_picked_ids.extend(picks)
                     else: all_picked_ids.append(picks)
                 
-                # Check each available sub_profile
                 for key, sub_prof in u["sub_profiles"].items():
-                    # If the key (e.g. 'exarch', 'gun_drone') is in the picked IDs
                     if key in all_picked_ids:
                         profiles_to_print.append( (sub_prof.get("name", key), sub_prof) )
             
-            # Draw the combined table
+            # Draw the Table
             draw_profile_table(pdf, profiles_to_print)
             pdf.ln(2)
 
@@ -192,6 +195,19 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                 # Child Profiles
                 c_profs = []
                 if "profile" in uc: c_profs.append( ("Profile", uc["profile"]) )
+                
+                # Check for child sub-profiles (e.g. Drones on Bodyguard)
+                if "sub_profiles" in uc and "selected" in child:
+                    all_picked_c_ids = []
+                    for picks in child["selected"].values():
+                        if isinstance(picks, list): all_picked_c_ids.extend(picks)
+                        else: all_picked_c_ids.append(picks)
+                    for key, sub_prof in uc["sub_profiles"].items():
+                        if key in all_picked_c_ids:
+                            c_profs.append( (sub_prof.get("name", key), sub_prof) )
+
+                # Indent the table for children slightly if possible, or just draw it
+                # We'll just draw it normally below the name
                 draw_profile_table(pdf, c_profs)
 
                 # Child Options
@@ -214,6 +230,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
     pdf.add_page()
     pdf.chapter_title("Reference: Weapons")
     
+    # Weapon Table
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(60, 6, "Name", 1, 0, 'L', True)

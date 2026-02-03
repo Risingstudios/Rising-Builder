@@ -1,397 +1,457 @@
-from fpdf import FPDF
+import streamlit as st
+import json
+import uuid
+import requests
+from pathlib import Path
+from PIL import Image
+from reports import write_roster_pdf
 
-class PDF(FPDF):
-    def header(self):
-        self.set_font('Arial', 'B', 16)
-        self.cell(0, 10, 'Rising Builder - Army Roster', 0, 1, 'C')
-        self.set_line_width(0.5)
-        self.line(10, 20, 200, 20)
-        self.ln(10)
+# --- Setup & Configuration ---
+BASE_DIR = Path(__file__).parent
+CODEX_DIR = BASE_DIR / "codexes"
+CODEX_DIR.mkdir(exist_ok=True)
 
-    def footer(self):
-        self.set_y(-15)
-        self.set_font('Arial', 'I', 8)
-        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+# Load Icon
+icon_path = BASE_DIR / "app_icon.ico"
+if icon_path.exists():
+    app_icon = Image.open(icon_path)
+else:
+    app_icon = "🌙"
 
-    def chapter_title(self, label):
-        self.set_font('Arial', 'B', 12)
-        self.set_fill_color(200, 220, 255)  # Light Blue
-        self.cell(0, 6, label, 0, 1, 'L', True)
-        self.ln(4)
+st.set_page_config(page_title="Rising Builder", page_icon=app_icon, layout="wide")
 
-def draw_profile_table(pdf, profiles_list):
-    """Draws a clean, grid-based statline table."""
-    if not profiles_list: return
+if "roster" not in st.session_state:
+    st.session_state.roster = []
 
-    master_keys = ["WS", "BS", "S", "T", "W", "I", "A", "Ld", "Sv", "Front", "Side", "Rear"]
-    active_keys = []
-    for k in master_keys:
-        for _, p in profiles_list:
-            if k in p:
-                active_keys.append(k)
-                break
-    if not active_keys: return
+# --- Helper Functions ---
+def load_codex(filepath):
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        st.error(f"Error loading codex: {e}")
+        return None
 
-    # Table Config
-    pdf.set_font("Arial", 'B', 8)
-    stat_width = 9
-    name_width = 40
-    
-    # Header
-    pdf.set_fill_color(230, 230, 230)
-    pdf.cell(name_width, 5, "Model", 1, 0, 'L', True)
-    for k in active_keys:
-        pdf.cell(stat_width, 5, k, 1, 0, 'C', True)
-    pdf.ln()
+def get_unit_by_id(unit_id):
+    if not st.session_state.get("codex_data"): return None
+    for u in st.session_state.codex_data.get("units", []):
+        if u["id"] == unit_id:
+            return u
+    return None
 
-    # Rows
-    pdf.set_font("Arial", '', 9)
-    for name, stats in profiles_list:
-        display_name = "Standard" if name == "Unit Profile" else name
-        pdf.cell(name_width, 5, display_name, 1, 0, 'L')
-        for k in active_keys:
-            val = str(stats.get(k, "-"))
-            pdf.cell(stat_width, 5, val, 1, 0, 'C')
-        pdf.ln()
-
-def draw_game_reference_tables(pdf):
-    """
-    Draws 5th Ed Reference Charts.
-    Infantry Tables on top. Vehicle Table forced below.
-    """
-    pdf.add_page()
-    pdf.chapter_title("Game Reference Tables (5th Edition)")
-    
-    # --- CONFIGURATION ---
-    pdf.set_font("Arial", size=7) 
-    row_h = 4.5
-    x_start = 10
-    y_start = pdf.get_y()
-    
-    # --- 1. SHOOTING (Vertical) ---
-    bs_x = x_start
-    pdf.set_xy(bs_x, y_start)
-    
-    pdf.set_font("Arial", 'B', 8)
-    pdf.cell(25, 6, "Shooting", 0, 1, 'C')
-    pdf.set_fill_color(220, 220, 220)
-    pdf.cell(10, row_h, "BS", 1, 0, 'C', True)
-    pdf.cell(15, row_h, "To Hit", 1, 1, 'C', True)
-    pdf.set_font("Arial", '', 7)
-    bs_vals = {1: "6+", 2: "5+", 3: "4+", 4: "3+"}
-    for i in range(1, 11):
-        pdf.set_x(bs_x)
-        val = bs_vals.get(i, "2+")
-        pdf.cell(10, row_h, str(i), 1, 0, 'C')
-        pdf.cell(15, row_h, val, 1, 1, 'C')
-
-    # --- 2. ASSAULT (Matrix) ---
-    ws_x = bs_x + 30 
-    pdf.set_xy(ws_x, y_start)
-    col_w = 6
-    head_w = 18
-    pdf.set_font("Arial", 'B', 8)
-    pdf.cell(head_w + (10*col_w), 6, "Assault To Hit (D6)", 0, 1, 'C')
-    pdf.set_x(ws_x + head_w)
-    pdf.set_fill_color(220, 220, 220)
-    for i in range(1, 11):
-        pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
-    pdf.ln()
-    
-    curr_y = pdf.get_y()
-    pdf.set_xy(ws_x, curr_y - row_h)
-    pdf.set_font("Arial", 'B', 7)
-    pdf.cell(head_w, row_h, "Atk\\Def", 1, 0, 'C', True)
-    pdf.set_xy(ws_x, curr_y)
-    
-    pdf.set_font("Arial", '', 7)
-    for a_ws in range(1, 11):
-        pdf.set_x(ws_x)
-        pdf.set_fill_color(240, 240, 240)
-        pdf.cell(head_w, row_h, f"WS {a_ws}", 1, 0, 'C', True)
-        for d_ws in range(1, 11):
-            val = "4+"
-            if d_ws > (2 * a_ws): val = "5+"
-            elif a_ws > d_ws: val = "3+"
-            pdf.cell(col_w, row_h, val, 1, 0, 'C')
-        pdf.ln()
-
-    # --- 3. WOUNDING (Matrix) ---
-    st_x = ws_x + 78 + 5
-    pdf.set_xy(st_x, y_start)
-    pdf.set_font("Arial", 'B', 8)
-    pdf.cell(head_w + (10*col_w), 6, "To Wound (D6)", 0, 1, 'C')
-    pdf.set_x(st_x + head_w)
-    pdf.set_fill_color(220, 220, 220)
-    for i in range(1, 11):
-        pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
-    pdf.ln()
-    
-    curr_y = pdf.get_y()
-    pdf.set_xy(st_x, curr_y - row_h)
-    pdf.set_font("Arial", 'B', 7)
-    pdf.cell(head_w, row_h, "Str\\T", 1, 0, 'C', True)
-    pdf.set_xy(st_x, curr_y)
-    
-    pdf.set_font("Arial", '', 7)
-    for s in range(1, 11):
-        pdf.set_x(st_x)
-        pdf.set_fill_color(240, 240, 240)
-        pdf.cell(head_w, row_h, f"Str {s}", 1, 0, 'C', True)
-        for t in range(1, 11):
-            diff = s - t
-            if diff >= 2: val = "2+"
-            elif diff == 1: val = "3+"
-            elif diff == 0: val = "4+"
-            elif diff == -1: val = "5+"
-            elif diff == -2: val = "6+"
-            else: val = "-"
-            pdf.cell(col_w, row_h, val, 1, 0, 'C')
-        pdf.ln()
-
-    # ==========================================
-    # VEHICLE DAMAGE SECTION
-    # ==========================================
-    
-    # We forcefully move down. 
-    # Calculate bottom of previous tables: y_start + (11 * 4.5) + header ~ 60mm
-    # So we set Y to y_start + 65. 
-    # If that is too low on the page (> 250), we add a page.
-    
-    new_y = y_start + 65
-    if new_y > 250:
-        pdf.add_page()
-        new_y = 20
-    
-    pdf.set_xy(x_start, new_y)
-    
-    pdf.set_font("Arial", 'B', 12)
-    pdf.set_fill_color(200, 220, 255)
-    pdf.cell(0, 8, "Vehicle Damage", 0, 1, 'L', True)
-    pdf.ln(2)
-    
-    veh_start_y = pdf.get_y()
-    
-    # --- DAMAGE TABLE (Left) ---
-    pdf.set_font("Arial", 'B', 9)
-    pdf.set_fill_color(220, 220, 220)
-    pdf.cell(15, 6, "Roll", 1, 0, 'C', True)
-    pdf.cell(35, 6, "Result", 1, 0, 'L', True)
-    pdf.cell(80, 6, "Effect", 1, 1, 'L', True)
-    
-    pdf.set_font("Arial", '', 8)
-    damage_rows = [
-        ("1", "Crew Shaken", "Vehicle can only move (No Shooting)."),
-        ("2", "Crew Stunned", "Vehicle cannot move or shoot."),
-        ("3", "Weapon Destroyed", "One weapon destroyed."),
-        ("4", "Immobilised", "Cannot move."),
-        ("5", "Wrecked", "Destroyed. Becomes Wreck."),
-        ("6+", "Explodes!", "Destroyed. Models within D6\" take S3 hit.")
-    ]
-    
-    for roll, res, eff in damage_rows:
-        pdf.cell(15, 6, roll, 1, 0, 'C')
-        pdf.cell(35, 6, res, 1, 0, 'L')
-        pdf.cell(80, 6, eff, 1, 1, 'L')
-
-    # --- MODIFIERS (Right) ---
-    pdf.set_xy(x_start + 135, veh_start_y)
-    pdf.set_font("Arial", 'B', 9)
-    pdf.set_fill_color(220, 220, 220)
-    pdf.cell(55, 6, "Penetration Modifiers", 1, 1, 'L', True)
-    
-    pdf.set_font("Arial", '', 8)
-    modifiers = [
-        "AP 1 Weapon: +1",
-        "AP - Weapon: -1",
-        "Open-topped: +1",
-        "Glancing Hit: -2",
-        "Melta (Close): +D6",
-    ]
-    
-    for mod in modifiers:
-        pdf.set_x(x_start + 135)
-        pdf.cell(55, 6, mod, 1, 1, 'L')
-
-def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False):
-    pdf = PDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-
-    # --- 1. DATA COLLECTION ---
-    total_pts = 0
-    slot_counts = {"HQ": 0, "Troops": 0, "Elites": 0, "Fast Attack": 0, "Heavy Support": 0}
-    active_weapons = set()
-    active_rules = set()
-    
-    def collect_refs(name_list):
-        for name in name_list:
-            if name in codex_data.get('weapons', {}): active_weapons.add(name)
-            elif name in codex_data.get('rules', {}): active_rules.add(name)
-            elif name in codex_data.get('wargear', {}): active_rules.add(name)
-
-    for entry in roster:
-        u = get_unit_callback(entry['unit_id'])
-        if not u: continue
-        total_pts += entry.get('calculated_cost', 0)
-        if not entry.get("parent_id") and u.get("slot") in slot_counts:
-            slot_counts[u["slot"]] += 1
-        collect_refs(u.get("wargear", []))
-        collect_refs(u.get("special_rules", []))
-        if "selected" in entry:
-            for gid, picks in entry["selected"].items():
-                opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
-                if not opt_def: continue
-                for choice in opt_def.get("choices", []):
-                    if isinstance(picks, list) and choice["id"] in picks: collect_refs([choice["name"]])
-                    elif picks == choice["id"]: collect_refs([choice["name"]])
-
-    # --- 2. HEADER ---
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 8, f"Codex: {codex_data.get('codex_name', 'Unknown Army')}", ln=True)
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(50, 8, f"Points: {total_pts} / {points_limit}", border=1, align='C')
-    fo_text = f"HQ: {slot_counts['HQ']}/2   Troops: {slot_counts['Troops']}/6   Elites: {slot_counts['Elites']}/3   Fast: {slot_counts['Fast Attack']}/3   Heavy: {slot_counts['Heavy Support']}/3"
-    pdf.cell(140, 8, fo_text, border=1, ln=True, align='C')
-    pdf.ln(8)
-
-    # --- 3. ROSTER LISTING ---
-    slots_order = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support", "Dedicated Transport"]
-    for slot in slots_order:
-        slot_units = [e for e in roster if not e.get("parent_id") and get_unit_callback(e['unit_id'])['slot'] == slot]
-        if not slot_units: continue
+def fetch_github_issues():
+    """Fetches the latest open and closed issues from GitHub."""
+    try:
+        token = st.secrets["github"]["token"]
+        owner = st.secrets["github"]["owner"]
+        repo = st.secrets["github"]["repo"]
         
-        pdf.chapter_title(slot)
-        for entry in slot_units:
-            u = get_unit_callback(entry['unit_id'])
+        api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+        params = { "state": "all", "sort": "updated", "direction": "desc", "per_page": 20 }
+        headers = { "Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json" }
+        
+        response = requests.get(api_url, headers=headers, params=params)
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except Exception:
+        return []
+
+# --- CALLBACKS ---
+def cb_update_size(entry, key):
+    entry["size"] = st.session_state[key]
+
+def cb_update_counter(entry, gid, cid, key):
+    qty = st.session_state[key]
+    current_picks = entry.get("selected", {}).get(gid, [])
+    current_picks = [x for x in current_picks if x != cid]
+    current_picks.extend([cid] * qty)
+    if "selected" not in entry: entry["selected"] = {}
+    entry["selected"][gid] = current_picks
+
+def cb_update_radio(entry, gid, name_to_id_map, key):
+    selected_name = st.session_state[key]
+    if "selected" not in entry: entry["selected"] = {}
+    
+    if selected_name == "(None)":
+        entry["selected"][gid] = []
+    else:
+        cid = name_to_id_map.get(selected_name)
+        if cid:
+            entry["selected"][gid] = [cid]
+
+def cb_update_checkbox(entry, gid, cid, key):
+    is_checked = st.session_state[key]
+    if "selected" not in entry: entry["selected"] = {}
+    current_picks = entry["selected"].get(gid, [])
+    
+    if is_checked:
+        if cid not in current_picks:
+            current_picks.append(cid)
+    else:
+        if cid in current_picks:
+            current_picks.remove(cid)
+    
+    entry["selected"][gid] = current_picks
+
+def calculate_roster():
+    total_pts = 0
+    counts = {"HQ": 0, "Troops": 0, "Elites": 0, "Fast Attack": 0, "Heavy Support": 0}
+    
+    for entry in st.session_state.roster:
+        u = get_unit_by_id(entry["unit_id"])
+        if not u: continue
+        
+        cost = u.get("base_points", 0) + u.get("points_per_model", 0) * entry.get("size", 1)
+        selection_tracker = {}
+        
+        for gid, picks in entry.get("selected", {}).items():
+            opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
+            if not opt_def: continue
             
-            # Unit Bar
-            pdf.set_font("Arial", 'B', 11)
-            pdf.set_fill_color(240, 240, 240)
-            name_str = f"{u['name']}"
-            if entry.get("size", 1) > 1: name_str += f" (x{entry['size']})"
-            pdf.cell(150, 7, name_str, 1, 0, 'L', True)
-            pdf.cell(40, 7, f"{entry.get('calculated_cost', 0)} pts", 1, 1, 'C', True)
-            pdf.ln(1)
+            for choice in opt_def.get("choices", []):
+                c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
+                if c_qty > 0:
+                    pts = choice.get("points", 0)
+                    if choice.get("points_mode") == "per_model":
+                        cost += pts * entry.get("size", 1)
+                    else:
+                        cost += pts * c_qty
+                        cid = choice["id"]
+                        if cid not in selection_tracker:
+                            selection_tracker[cid] = {"count": 0, "points": pts}
+                        selection_tracker[cid]["count"] += c_qty
 
-            # Profiles
-            profiles_to_print = []
-            if "profile" in u: profiles_to_print.append( ("Unit Profile", u["profile"]) )
-            if "sub_profiles" in u and "selected" in entry:
-                all_picked_ids = []
-                for picks in entry["selected"].values():
-                    if isinstance(picks, list): all_picked_ids.extend(picks)
-                    else: all_picked_ids.append(picks)
-                for key, sub_prof in u["sub_profiles"].items():
-                    if key in all_picked_ids: profiles_to_print.append( (sub_prof.get("name", key), sub_prof) )
+        if u.get("enable_twin_link_discount"):
+            for cid, data in selection_tracker.items():
+                pairs = data["count"] // 2
+                if pairs > 0:
+                    discount = pairs * (data["points"] * 0.5)
+                    cost -= discount
+
+        entry["calculated_cost"] = cost
+        total_pts += cost
+        
+        if not entry.get("parent_id") and u.get("slot") in counts:
+            counts[u["slot"]] += 1
             
-            draw_profile_table(pdf, profiles_to_print)
-            pdf.ln(2)
+    return total_pts, counts
 
-            # Options
-            pdf.set_font("Arial", size=10)
-            options_text = []
-            if u.get("wargear"): options_text.append("Base: " + ", ".join(u["wargear"]))
-            if "selected" in entry:
-                for gid, picks in entry["selected"].items():
-                    opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
-                    if not opt_def: continue
-                    for choice in opt_def.get("choices", []):
-                        count = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
-                        if count > 0:
-                            item_str = choice['name']
-                            if count > 1: item_str = f"{count}x {item_str}"
-                            options_text.append(item_str)
-            if options_text: pdf.multi_cell(0, 5, "   " + ", ".join(options_text))
-            if u.get("special_rules"):
-                pdf.set_font("Arial", 'I', 9)
-                pdf.multi_cell(0, 5, "   Rules: " + ", ".join(u["special_rules"]))
+def render_unit_options(entry, unit):
+    # Display Points INSIDE the box so the Title doesn't change
+    st.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
+    
+    min_s = int(unit.get("min_size", 1))
+    max_s = int(unit.get("max_size", 1))
+    if min_s != max_s:
+        k = f"size_{entry['id']}"
+        st.number_input(f"Squad Size ({min_s}-{max_s})", 
+                        min_value=min_s, max_value=max_s, 
+                        value=int(entry.get("size", min_s)), 
+                        key=k,
+                        on_change=cb_update_size, args=(entry, k))
 
-            # Children
-            children = [c for c in roster if c.get("parent_id") == entry["id"]]
+    if "selected" not in entry: entry["selected"] = {}
+    
+    for opt in unit.get("options", []):
+        gid = opt["group_id"]
+        st.caption(f"**{opt.get('group_name', 'Options')}**")
+        current_picks = entry["selected"].get(gid, [])
+        choices = opt.get("choices", [])
+        max_sel = opt.get("max_select", 1)
+        if opt.get("linked_to_size"): max_sel = entry["size"]
+        
+        if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
+            for c in choices:
+                cid = c["id"]
+                qty = current_picks.count(cid)
+                k = f"opt_{entry['id']}_{gid}_{cid}"
+                st.number_input(f"{c['name']} (+{c['points']} pts)", 
+                                min_value=0, max_value=max_sel, value=qty, 
+                                key=k,
+                                on_change=cb_update_counter, args=(entry, gid, cid, k))
+        elif max_sel == 1:
+            name_map = {}
+            opts_display = ["(None)"]
+            for c in choices:
+                d_name = f"{c['name']} (+{c['points']})"
+                name_map[d_name] = c['id']
+                opts_display.append(d_name)
+            current_idx = 0
+            if current_picks:
+                curr_id = current_picks[0]
+                for d_name, d_id in name_map.items():
+                    if d_id == curr_id and d_name in opts_display:
+                        current_idx = opts_display.index(d_name)
+                        break
+            k = f"opt_{entry['id']}_{gid}"
+            st.selectbox("", opts_display, index=current_idx, key=k, label_visibility="collapsed",
+                         on_change=cb_update_radio, args=(entry, gid, name_map, k))
+        else:
+            for c in choices:
+                cid = c["id"]
+                is_checked = cid in current_picks
+                k = f"opt_{entry['id']}_{gid}_{cid}"
+                st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=k,
+                            on_change=cb_update_checkbox, args=(entry, gid, cid, k))
+
+
+# --- Sidebar ---
+with st.sidebar:
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if icon_path.exists(): st.image(app_icon, width=60)
+        else: st.write("🌙")
+    with col2:
+        st.title("Rising Builder")
+        
+    st.divider()
+    st.header("Settings")
+    
+    # 1. Codex Loader
+    available_codexes = list(CODEX_DIR.glob("*.json"))
+    codex_names = [p.name for p in available_codexes]
+    index = 0
+    if "current_codex_name" in st.session_state and st.session_state.current_codex_name in codex_names:
+        index = codex_names.index(st.session_state.current_codex_name)
+
+    selected_codex_name = st.selectbox("Select Codex", codex_names, index=index)
+    
+    if selected_codex_name:
+        path = CODEX_DIR / selected_codex_name
+        # Only load if changed AND not suppressed by load_file event
+        if st.session_state.get("current_codex_path") != str(path):
+            st.session_state.codex_data = load_codex(path)
+            st.session_state.current_codex_path = str(path)
+            st.session_state.current_codex_name = selected_codex_name
+            # If we just loaded a file, don't wipe the roster!
+            if not st.session_state.get("file_loaded_flag", False):
+                st.session_state.roster = [] 
+            
+            # Clear flag after check
+            st.session_state.file_loaded_flag = False
+            st.rerun()
+
+    points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
+    
+    st.divider()
+
+    # 2. Save / Load
+    st.subheader("Save / Load List")
+    save_data = {
+        "roster": st.session_state.roster,
+        "codex_file": selected_codex_name,
+        "points_limit": points_limit
+    }
+    roster_json = json.dumps(save_data, indent=2)
+    st.download_button("💾 Download Roster File", roster_json, "my_army_list.json", "application/json")
+
+    uploaded_file = st.file_uploader("📂 Load Roster File", type=["json"])
+    if uploaded_file is not None:
+        try:
+            data = json.load(uploaded_file)
+            saved_codex = data.get("codex_file")
+            
+            # --- FIX: ROSTER LOADING ---
+            # Set flag to prevent wipe
+            st.session_state.file_loaded_flag = True
+            
+            # Set Codex Name to force selectbox update on rerun
+            if saved_codex:
+                st.session_state.current_codex_name = saved_codex
+                # Also pre-set path so loader logic works
+                st.session_state.current_codex_path = str(CODEX_DIR / saved_codex)
+                st.session_state.codex_data = load_codex(CODEX_DIR / saved_codex)
+
+            st.session_state.roster = data.get("roster", [])
+            st.success("List loaded successfully!")
+            st.rerun()
+            
+        except Exception as e: st.error(f"Error reading file: {e}")
+
+    st.divider()
+    
+    # 3. PDF Export
+    st.write("### Export Options")
+    include_tables = st.checkbox("Include Game Reference Tables", value=True)
+    
+    if st.button("📄 Generate PDF Roster"):
+        pdf_path = BASE_DIR / "temp_roster.pdf"
+        write_roster_pdf(
+            st.session_state.roster, 
+            st.session_state.codex_data, 
+            points_limit, 
+            str(pdf_path), 
+            get_unit_by_id,
+            include_ref_tables=include_tables
+        )
+        with open(pdf_path, "rb") as f:
+            st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
+
+    # 4. Project Status
+    st.divider()
+    st.subheader("Project Tracker")
+    with st.expander("🛠️ Development Status"):
+        issues = fetch_github_issues()
+        if not issues:
+            st.caption("No recent data found.")
+        else:
+            for i in issues:
+                icon = "✅" if i["state"] == "closed" else "🔴"
+                st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
+
+    # 5. Feedback (FIXED)
+    st.divider()
+    st.subheader("Report an Issue")
+    
+    # Using Session State to manage form inputs if needed, but native form usually works.
+    # The key fix is ensuring 'requests' is imported and secrets exist.
+    
+    with st.form("feedback_form"):
+        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
+        
+        feedback_title = st.text_input("Short Summary (e.g. Shield Drone Points)")
+        feedback_name = st.text_input("Your Name (Optional)")
+        
+        feedback_msg = st.text_area("Detailed Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
+        include_context = st.checkbox("Include roster data", value=True)
+        submitted = st.form_submit_button("Submit Feedback")
+        
+        if submitted:
+            if not feedback_title or not feedback_msg:
+                st.error("Please provide both a Summary and a Description.")
+            else:
+                report_pts, _ = calculate_roster()
+                try:
+                    # Check secrets first
+                    if "github" not in st.secrets:
+                        st.error("GitHub secrets not configured!")
+                        st.stop()
+                        
+                    token = st.secrets["github"]["token"]
+                    owner = st.secrets["github"]["owner"]
+                    repo = st.secrets["github"]["repo"]
+                    
+                    final_title = f"[{feedback_type}] {feedback_title}"
+                    if feedback_name:
+                        final_title += f" (by {feedback_name})"
+
+                    body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
+                    
+                    if include_context:
+                        context_str = "\n\n**Context:**\n"
+                        if "codex_data" in st.session_state:
+                            context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
+                        context_str += f"- Points: {report_pts}/{points_limit}\n"
+                        context_str += f"- Unit Count: {len(st.session_state.roster)}"
+                        body_text += context_str
+
+                    api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+                    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+                    payload = {"title": final_title, "body": body_text}
+                    
+                    # Debug print if it fails
+                    response = requests.post(api_url, json=payload, headers=headers)
+                    
+                    if response.status_code == 201: st.success("Feedback sent!")
+                    else: 
+                        st.error(f"Error {response.status_code}: {response.text}")
+                except Exception as e:
+                    st.error(f"Error sending feedback: {e}")
+
+# --- Main Page ---
+if "codex_data" in st.session_state and st.session_state.codex_data:
+    data = st.session_state.codex_data
+    st.title(f"{data.get('codex_name', 'Army')} Builder")
+    
+    curr_pts, slots = calculate_roster()
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
+    col2.metric("HQ", f"{slots['HQ']}/2")
+    col3.metric("Troops", f"{slots['Troops']}/6")
+    col4.metric("Elites", f"{slots['Elites']}/3")
+    col5.metric("Fast", f"{slots['Fast Attack']}/3")
+    col6.metric("Heavy", f"{slots['Heavy Support']}/3")
+    st.divider()
+
+    st.header(f"Current Roster ({len(st.session_state.roster)} Units)")
+    parents = [e for e in st.session_state.roster if not e.get("parent_id")]
+    
+    if not parents: st.info("Your roster is empty. Add a unit below!")
+    else:
+        for entry in parents:
+            u = get_unit_by_id(entry["unit_id"])
+            if not u: continue
+
+            # FIX: REMOVED POINTS FROM TITLE TO PREVENT COLLAPSE
+            with st.expander(f"[{u['slot']}] {u['name']}", expanded=False):
+                render_unit_options(entry, u)
+
+                valid_transports = u.get("dedicated_transports", [])
+                if valid_transports:
+                    st.divider()
+                    cols = st.columns([3, 1])
+                    t_opts = [t for t in [get_unit_by_id(tid) for tid in valid_transports] if t]
+                    t_names = [t["name"] for t in t_opts]
+                    sel_t = cols[0].selectbox("Add Attachment", t_names, key=f"trans_sel_{entry['id']}")
+                    if cols[1].button("Add", key=f"add_trans_{entry['id']}"):
+                        tid = next(t["id"] for t in t_opts if t["name"] == sel_t)
+                        child_entry = {
+                            "id": str(uuid.uuid4()),
+                            "unit_id": tid,
+                            "size": int(get_unit_by_id(tid).get("default_size", 1)),
+                            "selected": {},
+                            "parent_id": entry["id"]
+                        }
+                        st.session_state.roster.append(child_entry)
+                        st.rerun()
+
+                st.divider()
+                if st.button("Remove Unit", key=f"del_{entry['id']}", type="primary"):
+                    ids_to_remove = [entry["id"]] + [c["id"] for c in st.session_state.roster if c.get("parent_id") == entry["id"]]
+                    st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
+                    st.rerun()
+
+            children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
             for child in children:
-                uc = get_unit_callback(child['unit_id'])
-                pdf.ln(2)
-                pdf.set_font("Arial", 'B', 10)
-                pdf.cell(10, 5, "  >", 0, 0)
-                pdf.cell(0, 5, f"Attached: {uc['name']} ({child.get('calculated_cost', 0)} pts)", ln=True)
-                
-                c_profs = []
-                if "profile" in uc: c_profs.append( ("Profile", uc["profile"]) )
-                if "sub_profiles" in uc and "selected" in child:
-                    all_picked_c_ids = []
-                    for picks in child["selected"].values():
-                        if isinstance(picks, list): all_picked_c_ids.extend(picks)
-                        else: all_picked_c_ids.append(picks)
-                    for key, sub_prof in uc["sub_profiles"].items():
-                        if key in all_picked_c_ids: c_profs.append( (sub_prof.get("name", key), sub_prof) )
-                
-                draw_profile_table(pdf, c_profs)
+                uc = get_unit_by_id(child["unit_id"])
+                if not uc: continue
+                with st.container():
+                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}**")
+                    with st.expander(f"Edit {uc['name']}", expanded=False):
+                        render_unit_options(child, uc)
+                        st.divider()
+                        if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
+                            st.session_state.roster.remove(child)
+                            st.rerun()
 
-                c_opts = []
-                if "selected" in child:
-                    for gid, picks in child["selected"].items():
-                        opt_def = next((o for o in uc.get("options", []) if o.get("group_id") == gid), None)
-                        if not opt_def: continue
-                        for choice in opt_def.get("choices", []):
-                            count = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
-                            if count > 0: c_opts.append(f"{choice['name']}")
-                if c_opts:
-                    pdf.set_font("Arial", size=9)
-                    pdf.cell(10, 5, "", 0, 0)
-                    pdf.multi_cell(0, 5, ", ".join(c_opts))
-            pdf.ln(4)
+    st.divider()
 
-    # --- 4. APPENDIX ---
-    pdf.add_page()
-    pdf.chapter_title("Reference: Weapons")
+    st.subheader("Add New Unit")
+    slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     
-    pdf.set_font("Arial", 'B', 9)
-    pdf.set_fill_color(220, 220, 220)
-    pdf.cell(60, 6, "Name", 1, 0, 'L', True)
-    pdf.cell(20, 6, "Range", 1, 0, 'C', True)
-    pdf.cell(15, 6, "Str", 1, 0, 'C', True)
-    pdf.cell(15, 6, "AP", 1, 0, 'C', True)
-    pdf.cell(40, 6, "Type", 1, 0, 'C', True)
-    pdf.cell(40, 6, "Notes", 1, 1, 'L', True)
+    selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
     
-    pdf.set_font("Arial", '', 9)
-    sorted_weps = sorted(list(active_weapons))
-    weapons_db = codex_data.get('weapons', {})
+    slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
     
-    for w_name in sorted_weps:
-        w_stats = weapons_db.get(w_name)
-        if not w_stats:
-            for key in weapons_db.keys():
-                if key in w_name: w_stats = weapons_db[key]; break
-        if w_stats:
-            pdf.cell(60, 6, w_name, 1, 0, 'L')
-            pdf.cell(20, 6, str(w_stats.get('range', '-')), 1, 0, 'C')
-            pdf.cell(15, 6, str(w_stats.get('S', '-')), 1, 0, 'C')
-            pdf.cell(15, 6, str(w_stats.get('AP', '-')), 1, 0, 'C')
-            pdf.cell(40, 6, str(w_stats.get('type', '-')), 1, 0, 'C')
-            notes = str(w_stats.get('notes', '-'))
-            pdf.cell(40, 6, notes[:25], 1, 1, 'L')
+    if not slot_units:
+        st.caption(f"No units found for {selected_slot}")
+    else:
+        unit_options = [u["name"] for u in slot_units]
+        selected_unit_name = st.selectbox(f"Select {selected_slot} Unit", unit_options, key=f"sel_unit_{selected_slot}")
+        
+        if st.button(f"Add {selected_unit_name}", key=f"btn_add_{selected_slot}"):
+            uid = next(u["id"] for u in slot_units if u["name"] == selected_unit_name)
+            unit_def = get_unit_by_id(uid)
+            new_entry = {
+                "id": str(uuid.uuid4()),
+                "unit_id": uid,
+                "size": int(unit_def.get("default_size", 1)),
+                "selected": {},
+                "parent_id": None
+            }
+            st.session_state.roster.append(new_entry)
+            st.rerun()
 
-    pdf.ln(10)
-    pdf.chapter_title("Reference: Rules & Wargear")
-    sorted_rules = sorted(list(active_rules))
-    rules_db = codex_data.get('rules', {})
-    gear_db = codex_data.get('wargear', {})
-    
-    for r_name in sorted_rules:
-        desc = ""
-        if r_name in rules_db: desc = rules_db[r_name].get('summary', '')
-        elif r_name in gear_db: desc = gear_db[r_name].get('summary', '')
-        if desc:
-            pdf.set_font("Arial", 'B', 10)
-            pdf.cell(0, 5, r_name, 0, 1)
-            pdf.set_font("Arial", '', 9)
-            pdf.multi_cell(0, 5, desc)
-            pdf.ln(2)
-
-    if include_ref_tables:
-        draw_game_reference_tables(pdf)
-
-    try: pdf.output(filename)
-    except Exception as e: print(f"Error writing PDF: {e}")
+else:
+    st.info("⬅️ Please select a Codex from the sidebar to begin.")

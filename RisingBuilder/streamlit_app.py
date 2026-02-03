@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import uuid
+import requests
 from pathlib import Path
 from PIL import Image
 from reports import write_roster_pdf
@@ -38,24 +39,45 @@ def get_unit_by_id(unit_id):
             return u
     return None
 
-# --- CALLBACKS (The Fix for the "One Step Behind" Bug) ---
+def fetch_github_issues():
+    """Fetches the latest open and closed issues from GitHub."""
+    try:
+        token = st.secrets["github"]["token"]
+        owner = st.secrets["github"]["owner"]
+        repo = st.secrets["github"]["repo"]
+        
+        api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+        params = {
+            "state": "all",       # Get both Open and Closed
+            "sort": "updated",    # Sort by recent activity
+            "direction": "desc",
+            "per_page": 20        # Limit to last 20 items
+        }
+        headers = {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        
+        response = requests.get(api_url, headers=headers, params=params)
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except Exception:
+        return []
+
+# --- CALLBACKS ---
 def cb_update_size(entry, key):
-    """Updates squad size immediately."""
     entry["size"] = st.session_state[key]
 
 def cb_update_counter(entry, gid, cid, key):
-    """Updates counter-style options (weapons, drones)."""
     qty = st.session_state[key]
     current_picks = entry.get("selected", {}).get(gid, [])
-    # Remove all instances of this ID
     current_picks = [x for x in current_picks if x != cid]
-    # Add the new quantity back
     current_picks.extend([cid] * qty)
     if "selected" not in entry: entry["selected"] = {}
     entry["selected"][gid] = current_picks
 
 def cb_update_radio(entry, gid, name_to_id_map, key):
-    """Updates radio-style options (single choice)."""
     selected_name = st.session_state[key]
     if "selected" not in entry: entry["selected"] = {}
     
@@ -67,7 +89,6 @@ def cb_update_radio(entry, gid, name_to_id_map, key):
             entry["selected"][gid] = [cid]
 
 def cb_update_checkbox(entry, gid, cid, key):
-    """Updates checkbox-style options."""
     is_checked = st.session_state[key]
     if "selected" not in entry: entry["selected"] = {}
     current_picks = entry["selected"].get(gid, [])
@@ -89,10 +110,7 @@ def calculate_roster():
         u = get_unit_by_id(entry["unit_id"])
         if not u: continue
         
-        # 1. Base Points
         cost = u.get("base_points", 0) + u.get("points_per_model", 0) * entry.get("size", 1)
-        
-        # 2. Options Calculation
         selection_tracker = {}
         
         for gid, picks in entry.get("selected", {}).items():
@@ -101,22 +119,17 @@ def calculate_roster():
             
             for choice in opt_def.get("choices", []):
                 c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
-                
                 if c_qty > 0:
                     pts = choice.get("points", 0)
-                    
                     if choice.get("points_mode") == "per_model":
                         cost += pts * entry.get("size", 1)
                     else:
                         cost += pts * c_qty
-                        
-                        # Track for Twin-Link check
                         cid = choice["id"]
                         if cid not in selection_tracker:
                             selection_tracker[cid] = {"count": 0, "points": pts}
                         selection_tracker[cid]["count"] += c_qty
 
-        # 3. Apply Twin-Link Discount
         if u.get("enable_twin_link_discount"):
             for cid, data in selection_tracker.items():
                 pairs = data["count"] // 2
@@ -127,17 +140,12 @@ def calculate_roster():
         entry["calculated_cost"] = cost
         total_pts += cost
         
-        # Slots (only if not a child unit)
         if not entry.get("parent_id") and u.get("slot") in counts:
             counts[u["slot"]] += 1
             
     return total_pts, counts
 
 def render_unit_options(entry, unit):
-    """
-    Renders options using Callbacks to ensure instant UI updates.
-    """
-    # 1. Squad Size
     min_s = int(unit.get("min_size", 1))
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
@@ -148,19 +156,16 @@ def render_unit_options(entry, unit):
                         key=k,
                         on_change=cb_update_size, args=(entry, k))
 
-    # 2. Options Logic
     if "selected" not in entry: entry["selected"] = {}
     
     for opt in unit.get("options", []):
         gid = opt["group_id"]
         st.caption(f"**{opt.get('group_name', 'Options')}**")
-        
         current_picks = entry["selected"].get(gid, [])
         choices = opt.get("choices", [])
         max_sel = opt.get("max_select", 1)
         if opt.get("linked_to_size"): max_sel = entry["size"]
         
-        # A) Counter Logic
         if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
             for c in choices:
                 cid = c["id"]
@@ -170,33 +175,23 @@ def render_unit_options(entry, unit):
                                 min_value=0, max_value=max_sel, value=qty, 
                                 key=k,
                                 on_change=cb_update_counter, args=(entry, gid, cid, k))
-
-        # B) Radio Logic
         elif max_sel == 1:
-            # Build map of "Display Name" -> "ID"
             name_map = {}
             opts_display = ["(None)"]
-            
             for c in choices:
                 d_name = f"{c['name']} (+{c['points']})"
                 name_map[d_name] = c['id']
                 opts_display.append(d_name)
-            
             current_idx = 0
             if current_picks:
                 curr_id = current_picks[0]
-                # Find which display name matches this ID
                 for d_name, d_id in name_map.items():
-                    if d_id == curr_id:
-                        if d_name in opts_display:
-                            current_idx = opts_display.index(d_name)
+                    if d_id == curr_id and d_name in opts_display:
+                        current_idx = opts_display.index(d_name)
                         break
-                            
             k = f"opt_{entry['id']}_{gid}"
             st.selectbox("", opts_display, index=current_idx, key=k, label_visibility="collapsed",
                          on_change=cb_update_radio, args=(entry, gid, name_map, k))
-
-        # C) Checkbox Logic
         else:
             for c in choices:
                 cid = c["id"]
@@ -272,7 +267,19 @@ with st.sidebar:
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
 
-    # 4. Feedback
+    # 4. Project Status (The New Feature!)
+    st.divider()
+    st.subheader("Project Tracker")
+    with st.expander("🛠️ Development Status"):
+        issues = fetch_github_issues()
+        if not issues:
+            st.caption("No recent data found.")
+        else:
+            for i in issues:
+                icon = "✅" if i["state"] == "closed" else "🔴"
+                st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
+
+    # 5. Feedback
     st.divider()
     st.subheader("Report an Issue")
     with st.form("feedback_form"):
@@ -297,7 +304,6 @@ with st.sidebar:
                     context_str += f"- Unit Count: {len(st.session_state.roster)}"
                     body_text += context_str
 
-                import requests 
                 api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
                 headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
                 payload = {"title": f"[{feedback_type}] Feedback from App", "body": body_text}
@@ -313,7 +319,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
     st.title(f"{data.get('codex_name', 'Army')} Builder")
     
-    # Summary
     curr_pts, slots = calculate_roster()
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
@@ -324,7 +329,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     col6.metric("Heavy", f"{slots['Heavy Support']}/3")
     st.divider()
 
-    # --- Roster Display ---
     st.header(f"Current Roster ({len(st.session_state.roster)} Units)")
     parents = [e for e in st.session_state.roster if not e.get("parent_id")]
     
@@ -335,17 +339,14 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             if not u: continue
 
             with st.expander(f"[{u['slot']}] {u['name']} ({entry.get('calculated_cost', 0)} pts)", expanded=False):
-                # RENDER PARENT OPTIONS
                 render_unit_options(entry, u)
 
-                # Add Attachment Logic
                 valid_transports = u.get("dedicated_transports", [])
                 if valid_transports:
                     st.divider()
                     cols = st.columns([3, 1])
                     t_opts = [t for t in [get_unit_by_id(tid) for tid in valid_transports] if t]
                     t_names = [t["name"] for t in t_opts]
-                    
                     sel_t = cols[0].selectbox("Add Attachment", t_names, key=f"trans_sel_{entry['id']}")
                     if cols[1].button("Add", key=f"add_trans_{entry['id']}"):
                         tid = next(t["id"] for t in t_opts if t["name"] == sel_t)
@@ -365,7 +366,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                     st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
                     st.rerun()
 
-            # --- Roster Children (Attachments) ---
             children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
             for child in children:
                 uc = get_unit_by_id(child["unit_id"])
@@ -373,10 +373,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 with st.container():
                     st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
                     with st.expander(f"Edit {uc['name']}", expanded=False):
-                        
-                        # RENDER CHILD OPTIONS
                         render_unit_options(child, uc)
-                        
                         st.divider()
                         if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
                             st.session_state.roster.remove(child)
@@ -384,7 +381,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
     st.divider()
 
-    # --- Add New Unit Section ---
     st.subheader("Add New Unit")
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     tabs = st.tabs(slots_map)

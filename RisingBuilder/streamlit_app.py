@@ -43,6 +43,34 @@ def get_unit_by_id(unit_id):
             return u
     return None
 
+def get_tooltip(item_name, codex_data):
+    """Generates a tooltip string for a given item name by looking up stats/rules."""
+    if not codex_data: return None
+    
+    # 1. Check Weapons
+    weps = codex_data.get("weapons", {})
+    # Exact match
+    if item_name in weps:
+        w = weps[item_name]
+        return f"[Weapon] Rng: {w.get('range', '-')}, S: {w.get('S', '-')}, AP: {w.get('AP', '-')}, Type: {w.get('type', '-')}. {w.get('notes', '')}"
+    
+    # Partial match (e.g. Twin-linked Shuriken Catapult -> Shuriken Catapult)
+    for k, v in weps.items():
+        if k in item_name:
+             return f"[{k}] Rng: {v.get('range', '-')}, S: {v.get('S', '-')}, AP: {v.get('AP', '-')}, Type: {v.get('type', '-')}. {v.get('notes', '')}"
+
+    # 2. Check Wargear
+    gear = codex_data.get("wargear", {})
+    if item_name in gear:
+        return f"[Wargear] {gear[item_name].get('summary', '')}"
+        
+    # 3. Check Rules
+    rules = codex_data.get("rules", {})
+    if item_name in rules:
+        return f"[Rule] {rules[item_name].get('summary', '')}"
+    
+    return None
+
 def fetch_github_issues():
     """Fetches the latest open and closed issues from GitHub."""
     try:
@@ -63,11 +91,9 @@ def fetch_github_issues():
 
 # --- CALLBACKS ---
 def cb_update_roster_name():
-    """Updates the roster name from session state."""
     st.session_state.roster_name = st.session_state.roster_name_input
 
 def cb_update_custom_name(entry, key):
-    """Updates custom unit name."""
     entry["custom_name"] = st.session_state[key]
 
 def cb_update_size(entry, key):
@@ -149,8 +175,8 @@ def calculate_roster():
             
     return total_pts, counts
 
-def render_unit_options(entry, unit):
-    # --- Custom Name Input ---
+def render_unit_options(entry, unit, codex_data):
+    # Custom Name
     k_name = f"name_{entry['id']}"
     st.text_input("Custom Name (Optional)", 
                   value=entry.get("custom_name", ""), 
@@ -158,7 +184,6 @@ def render_unit_options(entry, unit):
                   key=k_name,
                   on_change=cb_update_custom_name, args=(entry, k_name))
 
-    # Points display
     st.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
     
     # Size
@@ -188,9 +213,12 @@ def render_unit_options(entry, unit):
                 cid = c["id"]
                 qty = current_picks.count(cid)
                 k = f"opt_{entry['id']}_{gid}_{cid}"
+                tooltip = get_tooltip(c["name"], codex_data)
+                
                 st.number_input(f"{c['name']} (+{c['points']} pts)", 
                                 min_value=0, max_value=max_sel, value=qty, 
                                 key=k,
+                                help=tooltip, # TOOLTIP HERE
                                 on_change=cb_update_counter, args=(entry, gid, cid, k))
         elif max_sel == 1:
             name_map = {}
@@ -214,7 +242,10 @@ def render_unit_options(entry, unit):
                 cid = c["id"]
                 is_checked = cid in current_picks
                 k = f"opt_{entry['id']}_{gid}_{cid}"
+                tooltip = get_tooltip(c["name"], codex_data)
+                
                 st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=k,
+                            help=tooltip, # TOOLTIP HERE
                             on_change=cb_update_checkbox, args=(entry, gid, cid, k))
 
 
@@ -241,16 +272,14 @@ with st.sidebar:
     
     if selected_codex_name:
         path = CODEX_DIR / selected_codex_name
-        # Only load if changed AND not suppressed by load_file event
         if st.session_state.get("current_codex_path") != str(path):
             st.session_state.codex_data = load_codex(path)
             st.session_state.current_codex_path = str(path)
             st.session_state.current_codex_name = selected_codex_name
             
-            # WIPE ROSTER only if we are NOT loading a file
             if not st.session_state.get("is_loading_file", False):
                 st.session_state.roster = [] 
-                st.session_state.roster_name = "My Army List" # Reset name on codex swap
+                st.session_state.roster_name = "My Army List"
             
             st.session_state.is_loading_file = False
             st.rerun()
@@ -259,8 +288,7 @@ with st.sidebar:
     st.text_input("Roster Name", 
                   value=st.session_state.roster_name, 
                   key="roster_name_input",
-                  on_change=cb_update_roster_name,
-                  help="This name will appear on the PDF and the saved file.")
+                  on_change=cb_update_roster_name)
                   
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
@@ -269,7 +297,6 @@ with st.sidebar:
     # 3. Save / Load
     st.subheader("Save / Load List")
     
-    # Sanitize filename
     safe_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', st.session_state.roster_name)
     if not safe_filename: safe_filename = "army_list"
     
@@ -321,7 +348,7 @@ with st.sidebar:
             str(pdf_path), 
             get_unit_by_id,
             include_ref_tables=include_tables,
-            roster_name=st.session_state.roster_name # Pass the custom name
+            roster_name=st.session_state.roster_name
         )
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
@@ -390,7 +417,6 @@ with st.sidebar:
 if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
     
-    # Custom Title in App (Uses the new variable)
     st.title(f"{st.session_state.roster_name}")
     st.caption(f"Using Codex: {data.get('codex_name', 'Army')}")
     
@@ -413,13 +439,14 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             u = get_unit_by_id(entry["unit_id"])
             if not u: continue
 
-            # Display Name: Use Custom Name if available
+            # Display Name
             display_title = f"[{u['slot']}] {u['name']}"
             if entry.get("custom_name"):
                 display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']})"
 
             with st.expander(display_title, expanded=False):
-                render_unit_options(entry, u)
+                # Pass Codex Data for Tooltips
+                render_unit_options(entry, u, data)
 
                 valid_transports = u.get("dedicated_transports", [])
                 if valid_transports:
@@ -451,14 +478,13 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 uc = get_unit_by_id(child["unit_id"])
                 if not uc: continue
                 with st.container():
-                    # Custom Child Name Logic
                     child_title = uc['name']
                     if child.get("custom_name"):
                         child_title = f"{child['custom_name']} ({uc['name']})"
                         
                     st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{child_title}**")
                     with st.expander(f"Edit {child_title}", expanded=False):
-                        render_unit_options(child, uc)
+                        render_unit_options(child, uc, data)
                         st.divider()
                         if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
                             st.session_state.roster.remove(child)

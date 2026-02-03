@@ -38,6 +38,49 @@ def get_unit_by_id(unit_id):
             return u
     return None
 
+# --- CALLBACKS (The Fix for the "One Step Behind" Bug) ---
+def cb_update_size(entry, key):
+    """Updates squad size immediately."""
+    entry["size"] = st.session_state[key]
+
+def cb_update_counter(entry, gid, cid, key):
+    """Updates counter-style options (weapons, drones)."""
+    qty = st.session_state[key]
+    current_picks = entry.get("selected", {}).get(gid, [])
+    # Remove all instances of this ID
+    current_picks = [x for x in current_picks if x != cid]
+    # Add the new quantity back
+    current_picks.extend([cid] * qty)
+    if "selected" not in entry: entry["selected"] = {}
+    entry["selected"][gid] = current_picks
+
+def cb_update_radio(entry, gid, name_to_id_map, key):
+    """Updates radio-style options (single choice)."""
+    selected_name = st.session_state[key]
+    if "selected" not in entry: entry["selected"] = {}
+    
+    if selected_name == "(None)":
+        entry["selected"][gid] = []
+    else:
+        cid = name_to_id_map.get(selected_name)
+        if cid:
+            entry["selected"][gid] = [cid]
+
+def cb_update_checkbox(entry, gid, cid, key):
+    """Updates checkbox-style options."""
+    is_checked = st.session_state[key]
+    if "selected" not in entry: entry["selected"] = {}
+    current_picks = entry["selected"].get(gid, [])
+    
+    if is_checked:
+        if cid not in current_picks:
+            current_picks.append(cid)
+    else:
+        if cid in current_picks:
+            current_picks.remove(cid)
+    
+    entry["selected"][gid] = current_picks
+
 def calculate_roster():
     total_pts = 0
     counts = {"HQ": 0, "Troops": 0, "Elites": 0, "Fast Attack": 0, "Heavy Support": 0}
@@ -50,8 +93,6 @@ def calculate_roster():
         cost = u.get("base_points", 0) + u.get("points_per_model", 0) * entry.get("size", 1)
         
         # 2. Options Calculation
-        # We track selections to check for Twin-Linking later
-        # Structure: { "weapon_id": { "count": 0, "points": 12 } }
         selection_tracker = {}
         
         for gid, picks in entry.get("selected", {}).items():
@@ -59,17 +100,14 @@ def calculate_roster():
             if not opt_def: continue
             
             for choice in opt_def.get("choices", []):
-                # Count how many of this specific item were picked
                 c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
                 
                 if c_qty > 0:
                     pts = choice.get("points", 0)
                     
-                    # Per-model points (like Grenades) are simple multiplication
                     if choice.get("points_mode") == "per_model":
                         cost += pts * entry.get("size", 1)
                     else:
-                        # Flat points (like Weapons) might get discounted
                         cost += pts * c_qty
                         
                         # Track for Twin-Link check
@@ -79,12 +117,8 @@ def calculate_roster():
                         selection_tracker[cid]["count"] += c_qty
 
         # 3. Apply Twin-Link Discount
-        # If the JSON says this unit can twin-link, we look for pairs.
         if u.get("enable_twin_link_discount"):
             for cid, data in selection_tracker.items():
-                # For every pair (2), we assume it's a Twin-Linked weapon.
-                # The cost of TL is usually 1.5x Base. We charged 2x Base.
-                # So we refund 0.5x Base for every pair.
                 pairs = data["count"] // 2
                 if pairs > 0:
                     discount = pairs * (data["points"] * 0.5)
@@ -101,17 +135,18 @@ def calculate_roster():
 
 def render_unit_options(entry, unit):
     """
-    Renders the Size spinner and Option widgets (Counters, Radios, Checkboxes)
-    for a specific roster entry. Used by both Parents and Children.
+    Renders options using Callbacks to ensure instant UI updates.
     """
     # 1. Squad Size
     min_s = int(unit.get("min_size", 1))
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
-        entry["size"] = st.number_input(f"Squad Size ({min_s}-{max_s})", 
-                                        min_value=min_s, max_value=max_s, 
-                                        value=int(entry.get("size", min_s)), 
-                                        key=f"size_{entry['id']}")
+        k = f"size_{entry['id']}"
+        st.number_input(f"Squad Size ({min_s}-{max_s})", 
+                        min_value=min_s, max_value=max_s, 
+                        value=int(entry.get("size", min_s)), 
+                        key=k,
+                        on_change=cb_update_size, args=(entry, k))
 
     # 2. Options Logic
     if "selected" not in entry: entry["selected"] = {}
@@ -125,46 +160,50 @@ def render_unit_options(entry, unit):
         max_sel = opt.get("max_select", 1)
         if opt.get("linked_to_size"): max_sel = entry["size"]
         
-        # A) Counter Logic (Multiple items, or single item with max > 1)
+        # A) Counter Logic
         if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
             for c in choices:
                 cid = c["id"]
                 qty = current_picks.count(cid)
-                new_qty = st.number_input(f"{c['name']} (+{c['points']} pts)", 
-                                          min_value=0, max_value=max_sel, value=qty, 
-                                          key=f"opt_{entry['id']}_{gid}_{cid}")
-                
-                # Update pick list: remove all old instances, add new count
-                current_picks = [x for x in current_picks if x != cid]
-                current_picks.extend([cid] * new_qty)
-                entry["selected"][gid] = current_picks
+                k = f"opt_{entry['id']}_{gid}_{cid}"
+                st.number_input(f"{c['name']} (+{c['points']} pts)", 
+                                min_value=0, max_value=max_sel, value=qty, 
+                                key=k,
+                                on_change=cb_update_counter, args=(entry, gid, cid, k))
 
-        # B) Radio Logic (Single Choice, Max 1)
+        # B) Radio Logic
         elif max_sel == 1:
-            opts = ["(None)"] + [f"{c['name']} (+{c['points']})" for c in choices]
+            # Build map of "Display Name" -> "ID"
+            name_map = {}
+            opts_display = ["(None)"]
+            
+            for c in choices:
+                d_name = f"{c['name']} (+{c['points']})"
+                name_map[d_name] = c['id']
+                opts_display.append(d_name)
+            
             current_idx = 0
             if current_picks:
                 curr_id = current_picks[0]
-                for i, c in enumerate(choices):
-                    if c["id"] == curr_id: current_idx = i + 1; break
-                    
-            sel = st.selectbox("", opts, index=current_idx, key=f"opt_{entry['id']}_{gid}", label_visibility="collapsed")
-            
-            if sel == "(None)": entry["selected"][gid] = []
-            else:
-                idx = opts.index(sel) - 1
-                entry["selected"][gid] = [choices[idx]["id"]]
+                # Find which display name matches this ID
+                for d_name, d_id in name_map.items():
+                    if d_id == curr_id:
+                        if d_name in opts_display:
+                            current_idx = opts_display.index(d_name)
+                        break
+                            
+            k = f"opt_{entry['id']}_{gid}"
+            st.selectbox("", opts_display, index=current_idx, key=k, label_visibility="collapsed",
+                         on_change=cb_update_radio, args=(entry, gid, name_map, k))
 
-        # C) Checkbox Logic (Multiple unique choices)
+        # C) Checkbox Logic
         else:
             for c in choices:
                 cid = c["id"]
                 is_checked = cid in current_picks
-                if st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=f"opt_{entry['id']}_{gid}_{cid}"):
-                    if cid not in current_picks: 
-                        if len(current_picks) < max_sel: entry["selected"].setdefault(gid, []).append(cid)
-                else:
-                    if cid in current_picks: entry["selected"][gid].remove(cid)
+                k = f"opt_{entry['id']}_{gid}_{cid}"
+                st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=k,
+                            on_change=cb_update_checkbox, args=(entry, gid, cid, k))
 
 
 # --- Sidebar ---
@@ -335,7 +374,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                     st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
                     with st.expander(f"Edit {uc['name']}", expanded=False):
                         
-                        # RENDER CHILD OPTIONS (FIXED!)
+                        # RENDER CHILD OPTIONS
                         render_unit_options(child, uc)
                         
                         st.divider()
@@ -372,4 +411,3 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")
-

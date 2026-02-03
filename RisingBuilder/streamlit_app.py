@@ -57,7 +57,6 @@ def get_tooltip(item_name, codex_data):
     weps = codex_data.get("weapons", {})
     for name, stats in weps.items():
         n = name.lower()
-        # Check for match in either direction (e.g. "Twin-linked Shuriken" contains "Shuriken")
         if n == query or n in query or query in n:
             return f"⚔️ [Weapon] Rng: {stats.get('range', '-')}, S: {stats.get('S', '-')}, AP: {stats.get('AP', '-')}, Type: {stats.get('type', '-')}. {stats.get('notes', '')}"
 
@@ -249,19 +248,25 @@ def render_unit_options(entry, unit, codex_data):
                         current_selected_name = d_name
                         break
             
+            # Calculate tooltip for CURRENT SELECTION
+            dropdown_tooltip = "Select an option to see rules."
+            if current_selected_name != "(None)":
+                clean_name = current_selected_name.split(" (+")[0]
+                desc = get_tooltip(clean_name, codex_data)
+                if desc: dropdown_tooltip = desc
+
             k = f"opt_{entry['id']}_{gid}"
             
-            # Render Selectbox
+            # Render Selectbox with HELP attached
             selected = st.selectbox("", opts_display, index=current_idx, key=k, label_visibility="collapsed",
+                         help=dropdown_tooltip, # <--- DYNAMIC TOOLTIP HERE
                          on_change=cb_update_radio, args=(entry, gid, name_map, k))
             
-            # Dynamic Description for Dropdown (Since they don't have hover icons)
+            # Also keep the caption below for extra visibility
             if selected != "(None)":
-                # Strip points cost for lookup: "Banshee Mask (+5)" -> "Banshee Mask"
                 clean_name = selected.split(" (+")[0]
                 desc = get_tooltip(clean_name, codex_data)
-                if desc:
-                    st.caption(f"↳ {desc}")
+                if desc: st.caption(f"↳ {desc}")
 
         else:
             for c in choices:

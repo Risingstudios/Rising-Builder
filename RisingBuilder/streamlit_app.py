@@ -146,6 +146,9 @@ def calculate_roster():
     return total_pts, counts
 
 def render_unit_options(entry, unit):
+    # Display Points INSIDE the box so the Title doesn't change
+    st.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
+    
     min_s = int(unit.get("min_size", 1))
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
@@ -351,7 +354,8 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             u = get_unit_by_id(entry["unit_id"])
             if not u: continue
 
-            with st.expander(f"[{u['slot']}] {u['name']} ({entry.get('calculated_cost', 0)} pts)", expanded=False):
+            # FIX: REMOVED POINTS FROM TITLE
+            with st.expander(f"[{u['slot']}] {u['name']}", expanded=False):
                 render_unit_options(entry, u)
 
                 valid_transports = u.get("dedicated_transports", [])
@@ -384,7 +388,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 uc = get_unit_by_id(child["unit_id"])
                 if not uc: continue
                 with st.container():
-                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}** ({child.get('calculated_cost',0)} pts)")
+                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}**")
                     with st.expander(f"Edit {uc['name']}", expanded=False):
                         render_unit_options(child, uc)
                         st.divider()
@@ -394,13 +398,9 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
     st.divider()
 
-    # --- UPDATED ADD UNIT SECTION (Persists State) ---
     st.subheader("Add New Unit")
-    
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     
-    # 1. Use a radio button to persist the selected slot across reruns
-    # We use a unique key so Streamlit remembers the selection
     selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
     
     slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
@@ -409,9 +409,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
         st.caption(f"No units found for {selected_slot}")
     else:
         unit_options = [u["name"] for u in slot_units]
-        
-        # 2. Use a unique key for the selectbox based on the slot
-        # This ensures that when the app reruns, it remembers "Dire Avengers" was selected for "Troops"
         selected_unit_name = st.selectbox(f"Select {selected_slot} Unit", unit_options, key=f"sel_unit_{selected_slot}")
         
         if st.button(f"Add {selected_unit_name}", key=f"btn_add_{selected_slot}"):

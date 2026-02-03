@@ -13,7 +13,8 @@
     "Cleansing Flame": { "summary": "Psychic Power. S5 AP4 hits on all enemy models in base contact." },
     "Grand Strategy": { "summary": "D3 units gain Scout, Counter-attack, or Scoring." },
     "Psychic Pilot": { "summary": "Vehicle counts as a Psyker." },
-    "Fortitude": { "summary": "Psychic Power. Vehicle ignores Shaken/Stunned results." }
+    "Fortitude": { "summary": "Psychic Power. Vehicle ignores Shaken/Stunned results." },
+    "Stubborn": { "summary": "Ignore modifiers to Leadership for Morale/Pinning." }
   },
   "wargear": {
     "Nemesis Force Sword": { "summary": "Force Weapon. +1 to Invulnerable Save in combat." },
@@ -26,7 +27,9 @@
     "Personal Teleporter": { "summary": "Unit moves like Jump Infantry. Once per game can make a 30\" shunt move." },
     "Psychotroke Grenades": { "summary": "Random effect on enemy unit in assault (lose attacks, attack selves, etc)." },
     "Rad Grenades": { "summary": "-1 Toughness to enemy unit in assault." },
-    "Psybolt Ammunition": { "summary": "+1 Strength to Bolter/Autocannon weapons." }
+    "Psybolt Ammunition": { "summary": "+1 Strength to Bolter/Autocannon weapons." },
+    "Daemonblade": { "summary": "Power Weapon. Roll D6 for effect (2+: +1S/I/A/Sv etc)." },
+    "Empyrean Brain Mines": { "summary": "Enemy in base contact must pass Initiative test or cannot attack." }
   },
   "weapons": {
     "Storm bolter": { "range": "24\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "" },
@@ -35,7 +38,11 @@
     "Psilencer": { "range": "24\"", "S": "4", "AP": "-", "type": "Heavy 6", "notes": "Force Weapon (Wounds Daemons on 2+)" },
     "Heavy Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Heavy 1", "notes": "Large Blast" },
     "Heavy Incinerator": { "range": "Template", "S": "6", "AP": "4", "type": "Heavy 1", "notes": "" },
-    "Mindstrike Missiles": { "range": "Unlimited", "S": "4", "AP": "5", "type": "Heavy 1", "notes": "Blast. Psykers take Perils on hit." }
+    "Mindstrike Missiles": { "range": "Unlimited", "S": "4", "AP": "5", "type": "Heavy 1", "notes": "Blast. Psykers take Perils on hit." },
+    "Hellrifle": { "range": "36\"", "S": "6", "AP": "3", "type": "Heavy 1", "notes": "Rending" },
+    "Combi-melta": { "range": "24\"", "S": "4/8", "AP": "5/1", "type": "Rapid Fire/Assault 1", "notes": "One shot melta" },
+    "Combi-plasma": { "range": "24\"", "S": "4/7", "AP": "5/2", "type": "Rapid Fire", "notes": "One shot plasma" },
+    "Combi-flamer": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire/Template", "notes": "One shot flamer" }
   },
   "units": [
     {
@@ -79,19 +86,6 @@
       ]
     },
     {
-      "id": "hq_crowe",
-      "name": "Castellan Crowe",
-      "slot": "HQ",
-      "unique": true,
-      "base_points": 150,
-      "min_size": 1, "max_size": 1, "default_size": 1,
-      "unit_type": "Infantry (Character)",
-      "profile": { "WS": 8, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 6, "A": 4, "Ld": 10, "Sv": "2+" },
-      "wargear": [ "Artificer Armour", "Storm bolter", "Iron Halo", "Blade of Antwyr" ],
-      "special_rules": [ "Independent Character", "Fearless", "The Aegis", "Master Swordsman", "Cleansing Flame", "Heroic Sacrifice" ],
-      "options": []
-    },
-    {
       "id": "hq_inquisitor",
       "name": "Ordo Malleus Inquisitor",
       "slot": "HQ",
@@ -100,22 +94,48 @@
       "unit_type": "Infantry (Character)",
       "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 3, "I": 4, "A": 3, "Ld": 10, "Sv": "3+" },
       "wargear": [ "Power Armour", "Bolt pistol", "Chainsword", "Frag/Krak Grenades" ],
-      "special_rules": [ "Independent Character", "Stubborn", "Psyker (Mastery 1)" ],
+      "special_rules": [ "Independent Character", "Stubborn", "Psyker (Mastery 1)", "Hammerhand" ],
       "dedicated_transports": ["el_henchmen", "dt_rhino", "dt_razorback", "dt_chimera"],
       "options": [
         {
-          "group_id": "armour", "group_name": "Armour Upgrade", "min_select": 0, "max_select": 1,
+          "group_id": "mastery", "group_name": "Psyker Mastery", "min_select": 0, "max_select": 1,
           "choices": [
-            { "id": "tda", "name": "Terminator Armour (with Daemon Hammer)", "points": 40 }
+            { "id": "lvl1", "name": "Upgrade to Psyker Mastery 1 (included)", "points": 0 }
           ]
         },
         {
-          "group_id": "weapon", "group_name": "Weapons (if not Terminator)", "min_select": 0, "max_select": 2,
+          "group_id": "armour", "group_name": "Armour Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "tda", "name": "Terminator Armour (Daemon Hammer + Storm Bolter)", "points": 40 },
+            { "id": "artificer", "name": "Artificer Armour (2+ Sv)", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "tda_weapons", "group_name": "Terminator Weapons (Only if TDA)", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "psyc", "name": "Psycannon (Replace Storm Bolter)", "points": 15 },
+            { "id": "combi", "name": "Combi-Weapon (Replace Storm Bolter)", "points": 5 },
+            { "id": "shield", "name": "Storm Shield (Replace Storm Bolter/Hammer)", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "power_weapons", "group_name": "Power Armour Weapons", "min_select": 0, "max_select": 2,
           "choices": [
             { "id": "sword", "name": "Power Sword", "points": 10 },
             { "id": "fist", "name": "Power Fist", "points": 20 },
-            { "id": "incin", "name": "Incinerator", "points": 15 },
-            { "id": "psyc", "name": "Psycannon", "points": 20 }
+            { "id": "hammer", "name": "Daemonhammer", "points": 15 },
+            { "id": "blade", "name": "Daemonblade", "points": 15 },
+            { "id": "combi", "name": "Combi-Weapon", "points": 10 },
+            { "id": "hell", "name": "Hellrifle", "points": 15 },
+            { "id": "incin", "name": "Incinerator (NOT ALLOWED)", "points": 999 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "mines", "name": "Empyrean Brain Mines", "points": 10 },
+            { "id": "psyoc", "name": "Psyocculum", "points": 25 },
+            { "id": "skull", "name": "Servo-skulls (x3)", "points": 15 }
           ]
         }
       ]
@@ -133,9 +153,21 @@
       "dedicated_transports": ["dt_rhino", "dt_razorback", "dt_chimera"],
       "options": [
         {
-          "group_id": "acolyte", "group_name": "Warrior Acolyte", "min_select": 0, "max_select": 12,
+          "group_id": "acolyte", "group_name": "Warrior Acolyte (Base Model)", "min_select": 0, "max_select": 12,
           "choices": [
             { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "acolyte_gear", "group_name": "Acolyte Upgrades (Requires Acolyte)", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "sb", "name": "Storm Bolter", "points": 3, "points_mode": "flat" },
+            { "id": "combi", "name": "Combi-weapon", "points": 10, "points_mode": "flat" },
+            { "id": "melta", "name": "Meltagun", "points": 10, "points_mode": "flat" },
+            { "id": "plasma", "name": "Plasma Gun", "points": 10, "points_mode": "flat" },
+            { "id": "flamer", "name": "Flamer", "points": 10, "points_mode": "flat" },
+            { "id": "carapace", "name": "Carapace Armour (4+)", "points": 4, "points_mode": "flat" },
+            { "id": "power", "name": "Power Armour (3+)", "points": 10, "points_mode": "flat" }
           ]
         },
         {
@@ -154,6 +186,20 @@
           "group_id": "psyker", "group_name": "Psyker", "min_select": 0, "max_select": 12,
           "choices": [
             { "id": "psyker", "name": "Psyker", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "servitor", "group_name": "Servitor", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "servitor", "name": "Servitor (Base)", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "servitor_guns", "group_name": "Servitor Upgrades (Max 3)", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "hb", "name": "Heavy Bolter", "points": 0, "points_mode": "flat" },
+            { "id": "mm", "name": "Multi-melta", "points": 0, "points_mode": "flat" },
+            { "id": "pc", "name": "Plasma Cannon", "points": 10, "points_mode": "flat" }
           ]
         },
         {
@@ -200,6 +246,73 @@
           ]
         }
       ]
+    },
+    {
+      "id": "dt_rhino",
+      "name": "Rhino",
+      "slot": "Dedicated Transport",
+      "base_points": 40,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 11, "Side": 11, "Rear": 10, "BS": 4 },
+      "wargear": [ "Storm bolter", "Smoke Launchers", "The Aegis" ],
+      "special_rules": [ "Psychic Pilot", "Fortitude" ],
+      "options": []
+    },
+    {
+      "id": "dt_razorback",
+      "name": "Razorback",
+      "slot": "Dedicated Transport",
+      "base_points": 45,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 11, "Side": 11, "Rear": 10, "BS": 4 },
+      "wargear": [ "Twin-linked Heavy Bolter", "Smoke Launchers", "The Aegis" ],
+      "special_rules": [ "Psychic Pilot", "Fortitude" ],
+      "options": [
+         {
+          "group_id": "turret", "group_name": "Turret Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "tl_psycannon", "name": "Twin-linked Psycannon", "points": 50 }
+          ]
+        },
+        {
+          "group_id": "ammo", "group_name": "Ammo Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "bolt", "name": "Psybolt Ammunition", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dt_chimera",
+      "name": "Inquisitorial Chimera",
+      "slot": "Dedicated Transport",
+      "base_points": 55,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 12, "Side": 10, "Rear": 10, "BS": 3 },
+      "wargear": [ "Multi-laser", "Heavy Bolter" ],
+      "options": []
+    },
+    {
+      "id": "hq_crowe",
+      "name": "Castellan Crowe",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 150,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 8, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 6, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Artificer Armour", "Storm bolter", "Iron Halo", "Blade of Antwyr" ],
+      "special_rules": [ "Independent Character", "Fearless", "The Aegis", "Master Swordsman", "Cleansing Flame", "Heroic Sacrifice" ],
+      "options": []
     },
     {
       "id": "el_paladins",
@@ -418,60 +531,6 @@
           ]
         }
       ]
-    },
-    {
-      "id": "dt_rhino",
-      "name": "Rhino",
-      "slot": "Dedicated Transport",
-      "base_points": 40,
-      "min_size": 1, "max_size": 1, "default_size": 1,
-      "unit_type": "Vehicle (Tank)",
-      "profile_type": "vehicle",
-      "is_transport": true,
-      "profile": { "Front": 11, "Side": 11, "Rear": 10, "BS": 4 },
-      "wargear": [ "Storm bolter", "Smoke Launchers", "The Aegis" ],
-      "special_rules": [ "Psychic Pilot", "Fortitude" ],
-      "options": []
-    },
-    {
-      "id": "dt_razorback",
-      "name": "Razorback",
-      "slot": "Dedicated Transport",
-      "base_points": 45,
-      "min_size": 1, "max_size": 1, "default_size": 1,
-      "unit_type": "Vehicle (Tank)",
-      "profile_type": "vehicle",
-      "is_transport": true,
-      "profile": { "Front": 11, "Side": 11, "Rear": 10, "BS": 4 },
-      "wargear": [ "Twin-linked Heavy Bolter", "Smoke Launchers", "The Aegis" ],
-      "special_rules": [ "Psychic Pilot", "Fortitude" ],
-      "options": [
-         {
-          "group_id": "turret", "group_name": "Turret Weapon", "min_select": 0, "max_select": 1,
-          "choices": [
-            { "id": "tl_psycannon", "name": "Twin-linked Psycannon", "points": 50 }
-          ]
-        },
-        {
-          "group_id": "ammo", "group_name": "Ammo Upgrade", "min_select": 0, "max_select": 1,
-          "choices": [
-            { "id": "bolt", "name": "Psybolt Ammunition", "points": 5 }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "dt_chimera",
-      "name": "Inquisitorial Chimera",
-      "slot": "Dedicated Transport",
-      "base_points": 55,
-      "min_size": 1, "max_size": 1, "default_size": 1,
-      "unit_type": "Vehicle (Tank)",
-      "profile_type": "vehicle",
-      "is_transport": true,
-      "profile": { "Front": 12, "Side": 10, "Rear": 10, "BS": 3 },
-      "wargear": [ "Multi-laser", "Heavy Bolter" ],
-      "options": []
     }
   ]
 }

@@ -267,7 +267,7 @@ with st.sidebar:
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
 
-    # 4. Project Status (The New Feature!)
+    # 4. Project Status
     st.divider()
     st.subheader("Project Tracker")
     with st.expander("🛠️ Development Status"):
@@ -276,43 +276,60 @@ with st.sidebar:
             st.caption("No recent data found.")
         else:
             for i in issues:
+                # Icon based on Open/Closed status
                 icon = "✅" if i["state"] == "closed" else "🔴"
                 st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
 
-    # 5. Feedback
+    # 5. Feedback (Updated Logic)
     st.divider()
     st.subheader("Report an Issue")
     with st.form("feedback_form"):
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
-        feedback_msg = st.text_area("Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
+        
+        # New: Title and Name inputs
+        feedback_title = st.text_input("Short Summary (e.g. Shield Drone Points)")
+        feedback_name = st.text_input("Your Name (Optional)")
+        
+        feedback_msg = st.text_area("Detailed Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
         include_context = st.checkbox("Include roster data", value=True)
         submitted = st.form_submit_button("Submit Feedback")
         
-        if submitted and feedback_msg:
-            report_pts, _ = calculate_roster()
-            try:
-                token = st.secrets["github"]["token"]
-                owner = st.secrets["github"]["owner"]
-                repo = st.secrets["github"]["repo"]
-                
-                body_text = f"**Type:** {feedback_type}\n\n**User Report:**\n{feedback_msg}"
-                if include_context:
-                    context_str = "\n\n**Context:**\n"
-                    if "codex_data" in st.session_state:
-                        context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
-                    context_str += f"- Points: {report_pts}/{points_limit}\n"
-                    context_str += f"- Unit Count: {len(st.session_state.roster)}"
-                    body_text += context_str
+        if submitted:
+            if not feedback_title or not feedback_msg:
+                st.error("Please provide both a Summary and a Description.")
+            else:
+                report_pts, _ = calculate_roster()
+                try:
+                    token = st.secrets["github"]["token"]
+                    owner = st.secrets["github"]["owner"]
+                    repo = st.secrets["github"]["repo"]
+                    
+                    # Construct Title: [Bug] Summary (by Name)
+                    final_title = f"[{feedback_type}] {feedback_title}"
+                    if feedback_name:
+                        final_title += f" (by {feedback_name})"
 
-                api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
-                headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
-                payload = {"title": f"[{feedback_type}] Feedback from App", "body": body_text}
-                response = requests.post(api_url, json=payload, headers=headers)
-                
-                if response.status_code == 201: st.success("Feedback sent!")
-                else: st.error(f"Error {response.status_code}: {response.text}")
-            except Exception as e:
-                st.error(f"Error sending feedback: {e}")
+                    # Construct Body
+                    body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
+                    
+                    if include_context:
+                        context_str = "\n\n**Context:**\n"
+                        if "codex_data" in st.session_state:
+                            context_str += f"- Codex: {st.session_state.codex_data.get('codex_name')}\n"
+                        context_str += f"- Points: {report_pts}/{points_limit}\n"
+                        context_str += f"- Unit Count: {len(st.session_state.roster)}"
+                        body_text += context_str
+
+                    import requests 
+                    api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+                    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
+                    payload = {"title": final_title, "body": body_text}
+                    response = requests.post(api_url, json=payload, headers=headers)
+                    
+                    if response.status_code == 201: st.success("Feedback sent!")
+                    else: st.error(f"Error {response.status_code}: {response.text}")
+                except Exception as e:
+                    st.error(f"Error sending feedback: {e}")
 
 # --- Main Page ---
 if "codex_data" in st.session_state and st.session_state.codex_data:

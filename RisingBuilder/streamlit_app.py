@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import uuid
 import requests
+import re
 from pathlib import Path
 from PIL import Image
 from reports import write_roster_pdf
@@ -22,6 +23,8 @@ st.set_page_config(page_title="Rising Builder", page_icon=app_icon, layout="wide
 
 if "roster" not in st.session_state:
     st.session_state.roster = []
+if "roster_name" not in st.session_state:
+    st.session_state.roster_name = "My Army List"
 
 # --- Helper Functions ---
 def load_codex(filepath):
@@ -58,6 +61,14 @@ def fetch_github_issues():
         return []
 
 # --- CALLBACKS ---
+def cb_update_roster_name():
+    """Updates the roster name from session state."""
+    st.session_state.roster_name = st.session_state.roster_name_input
+
+def cb_update_custom_name(entry, key):
+    """Updates custom unit name."""
+    entry["custom_name"] = st.session_state[key]
+
 def cb_update_size(entry, key):
     entry["size"] = st.session_state[key]
 
@@ -138,9 +149,18 @@ def calculate_roster():
     return total_pts, counts
 
 def render_unit_options(entry, unit):
-    # Display Points INSIDE the box so the Title doesn't change
+    # --- Custom Name Input ---
+    k_name = f"name_{entry['id']}"
+    st.text_input("Custom Name (Optional)", 
+                  value=entry.get("custom_name", ""), 
+                  placeholder=f"e.g. {unit['name']} Squad Alpha",
+                  key=k_name,
+                  on_change=cb_update_custom_name, args=(entry, k_name))
+
+    # Points display
     st.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
     
+    # Size
     min_s = int(unit.get("min_size", 1))
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
@@ -153,6 +173,7 @@ def render_unit_options(entry, unit):
 
     if "selected" not in entry: entry["selected"] = {}
     
+    # Options
     for opt in unit.get("options", []):
         gid = opt["group_id"]
         st.caption(f"**{opt.get('group_name', 'Options')}**")
@@ -219,56 +240,64 @@ with st.sidebar:
     
     if selected_codex_name:
         path = CODEX_DIR / selected_codex_name
-        # Only load if changed AND not suppressed by load_file event
         if st.session_state.get("current_codex_path") != str(path):
             st.session_state.codex_data = load_codex(path)
             st.session_state.current_codex_path = str(path)
             st.session_state.current_codex_name = selected_codex_name
             
-            # WIPE ROSTER only if we are NOT loading a file
             if not st.session_state.get("is_loading_file", False):
                 st.session_state.roster = [] 
+                st.session_state.roster_name = "My Army List" # Reset name on codex swap
             
-            # Clear flag
             st.session_state.is_loading_file = False
             st.rerun()
 
+    # 2. Roster Details
+    st.text_input("Roster Name", 
+                  value=st.session_state.roster_name, 
+                  key="roster_name_input",
+                  on_change=cb_update_roster_name,
+                  help="This name will appear on the PDF and the saved file.")
+                  
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
     st.divider()
 
-    # 2. Save / Load
+    # 3. Save / Load
     st.subheader("Save / Load List")
+    
+    # Sanitize filename
+    safe_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', st.session_state.roster_name)
+    if not safe_filename: safe_filename = "army_list"
+    
     save_data = {
+        "roster_name": st.session_state.roster_name,
         "roster": st.session_state.roster,
         "codex_file": selected_codex_name,
         "points_limit": points_limit
     }
     roster_json = json.dumps(save_data, indent=2)
-    st.download_button("💾 Download Roster File", roster_json, "my_army_list.json", "application/json")
+    st.download_button("💾 Download Roster File", roster_json, f"{safe_filename}.json", "application/json")
 
     uploaded_file = st.file_uploader("📂 Load Roster File", type=["json"])
     
     if uploaded_file is not None:
-        # Check if we already loaded this specific file to prevent re-reading on refresh
         if uploaded_file.file_id != st.session_state.get("last_loaded_file_id"):
             try:
-                # Reset file pointer to beginning to ensure clean read
                 uploaded_file.seek(0)
                 data = json.load(uploaded_file)
                 saved_codex = data.get("codex_file")
                 
-                # Setup Flags to prevent wipe
                 st.session_state.is_loading_file = True
                 st.session_state.last_loaded_file_id = uploaded_file.file_id
                 
-                # Pre-load Codex State
                 if saved_codex:
                     st.session_state.current_codex_name = saved_codex
                     st.session_state.current_codex_path = str(CODEX_DIR / saved_codex)
                     st.session_state.codex_data = load_codex(CODEX_DIR / saved_codex)
 
                 st.session_state.roster = data.get("roster", [])
+                st.session_state.roster_name = data.get("roster_name", "My Army List")
                 st.success("List loaded successfully!")
                 st.rerun()
                 
@@ -276,7 +305,7 @@ with st.sidebar:
 
     st.divider()
     
-    # 3. PDF Export
+    # 4. PDF Export
     st.write("### Export Options")
     include_tables = st.checkbox("Include Game Reference Tables", value=True)
     
@@ -288,12 +317,13 @@ with st.sidebar:
             points_limit, 
             str(pdf_path), 
             get_unit_by_id,
-            include_ref_tables=include_tables
+            include_ref_tables=include_tables,
+            roster_name=st.session_state.roster_name # Pass the custom name
         )
         with open(pdf_path, "rb") as f:
             st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
 
-    # 4. Project Status
+    # 5. Project Status
     st.divider()
     st.subheader("Project Tracker")
     with st.expander("🛠️ Development Status"):
@@ -305,17 +335,15 @@ with st.sidebar:
                 icon = "✅" if i["state"] == "closed" else "🔴"
                 st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
 
-    # 5. Feedback
+    # 6. Feedback
     st.divider()
     st.subheader("Report an Issue")
     
     with st.form("feedback_form"):
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
-        
-        feedback_title = st.text_input("Short Summary (e.g. Shield Drone Points)")
+        feedback_title = st.text_input("Short Summary")
         feedback_name = st.text_input("Your Name (Optional)")
-        
-        feedback_msg = st.text_area("Detailed Description", placeholder="E.g. The Fire Warrior Shas'ui has WS 2 but should be WS 3...")
+        feedback_msg = st.text_area("Detailed Description")
         include_context = st.checkbox("Include roster data", value=True)
         submitted = st.form_submit_button("Submit Feedback")
         
@@ -325,17 +353,15 @@ with st.sidebar:
             else:
                 report_pts, _ = calculate_roster()
                 try:
-                    # Robust check for secrets
                     if "github" not in st.secrets:
-                        st.error("GitHub secrets missing in .streamlit/secrets.toml")
+                        st.error("GitHub secrets missing.")
                     else:
                         token = st.secrets["github"]["token"]
                         owner = st.secrets["github"]["owner"]
                         repo = st.secrets["github"]["repo"]
                         
                         final_title = f"[{feedback_type}] {feedback_title}"
-                        if feedback_name:
-                            final_title += f" (by {feedback_name})"
+                        if feedback_name: final_title += f" (by {feedback_name})"
 
                         body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
                         
@@ -355,13 +381,15 @@ with st.sidebar:
                         
                         if response.status_code == 201: st.success("Feedback sent!")
                         else: st.error(f"Error {response.status_code}: {response.text}")
-                except Exception as e:
-                    st.error(f"Error sending feedback: {e}")
+                except Exception as e: st.error(f"Error sending feedback: {e}")
 
 # --- Main Page ---
 if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
-    st.title(f"{data.get('codex_name', 'Army')} Builder")
+    
+    # Custom Title in App
+    st.title(f"{st.session_state.roster_name}")
+    st.caption(f"Using Codex: {data.get('codex_name', 'Army')}")
     
     curr_pts, slots = calculate_roster()
     col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -382,8 +410,12 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             u = get_unit_by_id(entry["unit_id"])
             if not u: continue
 
-            # FIX: REMOVED POINTS FROM TITLE TO PREVENT COLLAPSE
-            with st.expander(f"[{u['slot']}] {u['name']}", expanded=False):
+            # Display Name: Use Custom Name if available
+            display_title = f"[{u['slot']}] {u['name']}"
+            if entry.get("custom_name"):
+                display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']})"
+
+            with st.expander(display_title, expanded=False):
                 render_unit_options(entry, u)
 
                 valid_transports = u.get("dedicated_transports", [])
@@ -416,8 +448,13 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
                 uc = get_unit_by_id(child["unit_id"])
                 if not uc: continue
                 with st.container():
-                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{uc['name']}**")
-                    with st.expander(f"Edit {uc['name']}", expanded=False):
+                    # Custom Child Name Logic
+                    child_title = uc['name']
+                    if child.get("custom_name"):
+                        child_title = f"{child['custom_name']} ({uc['name']})"
+                        
+                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{child_title}**")
+                    with st.expander(f"Edit {child_title}", expanded=False):
                         render_unit_options(child, uc)
                         st.divider()
                         if st.button("Remove Attachment", key=f"del_child_{child['id']}"):

@@ -20,57 +20,132 @@ class PDF(FPDF):
         self.ln(4)
 
 def draw_profile_table(pdf, profiles_list):
-    """
-    Draws a clean, grid-based statline table using Arial.
-    """
     if not profiles_list: return
-
-    # Master list of keys to look for
     master_keys = ["WS", "BS", "S", "T", "W", "I", "A", "Ld", "Sv", "Front", "Side", "Rear"]
-    
-    # Identify active keys (columns) for this specific unit
     active_keys = []
     for k in master_keys:
         for _, p in profiles_list:
             if k in p:
                 active_keys.append(k)
                 break
-    
     if not active_keys: return
 
-    # --- Table Settings ---
     pdf.set_font("Arial", 'B', 8)
-    stat_width = 9   # Width of each stat column
-    name_width = 40  # Width of the name column
+    stat_width = 9
+    name_width = 40
+    pdf.set_fill_color(230, 230, 230)
     
-    # --- 1. Header Row ---
-    pdf.set_fill_color(230, 230, 230) # Light Grey background for headers
-    
-    # 'Model' Header
     pdf.cell(name_width, 5, "Model", 1, 0, 'L', True)
-    
-    # Stat Headers (WS, BS, etc.)
     for k in active_keys:
         pdf.cell(stat_width, 5, k, 1, 0, 'C', True)
     pdf.ln()
 
-    # --- 2. Data Rows ---
     pdf.set_font("Arial", '', 9)
-    
     for name, stats in profiles_list:
-        # Clean up generic name
         display_name = "Standard" if name == "Unit Profile" else name
-        
-        # Name Cell
         pdf.cell(name_width, 5, display_name, 1, 0, 'L')
-        
-        # Stat Cells
         for k in active_keys:
             val = str(stats.get(k, "-"))
             pdf.cell(stat_width, 5, val, 1, 0, 'C')
         pdf.ln()
 
-def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback):
+def draw_game_reference_tables(pdf):
+    """Draws the 5th Ed Reference Charts (BS, WS, S vs T)."""
+    pdf.add_page()
+    pdf.chapter_title("Game Reference Tables (5th Edition)")
+    
+    # --- 1. BALLISTIC SKILL (SHOOTING) ---
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 8, "To Hit: Shooting (Ballistic Skill)", ln=True)
+    
+    pdf.set_font("Arial", '', 9)
+    pdf.set_fill_color(240, 240, 240)
+    
+    # Headers
+    w = 15
+    pdf.cell(30, 6, "BS of Firer", 1, 0, 'L', True)
+    for i in range(1, 11):
+        pdf.cell(w, 6, str(i), 1, 0, 'C', True)
+    pdf.ln()
+    
+    # Values
+    pdf.cell(30, 6, "D6 Score needed", 1, 0, 'L')
+    bs_vals = {1: "6+", 2: "5+", 3: "4+", 4: "3+"}
+    for i in range(1, 11):
+        if i < 5: val = bs_vals[i]
+        else: val = "2+" 
+        pdf.cell(w, 6, val, 1, 0, 'C')
+    pdf.ln(12)
+
+    # --- 2. WEAPON SKILL (ASSAULT) ---
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 8, "To Hit: Assault (Attacker WS vs Defender WS)", ln=True)
+    
+    # Grid Config
+    cell_size = 10
+    header_w = 25
+    
+    # Top Header (Defender WS)
+    pdf.set_font("Arial", 'B', 8)
+    pdf.set_fill_color(220, 220, 220)
+    pdf.cell(header_w, cell_size, "Attacker WS", 1, 0, 'C', True)
+    for d_ws in range(1, 11):
+        pdf.cell(cell_size, 5, f"Def {d_ws}", 1, 0, 'C', True)
+    pdf.ln(5)
+    
+    # Rows (Attacker WS)
+    pdf.set_font("Arial", '', 9)
+    for a_ws in range(1, 11):
+        # Row Header
+        pdf.set_fill_color(240, 240, 240)
+        pdf.cell(header_w, 5, f"WS {a_ws}", 1, 0, 'C', True) # No fill for now
+        
+        # Cells
+        for d_ws in range(1, 11):
+            # 5th Ed Rule:
+            # Defender > 2x Attacker: 5+
+            # Attacker > Defender: 3+
+            # Else: 4+
+            if d_ws > (2 * a_ws): score = "5+"
+            elif a_ws > d_ws: score = "3+"
+            else: score = "4+"
+            
+            pdf.cell(cell_size, 5, score, 1, 0, 'C')
+        pdf.ln()
+    pdf.ln(8)
+
+    # --- 3. STRENGTH VS TOUGHNESS (WOUNDING) ---
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 8, "To Wound (Attacker Strength vs Defender Toughness)", ln=True)
+    
+    # Top Header (Defender T)
+    pdf.set_font("Arial", 'B', 8)
+    pdf.set_fill_color(220, 220, 220)
+    pdf.cell(header_w, 5, "Attacker Str", 1, 0, 'C', True)
+    for t_val in range(1, 11):
+        pdf.cell(cell_size, 5, f"T {t_val}", 1, 0, 'C', True)
+    pdf.ln()
+    
+    # Rows (Attacker S)
+    pdf.set_font("Arial", '', 9)
+    for s_val in range(1, 11):
+        pdf.set_fill_color(240, 240, 240)
+        pdf.cell(header_w, 5, f"Str {s_val}", 1, 0, 'C', True)
+        
+        for t_val in range(1, 11):
+            diff = s_val - t_val
+            
+            if diff >= 2: score = "2+"
+            elif diff == 1: score = "3+"
+            elif diff == 0: score = "4+"
+            elif diff == -1: score = "5+"
+            elif diff == -2: score = "6+"
+            else: score = "-" # Impossible
+            
+            pdf.cell(cell_size, 5, score, 1, 0, 'C')
+        pdf.ln()
+
+def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False):
     pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
@@ -91,23 +166,17 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         u = get_unit_callback(entry['unit_id'])
         if not u: continue
         total_pts += entry.get('calculated_cost', 0)
-        
         if not entry.get("parent_id") and u.get("slot") in slot_counts:
             slot_counts[u["slot"]] += 1
-
         collect_refs(u.get("wargear", []))
         collect_refs(u.get("special_rules", []))
-        
         if "selected" in entry:
             for gid, picks in entry["selected"].items():
                 opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
                 if not opt_def: continue
                 for choice in opt_def.get("choices", []):
-                    # Check if selected (list or single)
-                    if isinstance(picks, list) and choice["id"] in picks:
-                        collect_refs([choice["name"]])
-                    elif picks == choice["id"]:
-                        collect_refs([choice["name"]])
+                    if isinstance(picks, list) and choice["id"] in picks: collect_refs([choice["name"]])
+                    elif picks == choice["id"]: collect_refs([choice["name"]])
 
     # --- 2. HEADER ---
     pdf.set_font("Arial", 'B', 12)
@@ -120,52 +189,38 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
 
     # --- 3. ROSTER LISTING ---
     slots_order = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support", "Dedicated Transport"]
-    
     for slot in slots_order:
         slot_units = [e for e in roster if not e.get("parent_id") and get_unit_callback(e['unit_id'])['slot'] == slot]
         if not slot_units: continue
         
         pdf.chapter_title(slot)
-        
         for entry in slot_units:
             u = get_unit_callback(entry['unit_id'])
             
-            # --- Unit Header Bar ---
             pdf.set_font("Arial", 'B', 11)
-            pdf.set_fill_color(240, 240, 240) # Light Grey Unit Bar
+            pdf.set_fill_color(240, 240, 240)
             name_str = f"{u['name']}"
             if entry.get("size", 1) > 1: name_str += f" (x{entry['size']})"
             pdf.cell(150, 7, name_str, 1, 0, 'L', True)
             pdf.cell(40, 7, f"{entry.get('calculated_cost', 0)} pts", 1, 1, 'C', True)
             pdf.ln(1)
 
-            # --- PROFILES TABLE (New Look) ---
             profiles_to_print = []
-            
-            # 1. Main Profile
-            if "profile" in u:
-                profiles_to_print.append( ("Unit Profile", u["profile"]) )
-            
-            # 2. Sub Profiles (Check selections)
+            if "profile" in u: profiles_to_print.append( ("Unit Profile", u["profile"]) )
             if "sub_profiles" in u and "selected" in entry:
                 all_picked_ids = []
                 for picks in entry["selected"].values():
                     if isinstance(picks, list): all_picked_ids.extend(picks)
                     else: all_picked_ids.append(picks)
-                
                 for key, sub_prof in u["sub_profiles"].items():
-                    if key in all_picked_ids:
-                        profiles_to_print.append( (sub_prof.get("name", key), sub_prof) )
+                    if key in all_picked_ids: profiles_to_print.append( (sub_prof.get("name", key), sub_prof) )
             
-            # Draw the Table
             draw_profile_table(pdf, profiles_to_print)
             pdf.ln(2)
 
-            # --- WARGEAR / RULES ---
             pdf.set_font("Arial", size=10)
             options_text = []
             if u.get("wargear"): options_text.append("Base: " + ", ".join(u["wargear"]))
-            
             if "selected" in entry:
                 for gid, picks in entry["selected"].items():
                     opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
@@ -176,14 +231,11 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                             item_str = choice['name']
                             if count > 1: item_str = f"{count}x {item_str}"
                             options_text.append(item_str)
-            
             if options_text: pdf.multi_cell(0, 5, "   " + ", ".join(options_text))
-            
             if u.get("special_rules"):
                 pdf.set_font("Arial", 'I', 9)
                 pdf.multi_cell(0, 5, "   Rules: " + ", ".join(u["special_rules"]))
 
-            # --- ATTACHMENTS (Children) ---
             children = [c for c in roster if c.get("parent_id") == entry["id"]]
             for child in children:
                 uc = get_unit_callback(child['unit_id'])
@@ -192,25 +244,18 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                 pdf.cell(10, 5, "  >", 0, 0)
                 pdf.cell(0, 5, f"Attached: {uc['name']} ({child.get('calculated_cost', 0)} pts)", ln=True)
                 
-                # Child Profiles
                 c_profs = []
                 if "profile" in uc: c_profs.append( ("Profile", uc["profile"]) )
-                
-                # Check for child sub-profiles (e.g. Drones on Bodyguard)
                 if "sub_profiles" in uc and "selected" in child:
                     all_picked_c_ids = []
                     for picks in child["selected"].values():
                         if isinstance(picks, list): all_picked_c_ids.extend(picks)
                         else: all_picked_c_ids.append(picks)
                     for key, sub_prof in uc["sub_profiles"].items():
-                        if key in all_picked_c_ids:
-                            c_profs.append( (sub_prof.get("name", key), sub_prof) )
-
-                # Indent the table for children slightly if possible, or just draw it
-                # We'll just draw it normally below the name
+                        if key in all_picked_c_ids: c_profs.append( (sub_prof.get("name", key), sub_prof) )
+                
                 draw_profile_table(pdf, c_profs)
 
-                # Child Options
                 c_opts = []
                 if "selected" in child:
                     for gid, picks in child["selected"].items():
@@ -223,14 +268,12 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
                     pdf.set_font("Arial", size=9)
                     pdf.cell(10, 5, "", 0, 0)
                     pdf.multi_cell(0, 5, ", ".join(c_opts))
-
             pdf.ln(4)
 
     # --- 4. APPENDIX ---
     pdf.add_page()
     pdf.chapter_title("Reference: Weapons")
     
-    # Weapon Table
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(60, 6, "Name", 1, 0, 'L', True)
@@ -248,9 +291,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         w_stats = weapons_db.get(w_name)
         if not w_stats:
             for key in weapons_db.keys():
-                if key in w_name:
-                    w_stats = weapons_db[key]; break
-        
+                if key in w_name: w_stats = weapons_db[key]; break
         if w_stats:
             pdf.cell(60, 6, w_name, 1, 0, 'L')
             pdf.cell(20, 6, str(w_stats.get('range', '-')), 1, 0, 'C')
@@ -270,13 +311,16 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         desc = ""
         if r_name in rules_db: desc = rules_db[r_name].get('summary', '')
         elif r_name in gear_db: desc = gear_db[r_name].get('summary', '')
-            
         if desc:
             pdf.set_font("Arial", 'B', 10)
             pdf.cell(0, 5, r_name, 0, 1)
             pdf.set_font("Arial", '', 9)
             pdf.multi_cell(0, 5, desc)
             pdf.ln(2)
+
+    # --- 5. OPTIONAL GAME TABLES ---
+    if include_ref_tables:
+        draw_game_reference_tables(pdf)
 
     try: pdf.output(filename)
     except Exception as e: print(f"Error writing PDF: {e}")

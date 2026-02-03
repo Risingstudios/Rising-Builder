@@ -47,16 +47,8 @@ def fetch_github_issues():
         repo = st.secrets["github"]["repo"]
         
         api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
-        params = {
-            "state": "all",       # Get both Open and Closed
-            "sort": "updated",    # Sort by recent activity
-            "direction": "desc",
-            "per_page": 20        # Limit to last 20 items
-        }
-        headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3+json"
-        }
+        params = { "state": "all", "sort": "updated", "direction": "desc", "per_page": 20 }
+        headers = { "Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json" }
         
         response = requests.get(api_url, headers=headers, params=params)
         if response.status_code == 200:
@@ -227,11 +219,17 @@ with st.sidebar:
     
     if selected_codex_name:
         path = CODEX_DIR / selected_codex_name
+        # Only load if changed AND not suppressed by load_file event
         if st.session_state.get("current_codex_path") != str(path):
             st.session_state.codex_data = load_codex(path)
             st.session_state.current_codex_path = str(path)
             st.session_state.current_codex_name = selected_codex_name
-            st.session_state.roster = [] 
+            # If we just loaded a file, don't wipe the roster!
+            if not st.session_state.get("file_loaded_flag", False):
+                st.session_state.roster = [] 
+            
+            # Clear flag after check
+            st.session_state.file_loaded_flag = False
             st.rerun()
 
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
@@ -253,12 +251,22 @@ with st.sidebar:
         try:
             data = json.load(uploaded_file)
             saved_codex = data.get("codex_file")
-            if saved_codex and saved_codex != selected_codex_name:
-                st.error(f"⚠️ Codex Mismatch! File is for '{saved_codex}', but you have '{selected_codex_name}'.")
-            else:
-                st.session_state.roster = data.get("roster", [])
-                st.success("List loaded successfully!")
-                st.rerun()
+            
+            # --- FIX: ROSTER LOADING ---
+            # Set flag to prevent wipe
+            st.session_state.file_loaded_flag = True
+            
+            # Set Codex Name to force selectbox update on rerun
+            if saved_codex:
+                st.session_state.current_codex_name = saved_codex
+                # Also pre-set path so loader logic works
+                st.session_state.current_codex_path = str(CODEX_DIR / saved_codex)
+                st.session_state.codex_data = load_codex(CODEX_DIR / saved_codex)
+
+            st.session_state.roster = data.get("roster", [])
+            st.success("List loaded successfully!")
+            st.rerun()
+            
         except Exception as e: st.error(f"Error reading file: {e}")
 
     st.divider()
@@ -292,9 +300,13 @@ with st.sidebar:
                 icon = "✅" if i["state"] == "closed" else "🔴"
                 st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
 
-    # 5. Feedback
+    # 5. Feedback (FIXED)
     st.divider()
     st.subheader("Report an Issue")
+    
+    # Using Session State to manage form inputs if needed, but native form usually works.
+    # The key fix is ensuring 'requests' is imported and secrets exist.
+    
     with st.form("feedback_form"):
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
         
@@ -311,6 +323,11 @@ with st.sidebar:
             else:
                 report_pts, _ = calculate_roster()
                 try:
+                    # Check secrets first
+                    if "github" not in st.secrets:
+                        st.error("GitHub secrets not configured!")
+                        st.stop()
+                        
                     token = st.secrets["github"]["token"]
                     owner = st.secrets["github"]["owner"]
                     repo = st.secrets["github"]["repo"]
@@ -329,14 +346,16 @@ with st.sidebar:
                         context_str += f"- Unit Count: {len(st.session_state.roster)}"
                         body_text += context_str
 
-                    import requests 
                     api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
                     headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
                     payload = {"title": final_title, "body": body_text}
+                    
+                    # Debug print if it fails
                     response = requests.post(api_url, json=payload, headers=headers)
                     
                     if response.status_code == 201: st.success("Feedback sent!")
-                    else: st.error(f"Error {response.status_code}: {response.text}")
+                    else: 
+                        st.error(f"Error {response.status_code}: {response.text}")
                 except Exception as e:
                     st.error(f"Error sending feedback: {e}")
 
@@ -364,7 +383,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             u = get_unit_by_id(entry["unit_id"])
             if not u: continue
 
-            # FIX: REMOVED POINTS FROM TITLE
+            # FIX: REMOVED POINTS FROM TITLE TO PREVENT COLLAPSE
             with st.expander(f"[{u['slot']}] {u['name']}", expanded=False):
                 render_unit_options(entry, u)
 
@@ -436,4 +455,3 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")
-

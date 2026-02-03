@@ -30,7 +30,6 @@ def draw_profile_table(pdf, profiles_list):
             if k in p:
                 active_keys.append(k)
                 break
-    
     if not active_keys: return
 
     # Table Config
@@ -57,7 +56,8 @@ def draw_profile_table(pdf, profiles_list):
 
 def draw_game_reference_tables(pdf):
     """
-    Draws 5th Ed Reference Charts: Infantry (Row 1) and Vehicles (Row 2).
+    Draws 5th Ed Reference Charts.
+    Infantry Tables on top. Vehicle Table forced below.
     """
     pdf.add_page()
     pdf.chapter_title("Game Reference Tables (5th Edition)")
@@ -65,26 +65,18 @@ def draw_game_reference_tables(pdf):
     # --- CONFIGURATION ---
     pdf.set_font("Arial", size=7) 
     row_h = 4.5
-    
-    # Margins and Start Positions
     x_start = 10
     y_start = pdf.get_y()
     
-    # ==========================================
-    # ROW 1: INFANTRY TABLES
-    # ==========================================
-
-    # --- TABLE 1: SHOOTING (Vertical) ---
+    # --- 1. SHOOTING (Vertical) ---
     bs_x = x_start
     pdf.set_xy(bs_x, y_start)
     
     pdf.set_font("Arial", 'B', 8)
     pdf.cell(25, 6, "Shooting", 0, 1, 'C')
-    
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(10, row_h, "BS", 1, 0, 'C', True)
     pdf.cell(15, row_h, "To Hit", 1, 1, 'C', True)
-    
     pdf.set_font("Arial", '', 7)
     bs_vals = {1: "6+", 2: "5+", 3: "4+", 4: "3+"}
     for i in range(1, 11):
@@ -93,65 +85,54 @@ def draw_game_reference_tables(pdf):
         pdf.cell(10, row_h, str(i), 1, 0, 'C')
         pdf.cell(15, row_h, val, 1, 1, 'C')
 
-    # --- TABLE 2: ASSAULT (Matrix) ---
+    # --- 2. ASSAULT (Matrix) ---
     ws_x = bs_x + 30 
     pdf.set_xy(ws_x, y_start)
-    
     col_w = 6
     head_w = 18
-    
     pdf.set_font("Arial", 'B', 8)
     pdf.cell(head_w + (10*col_w), 6, "Assault To Hit (D6)", 0, 1, 'C')
-    
-    # Header
     pdf.set_x(ws_x + head_w)
     pdf.set_fill_color(220, 220, 220)
     for i in range(1, 11):
         pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
     pdf.ln()
     
-    # Corner
     curr_y = pdf.get_y()
     pdf.set_xy(ws_x, curr_y - row_h)
     pdf.set_font("Arial", 'B', 7)
     pdf.cell(head_w, row_h, "Atk\\Def", 1, 0, 'C', True)
     pdf.set_xy(ws_x, curr_y)
     
-    # Rows
     pdf.set_font("Arial", '', 7)
     for a_ws in range(1, 11):
         pdf.set_x(ws_x)
         pdf.set_fill_color(240, 240, 240)
         pdf.cell(head_w, row_h, f"WS {a_ws}", 1, 0, 'C', True)
         for d_ws in range(1, 11):
+            val = "4+"
             if d_ws > (2 * a_ws): val = "5+"
             elif a_ws > d_ws: val = "3+"
-            else: val = "4+"
             pdf.cell(col_w, row_h, val, 1, 0, 'C')
         pdf.ln()
 
-    # --- TABLE 3: WOUNDING (Matrix) ---
+    # --- 3. WOUNDING (Matrix) ---
     st_x = ws_x + 78 + 5
     pdf.set_xy(st_x, y_start)
-    
     pdf.set_font("Arial", 'B', 8)
     pdf.cell(head_w + (10*col_w), 6, "To Wound (D6)", 0, 1, 'C')
-    
-    # Header
     pdf.set_x(st_x + head_w)
     pdf.set_fill_color(220, 220, 220)
     for i in range(1, 11):
         pdf.cell(col_w, row_h, str(i), 1, 0, 'C', True)
     pdf.ln()
     
-    # Corner
     curr_y = pdf.get_y()
     pdf.set_xy(st_x, curr_y - row_h)
     pdf.set_font("Arial", 'B', 7)
     pdf.cell(head_w, row_h, "Str\\T", 1, 0, 'C', True)
     pdf.set_xy(st_x, curr_y)
     
-    # Rows
     pdf.set_font("Arial", '', 7)
     for s in range(1, 11):
         pdf.set_x(st_x)
@@ -169,31 +150,29 @@ def draw_game_reference_tables(pdf):
         pdf.ln()
 
     # ==========================================
-    # ROW 2: VEHICLE DAMAGE (SAFE LAYOUT)
+    # VEHICLE DAMAGE SECTION
     # ==========================================
     
-    # Reset cursor to below the tables
-    # The tables end roughly at Y = start + 55mm
-    # We force the cursor down to be safe.
+    # We forcefully move down. 
+    # Calculate bottom of previous tables: y_start + (11 * 4.5) + header ~ 60mm
+    # So we set Y to y_start + 65. 
+    # If that is too low on the page (> 250), we add a page.
     
-    pdf.set_y(y_start + 65) 
-    pdf.set_x(x_start)
-    
-    # Check for space (Need approx 60mm)
-    if pdf.get_y() > 220: # If near bottom
+    new_y = y_start + 65
+    if new_y > 250:
         pdf.add_page()
-        pdf.set_y(20) # Top margin
+        new_y = 20
     
-    # Vehicle Header
+    pdf.set_xy(x_start, new_y)
+    
     pdf.set_font("Arial", 'B', 12)
     pdf.set_fill_color(200, 220, 255)
     pdf.cell(0, 8, "Vehicle Damage", 0, 1, 'L', True)
     pdf.ln(2)
     
-    # Save Top Y for columns
-    y_veh_top = pdf.get_y()
+    veh_start_y = pdf.get_y()
     
-    # --- LEFT COL: DAMAGE TABLE ---
+    # --- DAMAGE TABLE (Left) ---
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
     pdf.cell(15, 6, "Roll", 1, 0, 'C', True)
@@ -204,37 +183,35 @@ def draw_game_reference_tables(pdf):
     damage_rows = [
         ("1", "Crew Shaken", "Vehicle can only move (No Shooting)."),
         ("2", "Crew Stunned", "Vehicle cannot move or shoot."),
-        ("3", "Weapon Destroyed", "One weapon destroyed (Random/Owner choice)."),
-        ("4", "Immobilised", "Cannot move. (If moving Flat Out = Wrecked)."),
-        ("5", "Wrecked", "Destroyed. Becomes Wreck (Difficult Terrain)."),
-        ("6+", "Explodes!", "Destroyed. Removed. Models within D6\" take S3 hit.")
+        ("3", "Weapon Destroyed", "One weapon destroyed."),
+        ("4", "Immobilised", "Cannot move."),
+        ("5", "Wrecked", "Destroyed. Becomes Wreck."),
+        ("6+", "Explodes!", "Destroyed. Models within D6\" take S3 hit.")
     ]
     
     for roll, res, eff in damage_rows:
         pdf.cell(15, 6, roll, 1, 0, 'C')
         pdf.cell(35, 6, res, 1, 0, 'L')
         pdf.cell(80, 6, eff, 1, 1, 'L')
-    
-    # --- RIGHT COL: MODIFIERS BOX ---
-    # Move back up to header level
-    pdf.set_xy(x_start + 135, y_veh_top)
-    
+
+    # --- MODIFIERS (Right) ---
+    pdf.set_xy(x_start + 135, veh_start_y)
     pdf.set_font("Arial", 'B', 9)
     pdf.set_fill_color(220, 220, 220)
-    pdf.cell(50, 6, "Modifiers (Add/Sub to D6)", 1, 1, 'L', True)
+    pdf.cell(55, 6, "Penetration Modifiers", 1, 1, 'L', True)
     
     pdf.set_font("Arial", '', 8)
     modifiers = [
-        "-2  Glancing Hit",
-        "-1  AP - Weapon",
-        "+1  AP 1 Weapon",
-        "+1  Open-topped Vehicle",
+        "AP 1 Weapon: +1",
+        "AP - Weapon: -1",
+        "Open-topped: +1",
+        "Glancing Hit: -2",
+        "Melta (Close): +D6",
     ]
     
     for mod in modifiers:
         pdf.set_x(x_start + 135)
-        pdf.cell(50, 6, mod, 1, 1, 'L')
-
+        pdf.cell(55, 6, mod, 1, 1, 'L')
 
 def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False):
     pdf = PDF()
@@ -413,7 +390,6 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             pdf.multi_cell(0, 5, desc)
             pdf.ln(2)
 
-    # --- 5. GAME TABLES ---
     if include_ref_tables:
         draw_game_reference_tables(pdf)
 

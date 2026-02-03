@@ -276,17 +276,15 @@ with st.sidebar:
             st.caption("No recent data found.")
         else:
             for i in issues:
-                # Icon based on Open/Closed status
                 icon = "✅" if i["state"] == "closed" else "🔴"
                 st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
 
-    # 5. Feedback (Updated Logic)
+    # 5. Feedback
     st.divider()
     st.subheader("Report an Issue")
     with st.form("feedback_form"):
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
         
-        # New: Title and Name inputs
         feedback_title = st.text_input("Short Summary (e.g. Shield Drone Points)")
         feedback_name = st.text_input("Your Name (Optional)")
         
@@ -304,12 +302,10 @@ with st.sidebar:
                     owner = st.secrets["github"]["owner"]
                     repo = st.secrets["github"]["repo"]
                     
-                    # Construct Title: [Bug] Summary (by Name)
                     final_title = f"[{feedback_type}] {feedback_title}"
                     if feedback_name:
                         final_title += f" (by {feedback_name})"
 
-                    # Construct Body
                     body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
                     
                     if include_context:
@@ -398,29 +394,38 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
     st.divider()
 
+    # --- UPDATED ADD UNIT SECTION (Persists State) ---
     st.subheader("Add New Unit")
+    
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
-    tabs = st.tabs(slots_map)
-
-    for i, slot_name in enumerate(slots_map):
-        with tabs[i]:
-            slot_units = [u for u in data.get("units", []) if u.get("slot") == slot_name]
-            if not slot_units: st.caption(f"No units found for {slot_name}")
-            else:
-                unit_options = [u["name"] for u in slot_units]
-                selected_unit = st.selectbox(f"Select {slot_name}", unit_options, key=f"sel_{slot_name}")
-                if st.button(f"Add {selected_unit}", key=f"btn_add_{slot_name}"):
-                    uid = next(u["id"] for u in slot_units if u["name"] == selected_unit)
-                    unit_def = get_unit_by_id(uid)
-                    new_entry = {
-                        "id": str(uuid.uuid4()),
-                        "unit_id": uid,
-                        "size": int(unit_def.get("default_size", 1)),
-                        "selected": {},
-                        "parent_id": None
-                    }
-                    st.session_state.roster.append(new_entry)
-                    st.rerun()
+    
+    # 1. Use a radio button to persist the selected slot across reruns
+    # We use a unique key so Streamlit remembers the selection
+    selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
+    
+    slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
+    
+    if not slot_units:
+        st.caption(f"No units found for {selected_slot}")
+    else:
+        unit_options = [u["name"] for u in slot_units]
+        
+        # 2. Use a unique key for the selectbox based on the slot
+        # This ensures that when the app reruns, it remembers "Dire Avengers" was selected for "Troops"
+        selected_unit_name = st.selectbox(f"Select {selected_slot} Unit", unit_options, key=f"sel_unit_{selected_slot}")
+        
+        if st.button(f"Add {selected_unit_name}", key=f"btn_add_{selected_slot}"):
+            uid = next(u["id"] for u in slot_units if u["name"] == selected_unit_name)
+            unit_def = get_unit_by_id(uid)
+            new_entry = {
+                "id": str(uuid.uuid4()),
+                "unit_id": uid,
+                "size": int(unit_def.get("default_size", 1)),
+                "selected": {},
+                "parent_id": None
+            }
+            st.session_state.roster.append(new_entry)
+            st.rerun()
 
 else:
     st.info("⬅️ Please select a Codex from the sidebar to begin.")

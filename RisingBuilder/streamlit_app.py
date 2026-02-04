@@ -24,7 +24,7 @@ if "roster" not in st.session_state:
     st.session_state.roster = []
 if "roster_name" not in st.session_state:
     st.session_state.roster_name = "My Army List"
-# New state to track which unit is currently being edited to prevent collapsing
+# State to track active unit to prevent collapsing
 if "active_unit_id" not in st.session_state:
     st.session_state.active_unit_id = None
 

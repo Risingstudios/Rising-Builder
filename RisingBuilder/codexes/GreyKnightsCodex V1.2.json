@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (5th Edition) - V1.1",
+  "codex_name": "Grey Knights (5th Edition) - V1.2",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -104,12 +104,12 @@
     "Chainsword": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "" },
     "Power Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "" },
     "Power Fist": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy" },
-    "Combi-Weapon": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
-    "Combi-Melta": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "One shot Melta" },
-    "Combi-Plasma": { "range": "24\"", "S": "7", "AP": "2", "type": "Rapid Fire", "notes": "One shot Plasma" },
-    "Combi-Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "One shot Flamer" },
-    "combi": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
-    "Combi-Weapon (Replace Storm Bolter)": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
+    "Combi-Melta": { "range": "24\"/12\"", "S": "4/8", "AP": "5/1", "type": "Rapid Fire/Assault 1", "notes": "One shot Melta" },
+    "Combi-Plasma": { "range": "24\"", "S": "4/7", "AP": "5/2", "type": "Rapid Fire", "notes": "One shot Plasma" },
+    "Combi-Flamer": { "range": "24\"/Template", "S": "4/4", "AP": "5", "type": "Rapid Fire/Assault 1", "notes": "One shot Flamer" },
+    "Combi-Melta (Replace Storm Bolter)": { "range": "24\"/12\"", "S": "4/8", "AP": "5/1", "type": "Rapid Fire/Assault 1", "notes": "One shot Melta" },
+    "Combi-Plasma (Replace Storm Bolter)": { "range": "24\"", "S": "4/7", "AP": "5/2", "type": "Rapid Fire", "notes": "One shot Plasma" },
+    "Combi-Flamer (Replace Storm Bolter)": { "range": "24\"/Template", "S": "4/4", "AP": "5", "type": "Rapid Fire/Assault 1", "notes": "One shot Flamer" },
     "Meltagun": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
     "Multi-melta": { "range": "24\"", "S": "8", "AP": "1", "type": "Heavy 1", "notes": "Melta" },
     "Plasma Gun": { "range": "24\"", "S": "7", "AP": "2", "type": "Rapid Fire", "notes": "Gets Hot" },
@@ -151,7 +151,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
-            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 5 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -263,7 +263,9 @@
           "group_id": "ranged_term", "group_name": "Terminator Weapons (Requires Terminator Armour)", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "psyc", "name": "Psycannon (Replace Storm Bolter)", "points": 15 },
-            { "id": "combi", "name": "Combi-Weapon (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi_m", "name": "Combi-Melta (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi_p", "name": "Combi-Plasma (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi_f", "name": "Combi-Flamer (Replace Storm Bolter)", "points": 5 },
             { "id": "shield", "name": "Storm Shield (Replace Storm Bolter/Hammer)", "points": 10 }
           ]
         },
@@ -273,9 +275,9 @@
             { "id": "sword", "name": "Power Sword", "points": 10 },
             { "id": "fist", "name": "Power Fist", "points": 15 },
             { "id": "hammer", "name": "Daemonhammer", "points": 15 },
-            { "id": "combi_melta", "name": "Combi-Melta", "points": 10 },
-            { "id": "combi_plasma", "name": "Combi-Plasma", "points": 10 },
-            { "id": "combi_flamer", "name": "Combi-Flamer", "points": 10 },
+            { "id": "combi_m", "name": "Combi-Melta", "points": 10 },
+            { "id": "combi_p", "name": "Combi-Plasma", "points": 10 },
+            { "id": "combi_f", "name": "Combi-Flamer", "points": 10 },
             { "id": "incin", "name": "Incinerator (NOT ALLOWED)", "points": 0 }
           ]
         },
@@ -325,52 +327,58 @@
       "name": "Inquisitorial Henchmen Warband",
       "slot": "Elites",
       "base_points": 0,
-      "min_size": 1, "max_size": 1, "default_size": 1,
+      "min_size": 3, "max_size": 12, "default_size": 3,
       "unit_type": "Infantry",
       "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 3, "A": 1, "Ld": 7, "Sv": "-" },
       "wargear": [],
       "dedicated_transports": ["dt_rhino", "dt_razorback", "dt_chimera"],
       "options": [
         {
-          "group_id": "models", "group_name": "Select Models (Min 3, Max 12 Total)", "min_select": 3, "max_select": 12,
+          "group_id": "acolyte", "group_name": "Warrior Acolyte (4pts Base)", "min_select": 0, "max_select": 12,
           "choices": [
-            { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4 },
-            { "id": "crusader", "name": "Crusader (15 pts)", "points": 15 },
-            { "id": "dca", "name": "Death Cult Assassin (15 pts)", "points": 15 },
-            { "id": "arco", "name": "Arco-flagellant (15 pts)", "points": 15 },
-            { "id": "banisher", "name": "Banisher (15 pts)", "points": 15 },
-            { "id": "daemonhost", "name": "Daemonhost (10 pts)", "points": 10 },
-            { "id": "mystic", "name": "Mystic (10 pts)", "points": 10 },
-            { "id": "psyker", "name": "Psyker (10 pts)", "points": 10 },
-            { "id": "servitor", "name": "Servitor (10 pts)", "points": 10 },
-            { "id": "jokaero", "name": "Jokaero Weaponsmith (35 pts)", "points": 35 }
-          ]
-        },
-        {
-          "group_id": "acolyte_upgrades", "group_name": "Acolyte Swaps (Requires Acolyte)", "min_select": 0, "max_select": 12,
-          "choices": [
+            { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4, "points_mode": "flat" },
             { "id": "sb", "name": "Storm Bolter", "points": 3 },
-            { "id": "hotshot", "name": "Hot-shot Lasgun", "points": 5 },
-            { "id": "bolt", "name": "Boltgun", "points": 1 },
-            { "id": "carapace", "name": "Carapace Armour", "points": 4 },
-            { "id": "power", "name": "Power Armour", "points": 10 }
-          ]
-        },
-        {
-          "group_id": "acolyte_special", "group_name": "Acolyte Special Weapons (Max 3)", "min_select": 0, "max_select": 3,
-          "choices": [
+            { "id": "combi_m", "name": "Combi-Melta", "points": 10 },
+            { "id": "combi_p", "name": "Combi-Plasma", "points": 10 },
+            { "id": "combi_f", "name": "Combi-Flamer", "points": 10 },
             { "id": "melta", "name": "Meltagun", "points": 10 },
             { "id": "plasma", "name": "Plasma Gun", "points": 10 },
             { "id": "flamer", "name": "Flamer", "points": 10 },
-            { "id": "combi", "name": "Combi-weapon", "points": 10 }
+            { "id": "cara", "name": "Carapace Armour (4+)", "points": 4 },
+            { "id": "power", "name": "Power Armour (3+)", "points": 10 }
           ]
         },
         {
-          "group_id": "servitor_guns", "group_name": "Servitor Upgrades (Max 3)", "min_select": 0, "max_select": 3,
+          "group_id": "crusader", "group_name": "Crusader", "min_select": 0, "max_select": 12,
           "choices": [
+            { "id": "crusader", "name": "Crusader (Power Weapon/Storm Shield)", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "dca", "group_name": "Death Cult Assassin", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "dca", "name": "Death Cult Assassin (2x Power Wep)", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "psyker", "group_name": "Psyker", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "psyker", "name": "Psyker", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "servitor", "group_name": "Servitor (10pts Base)", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "servitor", "name": "Servitor (Base)", "points": 10, "points_mode": "flat" },
             { "id": "hb", "name": "Heavy Bolter", "points": 0 },
             { "id": "mm", "name": "Multi-melta", "points": 0 },
             { "id": "pc", "name": "Plasma Cannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "monkey", "group_name": "Jokaero", "min_select": 0, "max_select": 12,
+          "choices": [
+            { "id": "monkey", "name": "Jokaero Weaponsmith", "points": 35, "points_mode": "flat" }
           ]
         }
       ]

@@ -57,7 +57,6 @@ def get_tooltip(item_name, codex_data):
     weps = codex_data.get("weapons", {})
     for name, stats in weps.items():
         n = name.lower()
-        # Check if the weapon name exists inside the selected option string
         if n in query:
             matches.append(f"⚔️ [{name}] Rng: {stats.get('range', '-')}, S: {stats.get('S', '-')}, AP: {stats.get('AP', '-')}, Type: {stats.get('type', '-')}. {stats.get('notes', '')}")
 
@@ -220,7 +219,6 @@ def render_unit_options(entry, unit, codex_data):
             # Calculate tooltip
             dropdown_tooltip = "Select an option to see rules."
             if current_selected_name != "(None)":
-                # Remove points cost: "Power Sword (+15)" -> "Power Sword"
                 clean_name = re.sub(r' \(\+\d+.*\)', '', current_selected_name)
                 desc = get_tooltip(clean_name, codex_data)
                 if desc: dropdown_tooltip = desc
@@ -281,6 +279,32 @@ with st.sidebar:
     st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
+    # --- NEW CODEX INSPECTOR ---
+    with st.expander("🔍 Codex Inspector"):
+        st.caption("Search your loaded JSON for rules.")
+        search_term = st.text_input("Search DB", placeholder="e.g. Shield").lower()
+        if search_term and "codex_data" in st.session_state:
+            data = st.session_state.codex_data
+            found = False
+            # Check Weapons
+            for k in data.get("weapons", {}):
+                if search_term in k.lower():
+                    st.markdown(f"**⚔️ {k}**")
+                    found = True
+            # Check Wargear
+            for k in data.get("wargear", {}):
+                if search_term in k.lower():
+                    st.markdown(f"**⚙️ {k}**")
+                    found = True
+            # Check Rules
+            for k in data.get("rules", {}):
+                if search_term in k.lower():
+                    st.markdown(f"**📜 {k}**")
+                    found = True
+            
+            if not found:
+                st.warning(f"No match for '{search_term}' found in DB.")
+
     st.divider()
     st.subheader("Save / Load List")
     

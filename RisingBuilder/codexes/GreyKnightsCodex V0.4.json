@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.3 Fix",
+  "codex_name": "Grey Knights (My Data) - V0.4 Fix",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -22,7 +22,9 @@
     "Master Swordsman": { "summary": "Re-roll failed To Hit rolls in close combat." },
     "Fearless": { "summary": "Passes Morale/Pinning automatically. Cannot go to Ground." },
     "Holocaust": { "summary": "Psychic Power. Large Blast S5 AP- range 12\"." },
-    "Assault Vehicle": { "summary": "Passengers may assault the turn they disembark." }
+    "Assault Vehicle": { "summary": "Passengers may assault the turn they disembark." },
+    "Power of the Machine Spirit": { "summary": "Vehicle can fire one more weapon than normal at BS4, even if moving Fast." },
+    "Repair": { "summary": "If immobilized, roll a D6 in shooting phase. On a 6, the vehicle is repaired." }
   },
   "wargear": {
     "Personal Teleporter": { "summary": "Unit moves as Jump Infantry. Once per game 30\" shunt move." },
@@ -42,14 +44,17 @@
     "Storm Shield": { "summary": "3+ Invulnerable Save. No bonus attack for two weapons." },
     "Storm Shield (Replace Storm Bolter/Hammer)": { "summary": "3+ Invulnerable Save." },
     "Smoke Launchers": { "summary": "Once per game, vehicle gains 5+ cover save but cannot shoot." },
-    "Terminator Armour (Daemon Hammer / Storm Bolter)": { "summary": "Standard Terminator loadout." },
+    "Terminator Armour (Daemon Hammer + Storm Bolter)": { "summary": "Standard Terminator loadout." },
     "Warrior Acolyte (4 pts)": { "summary": "Basic Henchman. BS3 S3 T3 Sv 5+." },
     "Crusader (Power Weapon/Storm Shield)": { "summary": "Henchman. WS4, Power Weapon, Storm Shield (3+ Inv)." },
     "Death Cult Assassin (2x Power Wep)": { "summary": "Henchman. WS5 I6 A2, Two Power Weapons (5+ Inv)." },
     "Psyker": { "summary": "Henchman. Can cast Psychic Barrage (S3 Large Blast, strength increases with more Psykers)." },
     "Servitor (Base)": { "summary": "Henchman. Heavy Weapon platform. Mindlock if Inquisitor not present." },
     "Jokaero Weaponsmith": { "summary": "Henchman. Digital Weapons (shooting). Customizes unit wargear (Roll D6)." },
-    "Blade of Antwyr": { "summary": "Demon weapon. Becomes Fleshbane, AP2. Crowe must always issue/accept challenges." }
+    "Blade of Antwyr": { "summary": "Demon weapon. Becomes Fleshbane, AP2. Crowe must always issue/accept challenges." },
+    "Searchlight": { "summary": "Used at night. If you shoot, target is illuminated for other units." },
+    "Psybolt Ammunition": { "summary": "+1 Strength to Storm Bolters, Psycannons, Psilencers, and Autocannons." },
+    "Narthecium/Reductor": { "summary": "Unit gains Feel No Pain." }
   },
   "weapons": {
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
@@ -58,12 +63,14 @@
     "Daemonhammer": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Force Weapon, Concussive, Unwieldy" },
     "Nemesis Warding Stave": { "range": "-", "S": "+2", "AP": "4", "type": "Melee", "notes": "Force Weapon, 2+ Invulnerable Save in combat" },
     "Nemesis Falchions": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Force Weapon, +1 Attack" },
+    "Nemesis Greatsword": { "range": "-", "S": "User", "AP": "2", "type": "Melee", "notes": "Force Weapon, Master-crafted, Re-roll hits/wounds/penetration" },
     "Storm Bolter": { "range": "24\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "" },
     "Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Assault 2/Heavy 4", "notes": "Rending" },
     "Psycannon (Replace Storm Bolter)": { "range": "24\"", "S": "7", "AP": "4", "type": "Assault 2/Heavy 4", "notes": "Rending" },
     "Incinerator": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "Soul Blaze" },
     "Incinerator (NOT ALLOWED)": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "INVALID SELECTION" },
     "Heavy Incinerator": { "range": "Template", "S": "6", "AP": "4", "type": "Assault 1", "notes": "Soul Blaze, Torrent" },
+    "Psilencer": { "range": "24\"", "S": "4", "AP": "-", "type": "Heavy 6", "notes": "Force" },
     "Gatling Psilencer": { "range": "24\"", "S": "4", "AP": "-", "type": "Heavy 12", "notes": "Force" },
     "Heavy Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Large Blast", "notes": "Rending" },
     "Bolt pistol": { "range": "12\"", "S": "4", "AP": "5", "type": "Pistol", "notes": "" },
@@ -151,7 +158,7 @@
         {
           "group_id": "armour", "group_name": "Armour Upgrade", "min_select": 0, "max_select": 1,
           "choices": [
-            { "id": "term", "name": "Terminator Armour (Daemon Hammer / Storm Bolter)", "points": 40 },
+            { "id": "term", "name": "Terminator Armour (Daemon Hammer + Storm Bolter)", "points": 40 },
             { "id": "art", "name": "Artificer Armour (2+ Sv)", "points": 10 }
           ]
         },

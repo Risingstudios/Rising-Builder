@@ -47,6 +47,17 @@
     "Divination": { "summary": "Redeploy D3+1 units after deployment (within deployment zone)." }
   },
   "wargear": {
+    "Shimmershield": { "summary": "5+ Invulnerable save for the Exarch and his unit in close combat." },
+    "Diresword": { "summary": "Power Weapon. Targets suffering a wound must pass a Ld test or suffer Instant Death." },
+    "Executioner": { "summary": "Two-handed Power Weapon that grants +2 Strength." },
+    "Mirrorswords": { "summary": "Paired Power Weapons. Grants +2 Attacks instead of the usual +1 for two weapons." },
+    "Triskele": { "summary": "Power Weapon. Can be thrown: Range 12\", S3, AP2, Assault 3." },
+    "Scorpion's Claw": { "summary": "Counts as a Power Fist (S x2, AP2, Unwieldy) and a Shuriken Catapult." },
+    "Biting Blade": { "summary": "Two-handed. Grants +1 Strength. Each hit adds a further +1 Strength for wounding." },
+    "Chainsabres": { "summary": "Counts as Twin-linked Shuriken Pistols. In melee, grants +1 Attack and re-rolls to Hit and Wound." },
+    "Powerblades": { "summary": "Count as Power Weapons. Grant +1 Attack." },
+    "Sunrifle": { "summary": "Range 24\", S3, AP5, Assault 6, Pinning." },
+    "Hawk's Talon": { "summary": "Range 24\", S5, AP5, Assault 3." }
     "Ghosthelm": { "summary": "Ignore Perils of the Warp on a 3+ (take an invulnerable save)." },
     "Rune Armour": { "summary": "4+ Invulnerable save." },
     "Spirit Stones": { "summary": "Psyker: Use a second power per turn. Vehicle: Ignore 'Crew Stunned' on 2+." },
@@ -484,7 +495,7 @@
       "min_size": 5, "max_size": 10, "default_size": 5,
       "unit_type": "Infantry",
       "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "4+" },
-      "wargear": [ "Avenger shuriken catapult" ],
+      "wargear": [ "Avenger shuriken catapult", "Plasma Grenades" ],
       "special_rules": [ "Fleet of Foot" ],
       "dedicated_transports": ["dt_wave_serpent"],
       "sub_profiles": {
@@ -492,19 +503,21 @@
       },
       "options": [
         {
-          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
-          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+          "group_id": "exarch_upgrade", "group_name": "Character", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "exarch", "name": "Upgrade to Exarch", "points": 12 }
+          ]
         },
         {
-          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapon (Requires Exarch)", "min_select": 0, "max_select": 1,
           "choices": [
-            { "id": "dual_catapult", "name": "Two Avenger catapults", "points": 5 },
-            { "id": "diresword", "name": "Diresword & pistol", "points": 10 },
+            { "id": "twin_catapult", "name": "Two Avenger shuriken catapults", "points": 5 },
+            { "id": "diresword", "name": "Diresword & Shuriken pistol", "points": 10 },
             { "id": "shield", "name": "Power weapon & Shimmershield", "points": 15 }
           ]
         },
         {
-          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "group_id": "exarch_powers", "group_name": "Exarch Powers (Requires Exarch)", "min_select": 0, "max_select": 2,
           "choices": [
             { "id": "defend", "name": "Defend", "points": 15 },
             { "id": "bladestorm", "name": "Bladestorm", "points": 15 }
@@ -548,7 +561,7 @@
       "min_size": 5, "max_size": 10, "default_size": 5,
       "unit_type": "Infantry",
       "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "4+" },
-      "wargear": [ "Banshee Mask", "Shuriken pistol", "Power weapon" ],
+      "wargear": [ "Shuriken pistol", "Power weapon", "Banshee Mask" ],
       "special_rules": [ "Fleet of Foot" ],
       "dedicated_transports": ["dt_wave_serpent"],
       "sub_profiles": {
@@ -556,11 +569,13 @@
       },
       "options": [
         {
-          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
-          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+          "group_id": "exarch_upgrade", "group_name": "Character", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "exarch", "name": "Upgrade to Exarch", "points": 12 }
+          ]
         },
         {
-          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapon (Requires Exarch)", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "executioner", "name": "Executioner", "points": 10 },
             { "id": "triskele", "name": "Triskele", "points": 5 },
@@ -568,7 +583,7 @@
           ]
         },
         {
-          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "group_id": "exarch_powers", "group_name": "Exarch Powers (Requires Exarch)", "min_select": 0, "max_select": 2,
           "choices": [
             { "id": "war_shout", "name": "War Shout", "points": 5 },
             { "id": "acrobatic", "name": "Acrobatic", "points": 5 }
@@ -576,7 +591,7 @@
         }
       ]
     },
-    {
+   {
       "id": "el_striking_scorpions",
       "name": "Striking Scorpions",
       "slot": "Elites",
@@ -585,26 +600,28 @@
       "unit_type": "Infantry",
       "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 1, "I": 5, "A": 1, "Ld": 9, "Sv": "3+" },
       "wargear": [ "Shuriken pistol", "Scorpion chainsword", "Mandiblasters", "Plasma Grenades" ],
-      "special_rules": [ "Fleet of Foot", "Infiltrate", "Move Through Cover" ],
+      "special_rules": [ "Fleet of Foot", "Move Through Cover", "Infiltrate" ],
       "dedicated_transports": ["dt_wave_serpent"],
       "sub_profiles": {
-        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 4, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
+        "exarch": { "name": "Exarch", "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 1, "I": 6, "A": 2, "Ld": 9, "Sv": "3+" }
       },
       "options": [
         {
-          "group_id": "exarch", "group_name": "Squad Leader", "min_select": 0, "max_select": 1,
-          "choices": [ { "id": "exarch", "name": "Exarch Upgrade", "points": 12 } ]
+          "group_id": "exarch_upgrade", "group_name": "Character", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "exarch", "name": "Upgrade to Exarch", "points": 12 }
+          ]
         },
         {
-          "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
+          "group_id": "exarch_wargear", "group_name": "Exarch Weapon (Requires Exarch)", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "claw", "name": "Scorpion's Claw", "points": 15 },
-            { "id": "biting", "name": "Biting Blade", "points": 5 },
+            { "id": "biting_blade", "name": "Biting Blade", "points": 5 },
             { "id": "chainsabres", "name": "Chainsabres", "points": 5 }
           ]
         },
         {
-          "group_id": "exarch_powers", "group_name": "Exarch Powers", "min_select": 0, "max_select": 2,
+          "group_id": "exarch_powers", "group_name": "Exarch Powers (Requires Exarch)", "min_select": 0, "max_select": 2,
           "choices": [
             { "id": "stalker", "name": "Stalker", "points": 5 },
             { "id": "shadowstrike", "name": "Shadowstrike", "points": 20 }
@@ -1002,4 +1019,5 @@
       ]
     }
   ]
+
 }

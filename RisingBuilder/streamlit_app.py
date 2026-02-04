@@ -45,34 +45,40 @@ def get_unit_by_id(unit_id):
 
 def get_tooltip(item_name, codex_data):
     """
-    Generates a tooltip string by fuzzy searching Weapons, Wargear, and Rules.
+    Scans the item_name and finds ALL matching weapons/rules/wargear in the codex.
+    Returns a combined string of all matches.
     """
     if not codex_data or not item_name: return None
     
-    query = item_name.lower().strip()
+    query = item_name.lower()
+    matches = []
     
     # 1. Search Weapons
     weps = codex_data.get("weapons", {})
     for name, stats in weps.items():
         n = name.lower()
-        if n == query or n in query or query in n:
-            return f"⚔️ [Weapon] Rng: {stats.get('range', '-')}, S: {stats.get('S', '-')}, AP: {stats.get('AP', '-')}, Type: {stats.get('type', '-')}. {stats.get('notes', '')}"
+        # Check if the weapon name exists inside the selected option string
+        if n in query:
+            matches.append(f"⚔️ [{name}] Rng: {stats.get('range', '-')}, S: {stats.get('S', '-')}, AP: {stats.get('AP', '-')}, Type: {stats.get('type', '-')}. {stats.get('notes', '')}")
 
     # 2. Search Wargear
     gear = codex_data.get("wargear", {})
     for name, data in gear.items():
         n = name.lower()
-        if n == query or n in query or query in n:
-            return f"⚙️ [Wargear] {data.get('summary', 'No description available.')}"
+        if n in query:
+            matches.append(f"⚙️ [{name}] {data.get('summary', '')}")
             
     # 3. Search Rules
     rules = codex_data.get("rules", {})
     for name, data in rules.items():
         n = name.lower()
-        if n == query or n in query or query in n:
-            return f"📜 [Rule] {data.get('summary', 'No description available.')}"
+        if n in query:
+            matches.append(f"📜 [{name}] {data.get('summary', '')}")
     
-    return None
+    if not matches:
+        return None
+        
+    return "\n\n".join(matches)
 
 def fetch_github_issues():
     try:
@@ -201,7 +207,7 @@ def render_unit_options(entry, unit, codex_data):
                 opts_display.append(d_name)
             current_idx = 0
             
-            # Identify current selection for tooltip
+            # Find selected name
             current_selected_name = "(None)"
             if current_picks:
                 curr_id = current_picks[0]
@@ -211,23 +217,22 @@ def render_unit_options(entry, unit, codex_data):
                         current_selected_name = d_name
                         break
             
-            # Calculate tooltip for the SELECTED item
+            # Calculate tooltip
             dropdown_tooltip = "Select an option to see rules."
             if current_selected_name != "(None)":
-                clean_name = current_selected_name.split(" (+")[0]
+                # Remove points cost: "Power Sword (+15)" -> "Power Sword"
+                clean_name = re.sub(r' \(\+\d+.*\)', '', current_selected_name)
                 desc = get_tooltip(clean_name, codex_data)
                 if desc: dropdown_tooltip = desc
 
             k = f"opt_{entry['id']}_{gid}"
             
-            # FIX: Removed 'label_visibility="collapsed"' to reveal the help icon
-            # Set label="" so it doesn't duplicate the text, but the icon appears.
             selected = st.selectbox("", opts_display, index=current_idx, key=k, 
                          help=dropdown_tooltip,
                          on_change=cb_update_radio, args=(entry, gid, name_map, k))
             
             if selected != "(None)":
-                clean_name = selected.split(" (+")[0]
+                clean_name = re.sub(r' \(\+\d+.*\)', '', selected)
                 desc = get_tooltip(clean_name, codex_data)
                 if desc: st.caption(f"↳ {desc}")
 

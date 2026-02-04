@@ -1,5 +1,5 @@
 {
-  "codex_name": "Orks (My Data)",
+  "codex_name": "Orks (5th Edition) - V0.3",
   "rules": {
     "Prophet of the Waaagh!": { "summary": "Ghazghkull gives the whole army Fearless for a turn. He gets a 2+ Invuln save that turn." },
     "One Scalpel Short of a Medpack": { "summary": "Grotsnik is Fearless and has Rampage. He must always move towards the nearest enemy." },
@@ -12,7 +12,17 @@
     "Ramshackle": { "summary": "When vehicle is wrecked, roll on Ramshackle table. It might careen forward or explode harmlessly." },
     "Power of the Waaagh!": { "summary": "Weirdboyz determine psychic power randomly at start of turn by rolling D6." },
     "Eere We Go!": { "summary": "Deep Striking unit ignores dangerous terrain tests. If they scatter onto impassable/units, reduce scatter distance to avoid mishap." },
-    "Boarding Planks": { "summary": "Models can assault from this vehicle even if it moved (up to 12\"). Adds 2\" to disembark/assault range." }
+    "Boarding Planks": { "summary": "Models can assault from this vehicle even if it moved (up to 12\"). Adds 2\" to disembark/assault range." },
+    "Independent Character": { "summary": "May join/leave units. Look Out Sir rolls." },
+    "Eternal Warrior": { "summary": "Immune to Instant Death." },
+    "Fearless": { "summary": "Passes Morale/Pinning automatically. Cannot go to Ground." },
+    "Feel No Pain": { "summary": "Ignore unsaved wounds on 4+ (unless Instant Death/AP1/AP2)." },
+    "Psyker": { "summary": "Can use Psychic Powers." },
+    "Deep Strike": { "summary": "May deploy via Deep Strike rules." },
+    "Move Through Cover": { "summary": "Roll 3D6 for cover movement, pick highest." },
+    "Scouts": { "summary": "May Outflank. After deployment, may make a free move." },
+    "Hit and Run": { "summary": "End of assault phase: roll Initiative to break from combat and move 3D6\"." },
+    "It's a Grot!": { "summary": "Gretchin do not cause Panic tests for non-Grot units." }
   },
   "wargear": {
     "Adamantium Skull": { "summary": "Ghazghkull has a 2+ Invulnerable save on the turn he calls the Waaagh!" },
@@ -22,25 +32,48 @@
     "Goldtoof Armour": { "summary": "3+ Armor Save. 5+ Invulnerable Save (improves to 3+ vs Shooting)." },
     "Nest of Vipers": { "summary": "Zogwort attacks with 2D6 poison attacks in melee." },
     "Bosspole": { "summary": "Allows unit to re-roll failed Morale/Pinning tests. Usually requires taking a wound." },
+    "Nob: Bosspole": { "summary": "Allows unit to re-roll failed Morale/Pinning tests. Usually requires taking a wound." },
     "Cybork Body": { "summary": "5+ Invulnerable Save." },
+    "Cybork Bodies (5+ Inv)": { "summary": "5+ Invulnerable Save." },
     "Attack Squig": { "summary": "Adds +1 Attack to profile." },
     "Kustom Force Field": { "summary": "5+ Cover Save for all units within 6\"." },
     "Grot Oiler": { "summary": "Re-roll a repair roll." },
+    "Grot Oiler (Max 3)": { "summary": "Re-roll a repair roll." },
     "Ammo Runt": { "summary": "Re-roll one To Hit roll shooting." },
     "Mega Armour": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
+    "Mega Armour (2+ Sv, PK, TL-Shoota)": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
     "Stikkbombs": { "summary": "Frag grenades (strike at initiative in cover)." },
     "Tankbusta Bombs": { "summary": "S8 AP- melee attacks vs vehicles." },
     "Deff Rolla": { "summary": "Tank Shock causes D6 S10 hits." },
     "Grot Riggers": { "summary": "Vehicle has 'It Will Not Die' equivalent (Fix Immobilised on 6)." },
-    "Red Paint Job": { "summary": "+1\" movement." }
+    "Red Paint Job": { "summary": "+1\" movement." },
+    "Mek's Tools": { "summary": "Can repair vehicles in base contact on a 4+ (or 3+ with Grot Oiler)." },
+    "'Eavy Armour": { "summary": "Grants a 4+ Armour Save." },
+    "'Eavy Armour (4+ Sv)": { "summary": "Grants a 4+ Armour Save." },
+    "Nob: 'Eavy Armour": { "summary": "Grants a 4+ Armour Save." },
+    "Warbike (+1T, 4+ Cover)": { "summary": "Unit becomes Biker. +1 Toughness, 4+ Cover Save, Exhaust Cloud." },
+    "Warbikes (Entire Squad)": { "summary": "Unit mounts Warbikes." },
+    "Waaagh! Banner": { "summary": "+1 WS to the unit." },
+    "Jump Pack": { "summary": "Move 12\". Can Deep Strike." },
+    "Runtherd": { "summary": "Character. Keeps Gretchin in check." },
+    "Squig Hound": { "summary": "Attack Squig (+1A) or Herd Squig (Reroll Morale)." },
+    "Grot Prod": { "summary": "Counts as Close Combat Weapon. Doubles Runtherd Strength for discipline." },
+    "Armour Plates": { "summary": "Stunned results on damage chart count as Shaken instead." },
+    "Reinforced Ram": { "summary": "Reroll Dangerous Terrain tests. +2 Front Armour when Tank Shocking." },
+    "Bigbomm": { "summary": "One use. Dropped in movement phase. Large Blast, S5 AP5." }
   },
   "weapons": {
     "Slugga": { "range": "12\"", "S": "4", "AP": "6", "type": "Pistol", "notes": "" },
     "Choppa": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "" },
     "Shoota": { "range": "18\"", "S": "4", "AP": "6", "type": "Assault 2", "notes": "" },
+    "Swap Slugga/Choppa for Shootas": { "range": "18\"", "S": "4", "AP": "6", "type": "Assault 2", "notes": "" },
     "Big Shoota": { "range": "36\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "" },
+    "Twin-linked Big Shoota": { "range": "36\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "Twin-linked" },
+    "Two Big Shootas": { "range": "36\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "Fires twice" },
     "Rokkit Launcha": { "range": "24\"", "S": "8", "AP": "3", "type": "Assault 1", "notes": "" },
+    "TL Rokkit Launcha": { "range": "24\"", "S": "8", "AP": "3", "type": "Assault 1", "notes": "Twin-linked" },
     "Kustom Mega-blasta": { "range": "24\"", "S": "8", "AP": "2", "type": "Assault 1", "notes": "Gets Hot" },
+    "TL Kustom Mega-blasta": { "range": "24\"", "S": "8", "AP": "2", "type": "Assault 1", "notes": "Twin-linked, Gets Hot" },
     "Burna": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "Power Weapon in assault" },
     "Skorcha": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "" },
     "Deffgun": { "range": "48\"", "S": "7", "AP": "4", "type": "Heavy D3", "notes": "" },
@@ -48,10 +81,26 @@
     "Zzap Gun": { "range": "36\"", "S": "2D6", "AP": "2", "type": "Heavy 1", "notes": "Roll for Strength each time." },
     "Kannon (Frag)": { "range": "36\"", "S": "4", "AP": "5", "type": "Heavy 1", "notes": "Blast" },
     "Kannon (Shell)": { "range": "36\"", "S": "8", "AP": "3", "type": "Heavy 1", "notes": "" },
+    "Kannon": { "range": "36\"", "S": "4/8", "AP": "5/3", "type": "Heavy 1", "notes": "Frag (Blast) or Krak" },
     "Lobba": { "range": "48\"", "S": "5", "AP": "5", "type": "Heavy 1", "notes": "Barrage, Blast" },
     "Power Klaw": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy (I1)" },
+    "Nob: Power Klaw": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy (I1)" },
     "Big Choppa": { "range": "-", "S": "+2", "AP": "-", "type": "Melee", "notes": "Two-handed" },
-    "Snazzgun": { "range": "24\"", "S": "5", "AP": "D6", "type": "Assault 1", "notes": "" }
+    "Nob: Big Choppa": { "range": "-", "S": "+2", "AP": "-", "type": "Melee", "notes": "Two-handed" },
+    "Snazzgun": { "range": "24\"", "S": "5", "AP": "D6", "type": "Assault 1", "notes": "" },
+    "'Urty Syringe": { "range": "-", "S": "User", "AP": "6", "type": "Melee", "notes": "Poisoned (4+)" },
+    "Two Kustom Choppas (+2 S)": { "range": "-", "S": "+2", "AP": "-", "type": "Melee", "notes": "Rending" },
+    "Kombi-skorcha": { "range": "24\"/Tmplt", "S": "4/5", "AP": "6/4", "type": "Aslt 2 / Aslt 1", "notes": "One shot as Skorcha" },
+    "Kombi-rokkit": { "range": "18\"/24\"", "S": "4/8", "AP": "6/3", "type": "Aslt 2 / Aslt 1", "notes": "One shot as Rokkit" },
+    "Twin-linked Shoota": { "range": "18\"", "S": "4", "AP": "6", "type": "Assault 2", "notes": "Twin-linked" },
+    "Replace TL Shoota with Kombi-skorcha/rokkit": { "range": "Special", "S": "-", "AP": "-", "type": "Weapon", "notes": "See Kombi rules" },
+    "Grot Blasta": { "range": "12\"", "S": "3", "AP": "-", "type": "Pistol", "notes": "" },
+    "Killkannon": { "range": "24\"", "S": "7", "AP": "3", "type": "Ordnance 1", "notes": "Large Blast" },
+    "Killkannon (Reduces Capacity to 12)": { "range": "24\"", "S": "7", "AP": "3", "type": "Ordnance 1", "notes": "Large Blast" },
+    "Dreadnought Close Combat Weapon": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon" },
+    "Two Dreadnought Close Combat Weapons": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon, +1A" },
+    "Dreadnought CCW (+1 A)": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon" },
+    "Grotzooka": { "range": "18\"", "S": "6", "AP": "5", "type": "Heavy 2", "notes": "Blast" }
   },
   "units": [
     {
@@ -301,7 +350,7 @@
       "dedicated_transports": ["dt_trukk", "hs_battlewagon"],
       "options": [
         {
-          "group_id": "weap", "group_name": "Weapon Upgrades", "min_select": 0, "max_select": 10,
+          "group_id": "weap", "group_name": "Weapon Upgrades", "min_select": 0, "max_select": 10, "linked_to_size": true,
           "choices": [
             { "id": "kombi", "name": "Replace TL Shoota with Kombi-skorcha/rokkit", "points": 5, "points_mode": "flat" }
           ]

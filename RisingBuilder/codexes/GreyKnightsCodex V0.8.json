@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.7 Fix",
+  "codex_name": "Grey Knights (My Data) - V0.8",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -169,6 +169,7 @@
       "profile": { "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 4, "I": 3, "A": 3, "Ld": 10, "Sv": "2+" },
       "wargear": [ "Throne of Judgement", "Master-crafted Multi-melta", "Master-crafted Power Sword", "Orbital Strike Relay", "Iron Halo", "Frag/Krak Grenades" ],
       "special_rules": [ "Independent Character", "Fearless", "Relentless", "By Any Means Necessary" ],
+      "dedicated_transports": ["el_henchmen"],
       "options": []
     },
     {
@@ -311,7 +312,8 @@
       "dedicated_transports": ["dt_rhino", "dt_razorback", "dt_chimera"],
       "options": [
         {
-          "group_id": "acolyte", "group_name": "Warrior Acolyte (4pts Base)", "min_select": 0, "max_select": 12, "choices": [
+          "group_id": "acolyte", "group_name": "Warrior Acolyte (4pts Base)", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4, "points_mode": "flat" },
             { "id": "sb", "name": "Storm Bolter", "points": 3 },
             { "id": "combi", "name": "Combi-weapon", "points": 10 },
@@ -323,17 +325,20 @@
           ]
         },
         {
-          "group_id": "crusader", "group_name": "Crusader", "min_select": 0, "max_select": 12, "choices": [
+          "group_id": "crusader", "group_name": "Crusader", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "crusader", "name": "Crusader (Power Weapon/Storm Shield)", "points": 15, "points_mode": "flat" }
           ]
         },
         {
-          "group_id": "dca", "group_name": "Death Cult Assassin", "min_select": 0, "max_select": 12, "choices": [
+          "group_id": "dca", "group_name": "Death Cult Assassin", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "dca", "name": "Death Cult Assassin (2x Power Wep)", "points": 15, "points_mode": "flat" }
           ]
         },
         {
-          "group_id": "psyker", "group_name": "Psyker", "min_select": 0, "max_select": 12, "choices": [
+          "group_id": "psyker", "group_name": "Psyker", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "psyker", "name": "Psyker", "points": 10, "points_mode": "flat" }
           ]
         },
@@ -521,7 +526,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 5 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 10 },
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 10 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 25 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -561,7 +566,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 10 },
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 10 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 25 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -597,7 +602,7 @@
           "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 2,
           "choices": [
             { "id": "sword", "name": "Nemesis Greatsword", "points": 25 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 10 }
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 10 }
           ]
         },
         {

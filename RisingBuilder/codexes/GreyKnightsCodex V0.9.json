@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.8",
+  "codex_name": "Grey Knights (My Data) - V0.9",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -76,6 +76,7 @@
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
     "Nemesis Force Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Force Weapon, +1 Invulnerable Save in combat" },
     "Nemesis Daemonhammer": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Force Weapon, Concussive, Unwieldy" },
+    "Nemesis Daemon Hammer": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Force Weapon, Concussive, Unwieldy" },
     "Daemonhammer": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Force Weapon, Concussive, Unwieldy" },
     "Nemesis Warding Stave": { "range": "-", "S": "+2", "AP": "4", "type": "Melee", "notes": "Force Weapon, 2+ Invulnerable Save in combat" },
     "Nemesis Falchions": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Force Weapon, +1 Attack" },
@@ -399,7 +400,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 2 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 5 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -439,7 +440,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 5 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -485,7 +486,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 0 },
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 0 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 25 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -718,4 +719,5 @@
       "options": []
     }
   ]
+}
 }

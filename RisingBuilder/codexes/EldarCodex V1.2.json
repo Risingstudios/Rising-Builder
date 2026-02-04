@@ -1,5 +1,5 @@
 {
-  "codex_name": "Eldar (5th Edition) - My Data",
+  "codex_name": "Eldar (5th Edition) - V1.1 Fix",
   "rules": {
     "Fleet of Foot": { "summary": "Unit may run and then assault in the same turn." },
     "Independent Character": { "summary": "May join/leave units. Look Out Sir rolls." },
@@ -44,7 +44,14 @@
     "Destructor": { "summary": "Heavy Flamer template (S5 AP4)." },
     "Embolden": { "summary": "Warlock and unit re-roll failed Morale/Pinning tests." },
     "Enhance": { "summary": "Warlock and unit have +1 WS and +1 I." },
-    "Divination": { "summary": "Redeploy D3+1 units after deployment (within deployment zone)." }
+    "Divination": { "summary": "Redeploy D3+1 units after deployment (within deployment zone)." },
+    "Furious Charge": { "summary": "+1 Initiative and +1 Strength when charging." },
+    "Inspiring": { "summary": "Friendly units within 12\" are Fearless." },
+    "Deep Strike": { "summary": "May deploy via Deep Strike rules." },
+    "Warlock Powers": { "summary": "Has access to Destructor, Conceal, Embolden, Enhance." },
+    "Surprise Assault": { "summary": "Exarch power: When Deep Striking, unit may fire one extra time." },
+    "Withdraw": { "summary": "Exarch power: Unit gains Hit & Run." },
+    "Monstrous Creature": { "summary": "2D6 Armor Pen, Move Through Cover, Relentless, Fear, Smash." }
   },
   "wargear": {
     "Shimmershield": { "summary": "5+ Invulnerable save for the Exarch and his unit in close combat." },
@@ -87,27 +94,41 @@
     "Death Jester": { "summary": "Upgrade Character. Equipped with Shrieker Cannon." },
     "Hallucinogen Grenades": { "summary": "Counts as Assault Grenades. Enemies in cover check Ld; failure = stun/attack own unit." },
     "Staff of Ulthamar": { "summary": "Force Weapon. Allows Spirit Stones to be used on a 2+." },
-    "Energy Field": { "summary": "Penetrating hits with S > 8 count as S8. Ranged attacks against Front/Side never roll > 1D6 for penetration." }
+    "Energy Field": { "summary": "Penetrating hits with S > 8 count as S8. Ranged attacks against Front/Side never roll > 1D6 for penetration." },
+    "Melta bombs": { "summary": "S8 AP1 against vehicles in assault. Unwieldy." },
+    "Eldar jetbike": { "summary": "Unit type becomes Jetbike. +1 Toughness, 3+ Save, Turbo-boost move." },
+    "Warlock Leader": { "summary": "One model becomes a Warlock Leader (Character)." },
+    "Spiritseer Leader": { "summary": "One model becomes a Spiritseer Leader (Character)." },
+    "Ride Eldar Jetbikes (All models)": { "summary": "Entire unit mounts Eldar Jetbikes." },
+    "Two Power Fists": { "summary": "Strikes at S10 AP2." },
+    "Catapult": { "summary": "Shuriken Catapult." },
+    "Two Catapults": { "summary": "Two Shuriken Catapults." },
+    "Two Flamers": { "summary": "Two Flamers." }
   },
   "weapons": {
     "Shuriken catapult": { "range": "12\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Shuriken" },
     "Avenger shuriken catapult": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Shuriken" },
+    "Twin Avenger shuriken catapults": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Twin-linked, Shuriken" },
+    "Two Avenger shuriken catapults": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 4", "notes": "Two weapons fired together" },
     "Shuriken pistol": { "range": "12\"", "S": "4", "AP": "5", "type": "Pistol", "notes": "Shuriken" },
     "Shuriken cannon": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Shuriken" },
     "Scatter laser": { "range": "36\"", "S": "6", "AP": "6", "type": "Heavy 4", "notes": "" },
     "Eldar missile launcher": { "range": "48\"", "S": "X", "AP": "X", "type": "Heavy 1", "notes": "Krak (S8 AP3) or Plasma (S4 AP4 Blast Pinning)" },
     "Starcannon": { "range": "36\"", "S": "6", "AP": "2", "type": "Heavy 2", "notes": "" },
     "Bright lance": { "range": "36\"", "S": "8", "AP": "2", "type": "Heavy 1", "notes": "Lance" },
+    "Pulse Laser": { "range": "48\"", "S": "8", "AP": "2", "type": "Heavy 2", "notes": "" },
     "Pulse laser": { "range": "48\"", "S": "8", "AP": "2", "type": "Heavy 2", "notes": "" },
-    "Prism cannon": { "range": "60\"", "S": "9/5", "AP": "2/4", "type": "Heavy 1", "notes": "Focused (S9 AP2 Blast) or Dispersed (S5 AP4 Lg Blast)" },
+    "Prism Cannon": { "range": "60\"", "S": "9/5", "AP": "2/4", "type": "Heavy 1", "notes": "Focused (S9 AP2 Blast) or Dispersed (S5 AP4 Lg Blast)" },
     "Fusion gun": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
     "Fusion pistol": { "range": "6\"", "S": "8", "AP": "1", "type": "Pistol", "notes": "Melta" },
     "Firepike": { "range": "18\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
+    "Dragon's Breath Flamer": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "" },
     "Dragon's breath flamer": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "" },
     "Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "" },
     "Reaper launcher": { "range": "48\"", "S": "5", "AP": "3", "type": "Heavy 2", "notes": "" },
     "Tempest launcher": { "range": "36\"", "S": "4", "AP": "3", "type": "Heavy 2", "notes": "Blast, Barrage" },
     "Death spinner": { "range": "12\"", "S": "6", "AP": "-", "type": "Assault 2", "notes": "Monofilament" },
+    "Twin Death Spinners": { "range": "12\"", "S": "6", "AP": "-", "type": "Assault 4", "notes": "Twin-linked, Monofilament" },
     "Spinneret rifle": { "range": "18\"", "S": "6", "AP": "1", "type": "Assault 1", "notes": "Pinning" },
     "Lasblaster": { "range": "24\"", "S": "3", "AP": "5", "type": "Assault 2", "notes": "" },
     "Hawk's talon": { "range": "24\"", "S": "5", "AP": "5", "type": "Assault 3", "notes": "" },
@@ -118,11 +139,21 @@
     "Vibro cannon": { "range": "36\"", "S": "Special", "AP": "-", "type": "Heavy 1", "notes": "Vibro" },
     "Shadow weaver": { "range": "48\"", "S": "6", "AP": "-", "type": "Heavy 1", "notes": "Barrage, Blast, Monofilament" },
     "Singing spear": { "range": "12\"", "S": "X", "AP": "6", "type": "Assault 1", "notes": "Wound on 2+, S9 vs Vehicles" },
+    "Singing spear (replace Witchblade)": { "range": "12\"", "S": "X", "AP": "6", "type": "Assault 1", "notes": "Wound on 2+, S9 vs Vehicles" },
     "Triskele": { "range": "12\"", "S": "3", "AP": "2", "type": "Assault 3", "notes": "" },
+    "The Wailing Doom": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta. Melee: S+2 AP1 Melta/Armorbane." },
     "The Wailing Doom (Shooting)": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
     "The Maugetar": { "range": "36\"", "S": "6", "AP": "5", "type": "Assault 4", "notes": "Rending, Pinning" },
     "Shrieker Cannon": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Pinning. Bio-explosive ammo." },
     "Harlequin's Kiss": { "range": "-", "S": "-", "AP": "-", "type": "Melee", "notes": "Rending" },
+    "Close combat weapon": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "" },
+    "Witchblade": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "Wound on 2+, S9 vs Vehicles" },
+    "Power weapon": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Ignores Armor Saves" },
+    "Scorpion chainsword": { "range": "-", "S": "+1", "AP": "-", "type": "Melee", "notes": "" },
+    "Scorpion's claw": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Fist" },
+    "Laser lance": { "range": "6\"", "S": "6", "AP": "3", "type": "Assault 1", "notes": "Lance. +1S AP3 on charge." },
+    "Star Lance": { "range": "6\"", "S": "8", "AP": "2", "type": "Assault 1", "notes": "Lance. +2S AP2 on charge." },
+    "Wraithsword": { "range": "-", "S": "10", "AP": "2", "type": "Melee", "notes": "Master-crafted" },
     "Twin-linked Shuriken Cannons": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Twin-linked, Shuriken" },
     "Twin-linked Scatter Lasers": { "range": "36\"", "S": "6", "AP": "6", "type": "Heavy 4", "notes": "Twin-linked" },
     "Twin-linked Missile Launchers": { "range": "48\"", "S": "X", "AP": "X", "type": "Heavy 1", "notes": "Twin-linked. Krak/Plasma." },
@@ -712,7 +743,7 @@
           "choices": [
             { "id": "talon", "name": "Hawk's Talon", "points": 10 },
             { "id": "sunrifle", "name": "Sunrifle", "points": 15 },
-            { "id": "power", "name": "Power Weapon", "points": 10 }
+            { "id": "power", "name": "Power weapon", "points": 10 }
           ]
         },
         {
@@ -746,7 +777,7 @@
           "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "dual_spinner", "name": "Twin Death Spinners", "points": 5 },
-            { "id": "spinneret", "name": "Spinneret Rifle", "points": 5 },
+            { "id": "spinneret", "name": "Spinneret rifle", "points": 5 },
             { "id": "blades", "name": "Powerblades", "points": 10 }
           ]
         },
@@ -781,7 +812,7 @@
           "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 2,
           "choices": [
             { "id": "star", "name": "Star Lance", "points": 15 },
-            { "id": "power", "name": "Power Weapon", "points": 0 },
+            { "id": "power", "name": "Power weapon", "points": 0 },
             { "id": "cannon", "name": "Shuriken Cannon (Jetbike)", "points": 15 }
           ]
         },
@@ -812,7 +843,7 @@
             { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
             { "id": "missile", "name": "Eldar missile launcher", "points": 20 },
             { "id": "starcannon", "name": "Starcannon", "points": 25 },
-            { "id": "lance", "name": "Bright Lance", "points": 30 }
+            { "id": "lance", "name": "Bright lance", "points": 30 }
           ]
         },
         {
@@ -843,9 +874,9 @@
         {
           "group_id": "exarch_wargear", "group_name": "Exarch Weapons", "min_select": 0, "max_select": 1,
           "choices": [
-            { "id": "tempest", "name": "Tempest Launcher", "points": 20 },
-            { "id": "missile", "name": "Eldar Missile Launcher", "points": 10 },
-            { "id": "cannon", "name": "Shuriken Cannon", "points": 0 }
+            { "id": "tempest", "name": "Tempest launcher", "points": 20 },
+            { "id": "missile", "name": "Eldar missile launcher", "points": 10 },
+            { "id": "cannon", "name": "Shuriken cannon", "points": 0 }
           ]
         },
         {
@@ -906,8 +937,8 @@
             { "id": "scatter", "name": "Scatter laser", "points": 15 },
             { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
             { "id": "starcannon", "name": "Starcannon", "points": 25 },
-            { "id": "missile", "name": "Missile Launcher", "points": 20 },
-            { "id": "lance", "name": "Bright Lance", "points": 30 }
+            { "id": "missile", "name": "Eldar missile launcher", "points": 20 },
+            { "id": "lance", "name": "Bright lance", "points": 30 }
           ]
         },
         {
@@ -916,8 +947,8 @@
             { "id": "scatter", "name": "Scatter laser", "points": 15 },
             { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
             { "id": "starcannon", "name": "Starcannon", "points": 25 },
-            { "id": "missile", "name": "Missile Launcher", "points": 20 },
-            { "id": "lance", "name": "Bright Lance", "points": 30 }
+            { "id": "missile", "name": "Eldar missile launcher", "points": 20 },
+            { "id": "lance", "name": "Bright lance", "points": 30 }
           ]
         },
         {
@@ -945,9 +976,9 @@
           "choices": [
             { "id": "scatter", "name": "Scatter laser", "points": 15 },
             { "id": "shuriken", "name": "Shuriken cannon", "points": 5 },
-            { "id": "missile", "name": "Missile Launcher", "points": 20 },
+            { "id": "missile", "name": "Eldar missile launcher", "points": 20 },
             { "id": "starcannon", "name": "Starcannon", "points": 25 },
-            { "id": "lance", "name": "Bright Lance", "points": 30 }
+            { "id": "lance", "name": "Bright lance", "points": 30 }
           ]
         },
         {
@@ -1019,6 +1050,4 @@
       ]
     }
   ]
-
 }
-

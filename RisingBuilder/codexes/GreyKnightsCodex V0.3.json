@@ -1,0 +1,550 @@
+{
+  "codex_name": "Grey Knights (My Data) - V0.3 Fix",
+  "rules": {
+    "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
+    "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
+    "Combat Squads": { "summary": "A 10-man squad may split into two 5-man squads before deployment." },
+    "Preferred Enemy (Daemons)": { "summary": "Re-roll to hit vs Daemons in close combat." },
+    "Prefered Enemy (Daemons)": { "summary": "Re-roll to hit vs Daemons in close combat." },
+    "Deep Strike": { "summary": "May arrive via Deep Strike." },
+    "Warp Quake": { "summary": "Psychic Power. Enemies Deep Striking within 12\" suffer a mishap automatically." },
+    "Hammerhand": { "summary": "Psychic Power. Unit gains +1 Strength in combat." },
+    "Might of Titan": { "summary": "Psychic Power. Unit gains +1 Strength and +1d6 Armor Pen." },
+    "Sanctuary": { "summary": "Psychic Power. Enemies assaulting the unit treat open ground as dangerous terrain." },
+    "Cleansing Flame": { "summary": "Psychic Power. S5 AP4 hits on all enemy models in base contact." },
+    "Grand Strategy": { "summary": "D3 units gain Scout, Counter-attack, or Scoring." },
+    "Psychic Pilot": { "summary": "Vehicle counts as a Psyker." },
+    "Fortitude": { "summary": "Psychic Power. Vehicle removes Shaken or Stunned result." },
+    "Independent Character": { "summary": "May join/leave units. Look Out Sir rolls." },
+    "Psyker (Mastery 1)": { "summary": "Generates 1 Warp Charge per turn." },
+    "Psyker (Level 1)": { "summary": "Generates 1 Warp Charge per turn." },
+    "Heroic Sacrifice": { "summary": "If killed in melee, the model may make a single attack against the slayer." },
+    "Master Swordsman": { "summary": "Re-roll failed To Hit rolls in close combat." },
+    "Fearless": { "summary": "Passes Morale/Pinning automatically. Cannot go to Ground." },
+    "Holocaust": { "summary": "Psychic Power. Large Blast S5 AP- range 12\"." },
+    "Assault Vehicle": { "summary": "Passengers may assault the turn they disembark." }
+  },
+  "wargear": {
+    "Personal Teleporter": { "summary": "Unit moves as Jump Infantry. Once per game 30\" shunt move." },
+    "Terminator Armour": { "summary": "2+ Armour Save, 5+ Invulnerable Save. Relentless, Bulky, Deep Strike." },
+    "Iron Halo": { "summary": "4+ Invulnerable Save." },
+    "Psychic Hood": { "summary": "Attempt to nullify enemy psychic powers within 24\"." },
+    "Blind Grenades": { "summary": "Defensive grenades. Enemies do not gain +1A for charging." },
+    "Digital Weapons": { "summary": "Re-roll one failed To Wound roll in the assault phase." },
+    "Power Armour": { "summary": "3+ Armour Save." },
+    "Artificer Armour": { "summary": "2+ Armour Save." },
+    "Artificer Armour (2+ Sv)": { "summary": "2+ Armour Save." },
+    "Frag/Krak Grenades": { "summary": "Assault and anti-tank grenades." },
+    "Psyocculum": { "summary": "Bearer and unit have BS10 when shooting at Psykers." },
+    "Servo-skulls (x3)": { "summary": "Reduces scatter for Deep Strike. Prevents Infiltration nearby." },
+    "Carapace Armour (4+)": { "summary": "4+ Armour Save." },
+    "Power Armour (3+)": { "summary": "3+ Armour Save." },
+    "Storm Shield": { "summary": "3+ Invulnerable Save. No bonus attack for two weapons." },
+    "Storm Shield (Replace Storm Bolter/Hammer)": { "summary": "3+ Invulnerable Save." },
+    "Smoke Launchers": { "summary": "Once per game, vehicle gains 5+ cover save but cannot shoot." },
+    "Terminator Armour (Daemon Hammer / Storm Bolter)": { "summary": "Standard Terminator loadout." },
+    "Warrior Acolyte (4 pts)": { "summary": "Basic Henchman. BS3 S3 T3 Sv 5+." },
+    "Crusader (Power Weapon/Storm Shield)": { "summary": "Henchman. WS4, Power Weapon, Storm Shield (3+ Inv)." },
+    "Death Cult Assassin (2x Power Wep)": { "summary": "Henchman. WS5 I6 A2, Two Power Weapons (5+ Inv)." },
+    "Psyker": { "summary": "Henchman. Can cast Psychic Barrage (S3 Large Blast, strength increases with more Psykers)." },
+    "Servitor (Base)": { "summary": "Henchman. Heavy Weapon platform. Mindlock if Inquisitor not present." },
+    "Jokaero Weaponsmith": { "summary": "Henchman. Digital Weapons (shooting). Customizes unit wargear (Roll D6)." },
+    "Blade of Antwyr": { "summary": "Demon weapon. Becomes Fleshbane, AP2. Crowe must always issue/accept challenges." }
+  },
+  "weapons": {
+    "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
+    "Nemesis Force Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Force Weapon, +1 Invulnerable Save in combat" },
+    "Nemesis Daemonhammer": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Force Weapon, Concussive, Unwieldy" },
+    "Daemonhammer": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Force Weapon, Concussive, Unwieldy" },
+    "Nemesis Warding Stave": { "range": "-", "S": "+2", "AP": "4", "type": "Melee", "notes": "Force Weapon, 2+ Invulnerable Save in combat" },
+    "Nemesis Falchions": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Force Weapon, +1 Attack" },
+    "Storm Bolter": { "range": "24\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "" },
+    "Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Assault 2/Heavy 4", "notes": "Rending" },
+    "Psycannon (Replace Storm Bolter)": { "range": "24\"", "S": "7", "AP": "4", "type": "Assault 2/Heavy 4", "notes": "Rending" },
+    "Incinerator": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "Soul Blaze" },
+    "Incinerator (NOT ALLOWED)": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "INVALID SELECTION" },
+    "Heavy Incinerator": { "range": "Template", "S": "6", "AP": "4", "type": "Assault 1", "notes": "Soul Blaze, Torrent" },
+    "Gatling Psilencer": { "range": "24\"", "S": "4", "AP": "-", "type": "Heavy 12", "notes": "Force" },
+    "Heavy Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Large Blast", "notes": "Rending" },
+    "Bolt pistol": { "range": "12\"", "S": "4", "AP": "5", "type": "Pistol", "notes": "" },
+    "Chainsword": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "" },
+    "Power Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "" },
+    "Power Fist": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy" },
+    "Combi-Weapon": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
+    "Combi-weapon": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
+    "Combi-Weapon (Replace Storm Bolter)": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
+    "Meltagun": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
+    "Multi-melta": { "range": "24\"", "S": "8", "AP": "1", "type": "Heavy 1", "notes": "Melta" },
+    "Plasma Gun": { "range": "24\"", "S": "7", "AP": "2", "type": "Rapid Fire", "notes": "Gets Hot" },
+    "Plasma Cannon": { "range": "36\"", "S": "7", "AP": "2", "type": "Heavy 1", "notes": "Blast, Gets Hot" },
+    "Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "" },
+    "Heavy Bolter": { "range": "36\"", "S": "5", "AP": "4", "type": "Heavy 3", "notes": "" },
+    "Twin-linked Heavy Bolter": { "range": "36\"", "S": "5", "AP": "4", "type": "Heavy 3", "notes": "Twin-linked" },
+    "Multi-laser": { "range": "36\"", "S": "6", "AP": "6", "type": "Heavy 3", "notes": "" },
+    "Two Twin-linked Lascannons": { "range": "48\"", "S": "9", "AP": "2", "type": "Heavy 1", "notes": "Twin-linked" },
+    "Two Dreadknight Close Combat Weapons": { "range": "-", "S": "10", "AP": "2", "type": "Melee", "notes": "Doomfists" }
+  },
+  "units": [
+    {
+      "id": "hq_grand_master",
+      "name": "Grand Master",
+      "slot": "HQ",
+      "base_points": 175,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 6, "BS": 5, "S": 4, "T": 4, "W": 3, "I": 5, "A": 3, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Terminator Armour", "Nemesis Force Halberd", "Storm Bolter", "Iron Halo", "Psychic Hood", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Independent Character", "Psyker (Mastery 1)", "Hammerhand", "Grand Strategy" ],
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
+            { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Ranged Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "psycannon", "name": "Psycannon", "points": 35 },
+            { "id": "incinerator", "name": "Incinerator", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "blind", "name": "Blind Grenades", "points": 5 },
+            { "id": "digi", "name": "Digital Weapons", "points": 5 },
+            { "id": "psy", "name": "Psyocculum", "points": 25 },
+            { "id": "skulls", "name": "Servo-skulls (x3)", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_crowe",
+      "name": "Castellan Crowe",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 150,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 8, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 6, "A": 4, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Artificer Armour", "Iron Halo", "Storm Bolter", "Blade of Antwyr", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Independent Character", "Psyker (Mastery 1)", "Hammerhand", "Fearless", "Heroic Sacrifice", "Cleansing Flame", "Master Swordsman" ],
+      "options": []
+    },
+    {
+      "id": "hq_inquisitor",
+      "name": "Ordo Malleus Inquisitor",
+      "slot": "HQ",
+      "base_points": 25,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 3, "I": 4, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Power Armour", "Bolt pistol", "Chainsword", "Frag/Krak Grenades" ],
+      "special_rules": [ "Independent Character", "Psyker (Mastery 1)", "Hammerhand" ],
+      "options": [
+        {
+          "group_id": "armour", "group_name": "Armour Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "term", "name": "Terminator Armour (Daemon Hammer / Storm Bolter)", "points": 40 },
+            { "id": "art", "name": "Artificer Armour (2+ Sv)", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "ranged_term", "group_name": "Terminator Weapons (Requires Terminator Armour)", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "psyc", "name": "Psycannon (Replace Storm Bolter)", "points": 15 },
+            { "id": "combi", "name": "Combi-Weapon (Replace Storm Bolter)", "points": 5 },
+            { "id": "shield", "name": "Storm Shield (Replace Storm Bolter/Hammer)", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "weapons", "group_name": "Weapons (Power Armour)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "sword", "name": "Power Sword", "points": 10 },
+            { "id": "fist", "name": "Power Fist", "points": 15 },
+            { "id": "hammer", "name": "Daemonhammer", "points": 15 },
+            { "id": "combi", "name": "Combi-Weapon", "points": 10 },
+            { "id": "incin", "name": "Incinerator (NOT ALLOWED)", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "psy", "name": "Psyocculum", "points": 25 },
+            { "id": "skulls", "name": "Servo-skulls (x3)", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_henchmen",
+      "name": "Inquisitorial Henchmen Warband",
+      "slot": "Elites",
+      "base_points": 0,
+      "min_size": 3, "max_size": 12, "default_size": 3,
+      "unit_type": "Infantry",
+      "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 3, "A": 1, "Ld": 7, "Sv": "-" },
+      "wargear": [],
+      "dedicated_transports": ["dt_rhino", "dt_razorback", "dt_chimera"],
+      "options": [
+        {
+          "group_id": "acolyte", "group_name": "Warrior Acolyte (4pts Base)", "min_select": 0, "max_select": 12, "choices": [
+            { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4, "points_mode": "flat" },
+            { "id": "sb", "name": "Storm Bolter", "points": 3 },
+            { "id": "combi", "name": "Combi-weapon", "points": 10 },
+            { "id": "melta", "name": "Meltagun", "points": 10 },
+            { "id": "plasma", "name": "Plasma Gun", "points": 10 },
+            { "id": "flamer", "name": "Flamer", "points": 10 },
+            { "id": "cara", "name": "Carapace Armour (4+)", "points": 4 },
+            { "id": "power", "name": "Power Armour (3+)", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "crusader", "group_name": "Crusader", "min_select": 0, "max_select": 12, "choices": [
+            { "id": "crusader", "name": "Crusader (Power Weapon/Storm Shield)", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "dca", "group_name": "Death Cult Assassin", "min_select": 0, "max_select": 12, "choices": [
+            { "id": "dca", "name": "Death Cult Assassin (2x Power Wep)", "points": 15, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "psyker", "group_name": "Psyker", "min_select": 0, "max_select": 12, "choices": [
+            { "id": "psyker", "name": "Psyker", "points": 10, "points_mode": "flat" }
+          ]
+        },
+        {
+          "group_id": "servitor", "group_name": "Servitor (10pts Base)", "min_select": 0, "max_select": 12, "choices": [
+            { "id": "servitor", "name": "Servitor (Base)", "points": 10, "points_mode": "flat" },
+            { "id": "hb", "name": "Heavy Bolter", "points": 0 },
+            { "id": "mm", "name": "Multi-melta", "points": 0 },
+            { "id": "pc", "name": "Plasma Cannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "monkey", "group_name": "Jokaero", "min_select": 0, "max_select": 12, "choices": [
+            { "id": "monkey", "name": "Jokaero Weaponsmith", "points": 35, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_purifier",
+      "name": "Purifier Squad",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 24,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "3+" },
+      "wargear": [ "Power Armour", "Nemesis Force Halberd", "Storm Bolter", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Brotherhood of Psykers", "Combat Squads", "Preferred Enemy (Daemons)", "Cleansing Flame", "Fearless" ],
+      "dedicated_transports": ["dt_rhino", "dt_razorback"],
+      "sub_profiles": {
+        "knight": { "name": "Knight of the Flame", "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 2 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
+            { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Special Weapons (2 per 5)", "min_select": 0, "max_select": 4,
+          "choices": [
+            { "id": "incin", "name": "Incinerator", "points": 0 },
+            { "id": "psil", "name": "Psilencer", "points": 0 },
+            { "id": "psyc", "name": "Psycannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_paladin",
+      "name": "Paladin Squad",
+      "slot": "Elites",
+      "base_points": 0, "points_per_model": 55,
+      "min_size": 1, "max_size": 10, "default_size": 1,
+      "unit_type": "Infantry",
+      "profile": { "WS": 5, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 4, "A": 2, "Ld": 9, "Sv": "2+" },
+      "wargear": [ "Terminator Armour", "Nemesis Force Halberd", "Storm Bolter", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Brotherhood of Psykers", "Combat Squads", "Preferred Enemy (Daemons)", "Holocaust" ],
+      "sub_profiles": {
+        "apothecary": { "name": "Apothecary", "WS": 5, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 4, "A": 2, "Ld": 9, "Sv": "2+" }
+      },
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
+            { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Special Weapons (2 per 5)", "min_select": 0, "max_select": 4,
+          "choices": [
+            { "id": "incin", "name": "Incinerator", "points": 5 },
+            { "id": "psil", "name": "Psilencer", "points": 0 },
+            { "id": "psyc", "name": "Psycannon", "points": 20 }
+          ]
+        },
+        {
+          "group_id": "apoth", "group_name": "Apothecary", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "apoth", "name": "Narthecium/Reductor", "points": 75 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_terminator",
+      "name": "Grey Knight Terminator Squad",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 40,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "2+" },
+      "wargear": [ "Terminator Armour", "Nemesis Force Halberd", "Storm Bolter", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Brotherhood of Psykers", "Combat Squads", "Preferred Enemy (Daemons)", "Hammerhand" ],
+      "sub_profiles": {
+        "justicar": { "name": "Terminator Justicar", "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "2+" }
+      },
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 0 },
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 25 },
+            { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Special Weapons (1 per 5)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "incin", "name": "Incinerator", "points": 5 },
+            { "id": "psil", "name": "Psilencer", "points": 0 },
+            { "id": "psyc", "name": "Psycannon", "points": 25 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr_strike",
+      "name": "Strike Squad",
+      "slot": "Troops",
+      "base_points": 0, "points_per_model": 20,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "3+" },
+      "wargear": [ "Power Armour", "Nemesis Force Halberd", "Storm Bolter", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Brotherhood of Psykers", "Combat Squads", "Preferred Enemy (Daemons)", "Warp Quake", "Deep Strike" ],
+      "dedicated_transports": ["dt_rhino", "dt_razorback"],
+      "sub_profiles": {
+        "justicar": { "name": "Justicar", "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 5 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 10 },
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 25 },
+            { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Special Weapons (1 per 5)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "incin", "name": "Incinerator", "points": 5 },
+            { "id": "psil", "name": "Psilencer", "points": 0 },
+            { "id": "psyc", "name": "Psycannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa_interceptor",
+      "name": "Interceptor Squad",
+      "slot": "Fast Attack",
+      "base_points": 0, "points_per_model": 26,
+      "min_size": 5, "max_size": 10, "default_size": 5,
+      "unit_type": "Jump Infantry",
+      "profile": { "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 1, "Ld": 8, "Sv": "3+" },
+      "wargear": [ "Power Armour", "Personal Teleporter", "Nemesis Force Halberd", "Storm Bolter", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Brotherhood of Psykers", "Combat Squads", "Preferred Enemy (Daemons)", "Hammerhand", "Deep Strike" ],
+      "sub_profiles": {
+        "justicar": { "name": "Justicar", "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "3+" }
+      },
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 10 },
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 25 },
+            { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Special Weapons (1 per 5)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "incin", "name": "Incinerator", "points": 5 },
+            { "id": "psil", "name": "Psilencer", "points": 0 },
+            { "id": "psyc", "name": "Psycannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 20 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_dreadknight",
+      "name": "Nemesis Dreadknight",
+      "slot": "Heavy Support",
+      "base_points": 130,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Monstrous Creature",
+      "profile": { "WS": 5, "BS": 4, "S": 6, "T": 6, "W": 4, "I": 4, "A": 3, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Two Dreadknight Close Combat Weapons" ],
+      "special_rules": [ "The Aegis", "Prefered Enemy (Daemons)", "Psyker (Level 1)", "Hammerhand", "Deep Strike" ],
+      "options": [
+        {
+          "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "sword", "name": "Nemesis Greatsword", "points": 25 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "ranged", "group_name": "Ranged Weapons (Max 2)", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "incin", "name": "Heavy Incinerator", "points": 30 },
+            { "id": "psil", "name": "Gatling Psilencer", "points": 35 },
+            { "id": "psyc", "name": "Heavy Psycannon", "points": 40 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "teleport", "name": "Personal Teleporter", "points": 75 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_land_raider",
+      "name": "Land Raider",
+      "slot": "Heavy Support",
+      "base_points": 255,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 14, "Side": 14, "Rear": 14, "BS": 4 },
+      "wargear": [ "Twin-linked Heavy Bolter", "Two Twin-linked Lascannons", "Smoke Launchers", "Searchlight" ],
+      "special_rules": [ "The Aegis", "Psychic Pilot", "Fortitude", "Assault Vehicle", "Power of the Machine Spirit" ],
+      "options": [
+        {
+          "group_id": "pintle", "group_name": "Pintle Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "mm", "name": "Multi-melta", "points": 10 },
+            { "id": "sb", "name": "Storm Bolter", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dt_rhino",
+      "name": "Rhino",
+      "slot": "Dedicated Transport",
+      "base_points": 40,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 11, "Side": 11, "Rear": 10, "BS": 4 },
+      "wargear": [ "Storm Bolter", "Smoke Launchers", "Searchlight" ],
+      "special_rules": [ "The Aegis", "Psychic Pilot", "Fortitude", "Repair" ],
+      "options": []
+    },
+    {
+      "id": "dt_razorback",
+      "name": "Razorback",
+      "slot": "Dedicated Transport",
+      "base_points": 45,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 11, "Side": 11, "Rear": 10, "BS": 4 },
+      "wargear": [ "Twin-linked Heavy Bolter", "Smoke Launchers", "Searchlight" ],
+      "special_rules": [ "The Aegis", "Psychic Pilot", "Fortitude" ],
+      "options": []
+    },
+    {
+      "id": "dt_chimera",
+      "name": "Inquisitorial Chimera",
+      "slot": "Dedicated Transport",
+      "base_points": 55,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "is_transport": true,
+      "profile": { "Front": 12, "Side": 10, "Rear": 10, "BS": 3 },
+      "wargear": [ "Multi-laser", "Heavy Bolter", "Smoke Launchers", "Searchlight" ],
+      "special_rules": [],
+      "options": []
+    }
+  ]
+}

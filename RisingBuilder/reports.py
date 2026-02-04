@@ -17,6 +17,16 @@ class PDF(FPDF):
         self.cell(0, 6, label, 0, 1, 'L', True)
         self.ln(4)
 
+def check_space(pdf, required_mm):
+    """
+    Checks if there is enough space on the current page.
+    If not, adds a new page.
+    Assumes A4 height ~297mm, bottom margin ~15mm.
+    Safe limit ~275mm.
+    """
+    if pdf.get_y() + required_mm > 275:
+        pdf.add_page()
+
 def draw_profile_table(pdf, profiles_list):
     """Draws a clean, grid-based statline table."""
     if not profiles_list: return
@@ -99,7 +109,9 @@ def draw_weapon_table(pdf, weapon_names, weapons_db):
     pdf.ln(1)
 
 def draw_game_reference_tables(pdf):
-    pdf.add_page()
+    # Check space for headers + infantry tables (~60mm)
+    check_space(pdf, 60)
+    
     pdf.chapter_title("Game Reference Tables (5th Edition)")
     pdf.set_font("Arial", size=7) 
     row_h = 4.5
@@ -183,10 +195,17 @@ def draw_game_reference_tables(pdf):
         pdf.ln()
 
     # ROW 2: VEHICLE
+    # Check space for vehicle tables (~60mm)
+    # If we force break, reset X/Y
+    
+    # We forcefully move down. 
     new_y = y_start + 65
-    if new_y > 250:
+    
+    # Check if this new Y is safe on current page
+    if new_y + 50 > 275: 
         pdf.add_page()
-        new_y = 20
+        new_y = 20 # Top margin
+        
     pdf.set_xy(x_start, new_y)
     pdf.set_font("Arial", 'B', 12)
     pdf.set_fill_color(200, 220, 255)
@@ -230,7 +249,7 @@ def draw_game_reference_tables(pdf):
         pdf.cell(55, 6, mod, 1, 1, 'L')
 
 def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callback, include_ref_tables=False, roster_name="Army Roster"):
-    pdf = PDF()
+    pdf = PDF(orientation='P', unit='mm', format='A4')
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
@@ -257,7 +276,6 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             
             # 2. If not found, try splitting combined strings
             if not found:
-                # Split by ' & ', ', ', or ' and '
                 parts = re.split(r' & | and |, ', name)
                 if len(parts) > 1:
                     collect_refs(parts)
@@ -299,19 +317,22 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         slot_units = [e for e in roster if not e.get("parent_id") and get_unit_callback(e['unit_id'])['slot'] == slot]
         if not slot_units: continue
         
+        # SMART FLOW: Only add page if very low, otherwise just print header
+        check_space(pdf, 20)
         pdf.chapter_title(slot)
+        
         for entry in slot_units:
+            # CHECK SPACE BEFORE STARTING UNIT
+            # A full unit entry takes ~50mm (Header, Profile, Options)
+            check_space(pdf, 50)
+            
             u = get_unit_callback(entry['unit_id'])
             
             # --- Unit Name ---
             pdf.set_font("Arial", 'B', 11)
             pdf.set_fill_color(240, 240, 240)
-            
             name_str = f"{u['name']}"
-            # Custom name logic
-            if entry.get("custom_name"):
-                name_str = f"{entry['custom_name']} ({u['name']})"
-            
+            if entry.get("custom_name"): name_str = f"{entry['custom_name']} ({u['name']})"
             if entry.get("size", 1) > 1: name_str += f" (x{entry['size']})"
             pdf.cell(150, 7, name_str, 1, 0, 'L', True)
             pdf.cell(40, 7, f"{entry.get('calculated_cost', 0)} pts", 1, 1, 'C', True)
@@ -332,10 +353,8 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             # --- INLINE WEAPONS (Parent) ---
             unit_weapons = []
             weapons_db = codex_data.get("weapons", {})
-            # Base
             for item in u.get("wargear", []):
                 if item in weapons_db: unit_weapons.append(item)
-            # Options
             if "selected" in entry:
                 for gid, picks in entry["selected"].items():
                     opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
@@ -419,7 +438,8 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             pdf.ln(4)
 
     # --- 4. APPENDIX ---
-    pdf.add_page()
+    # SMART FLOW: Don't force page break unless needed
+    check_space(pdf, 50)
     pdf.chapter_title("Reference: Weapons")
     
     pdf.set_font("Arial", 'B', 9)
@@ -450,8 +470,9 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
             pdf.cell(40, 6, notes[:25], 1, 1, 'L')
 
     pdf.ln(10)
+    check_space(pdf, 50)
     pdf.chapter_title("Reference: Rules & Wargear")
-    # Sort Rules Alphabetically
+    
     sorted_rules = sorted(list(active_rules))
     rules_db = codex_data.get('rules', {})
     gear_db = codex_data.get('wargear', {})
@@ -461,6 +482,7 @@ def write_roster_pdf(roster, codex_data, points_limit, filename, get_unit_callba
         if r_name in rules_db: desc = rules_db[r_name].get('summary', '')
         elif r_name in gear_db: desc = gear_db[r_name].get('summary', '')
         if desc:
+            check_space(pdf, 15) # Ensure title + at least 1 line fits
             pdf.set_font("Arial", 'B', 10)
             pdf.cell(0, 5, r_name, 0, 1)
             pdf.set_font("Arial", '', 9)

@@ -434,6 +434,8 @@ with st.sidebar:
                     except Exception as e: st.error(f"Error: {e}")
     else:
         st.info("🎲 Play Mode Active. Editing is disabled.")
+        # Ensure points_limit is set in Play Mode
+        points_limit = st.session_state.get("points_limit_input", 1500)
 
 # --- RENDER FUNCTIONS ---
 def render_play_mode_unit(entry, data, depth=0):

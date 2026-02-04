@@ -443,7 +443,11 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     st.subheader("Add New Unit")
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
+    
+    # --- SORT LOGIC ADDED HERE ---
     slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
+    slot_units.sort(key=lambda x: x["name"]) # Sort alphabetically
+    
     if not slot_units: st.caption(f"No units found for {selected_slot}")
     else:
         unit_options = [u["name"] for u in slot_units]

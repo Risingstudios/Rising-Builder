@@ -1,5 +1,5 @@
 {
-  "codex_name": "Tau Empire (My Data) - V1.1",
+  "codex_name": "Tau Empire (My Data) - V1.2",
   "rules": {
     "Acute Senses": { "summary": "Re-roll Night Fighting spotting distance checks." },
     "Deep Strike": { "summary": "Unit may start in reserve and arrive via Deep Strike." },
@@ -15,7 +15,11 @@
     "Hit and Run": { "summary": "At end of assault phase, roll Initiative to break combat and move 3D6\"." },
     "Preferred Enemy (Orks)": { "summary": "Re-roll failed To Hit rolls against Orks in close combat." },
     "Skilled Rider": { "summary": "+1 to Jink cover saves. Re-roll dangerous terrain tests." },
-    "Pinning": { "summary": "If unit suffers a wound from this weapon, it must take a Leadership test or Go to Ground." }
+    "Pinning": { "summary": "If unit suffers a wound from this weapon, it must take a Leadership test or Go to Ground." },
+    "Independent Character": { "summary": "May join/leave units. Look Out Sir rolls." },
+    "Fearless": { "summary": "Passes Morale/Pinning automatically. Cannot go to Ground." },
+    "Inspiring Presence": { "summary": "Friendly Tau units within 12\" may use the Ethereal's Leadership." },
+    "Move Through Cover": { "summary": "Roll 3D6 for cover movement, pick highest." }
   },
   "wargear": {
     "Target lock": { "summary": "Model can fire at a different target to the rest of the unit." },
@@ -42,6 +46,8 @@
     "Disruption Pod": { "summary": "Vehicle is obscured (4+ Cover Save) if over 12\" away." },
     "Crisis Battlesuit": { "summary": "3+ Armor Save, Jet Pack. Includes Multi-tracker and Blacksun Filter." },
     "XV22 Stealth Battlesuit": { "summary": "3+ Armor Save, Stealth Field, Jet Pack." },
+    "XV25 Stealth Battlesuit": { "summary": "3+ Armor Save, Stealth Field, Jet Pack." },
+    "Broadside Battlesuit": { "summary": "2+ Armor Save, Twin-linked Railgun platform. Slow and Purposeful." },
     "Symbol of Office": { "summary": "Ethereal allows friendly Tau units within 12\" to re-roll Morale tests." },
     "Homing Beacon": { "summary": "Friendly units Deep Striking within 6\" do not scatter." },
     "Kroot Hound": { "summary": "Beasts. Initiative 4, 2 Attacks." },
@@ -49,9 +55,16 @@
     "Kroot Armour (6+ Sv)": { "summary": "Unit gains a 6+ Armor Save." },
     "Replace Burst Cannons with 2 Gun Drones": { "summary": "Swap Burst Cannons for two detachable Gun Drones." },
     "Six Seeker Missiles": { "summary": "Vehicle carries 6 Seeker Missiles." },
-    "Two Fusion Blasters": { "summary": "Two Fusion Blasters." }
+    "Two Fusion Blasters": { "summary": "Two Fusion Blasters." },
+    "Crisis Bodyguard": { "summary": "Character. Equipped with Crisis Battlesuit." },
+    "Photon grenades": { "summary": "Defensive grenades. Charging enemies do not get +1 Attack." },
+    "Team Leader (Shas'ui)": { "summary": "Character Upgrade. +1 Attack, +1 Leadership." },
+    "Shaper": { "summary": "Character Upgrade. Kroot Leader." },
+    "Strain Leader": { "summary": "Character Upgrade. Vespid Leader." }
   },
   "weapons": {
+    "Dawn Blade": { "range": "-", "S": "5", "AP": "2", "type": "Melee", "notes": "Two-handed. 2D6 Armour Penetration." },
+    "Twin-linked heavy rail rifle": { "range": "72\"", "S": "10", "AP": "1", "type": "Heavy 1", "notes": "Twin-linked. Solid Shot (S10) or Submunition (S6 Blast)." },
     "Close combat weapon": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "" },
     "Honour Blade": { "range": "-", "S": "+2", "AP": "-", "type": "Melee", "notes": "Two-handed" },
     "Honour Blade (+2S)": { "range": "-", "S": "+2", "AP": "-", "type": "Melee", "notes": "Two-handed" },

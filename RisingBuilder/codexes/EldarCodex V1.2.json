@@ -1,5 +1,5 @@
 {
-  "codex_name": "Eldar (5th Edition) - V1.1 Fix",
+  "codex_name": "Eldar (5th Edition) - V1.2",
   "rules": {
     "Fleet of Foot": { "summary": "Unit may run and then assault in the same turn." },
     "Independent Character": { "summary": "May join/leave units. Look Out Sir rolls." },
@@ -54,6 +54,7 @@
     "Monstrous Creature": { "summary": "2D6 Armor Pen, Move Through Cover, Relentless, Fear, Smash." }
   },
   "wargear": {
+    "Warlock (Jetbike)": { "summary": "Character upgrade. Warlock mounted on an Eldar Jetbike." },
     "Shimmershield": { "summary": "5+ Invulnerable save for the Exarch and his unit in close combat." },
     "Diresword": { "summary": "Power Weapon. Targets suffering a wound must pass a Ld test or suffer Instant Death." },
     "Executioner": { "summary": "Two-handed Power Weapon that grants +2 Strength." },
@@ -106,6 +107,8 @@
     "Two Flamers": { "summary": "Two Flamers." }
   },
   "weapons": {
+    "Laser lance (requires Jetbike)": { "range": "6\"", "S": "6", "AP": "3", "type": "Assault 1", "notes": "Lance. +1S AP3 on charge." },
+    "Shuriken Cannon (Jetbike)": { "range": "24\"", "S": "6", "AP": "5", "type": "Assault 3", "notes": "Shuriken" },
     "Shuriken catapult": { "range": "12\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Shuriken" },
     "Avenger shuriken catapult": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Shuriken" },
     "Twin Avenger shuriken catapults": { "range": "18\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "Twin-linked, Shuriken" },

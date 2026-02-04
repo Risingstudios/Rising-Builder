@@ -1,5 +1,5 @@
 {
-  "codex_name": "Necrons (My Data) - V0.2 Fix",
+  "codex_name": "Necrons (My Data) - V0.2",
   "rules": {
     "Reanimation Protocols": { "summary": "When a model is removed, place a counter. On 5+, it returns with 1 wound." },
     "Living Metal": { "summary": "Ignore Crew Shaken and Crew Stunned results on a 2+." },

@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (5th Edition) - V1.0",
+  "codex_name": "Grey Knights (5th Edition) - V1.1",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -43,7 +43,7 @@
     "Artificer Armour (2+ Sv)": { "summary": "2+ Armour Save." },
     "Frag/Krak Grenades": { "summary": "Assault and anti-tank grenades." },
     "Psyocculum": { "summary": "Bearer and unit have BS10 when shooting at Psykers." },
-    "Servo-skulls (x3)": { "summary": "Reduces scatter for Deep Strike. Prevents Infiltration nearby." },
+    "Servo-skulls": { "summary": "Reduces scatter for Deep Strike. Prevents Infiltration nearby." },
     "Carapace Armour (4+)": { "summary": "4+ Armour Save." },
     "Power Armour (3+)": { "summary": "3+ Armour Save." },
     "Storm Shield": { "summary": "3+ Invulnerable Save. No bonus attack for two weapons." },
@@ -70,7 +70,8 @@
     "Twin-linked Assault Cannon": { "summary": "Range 24\" S6 AP4 Heavy 4 Rending Twin-linked." },
     "Two Flamestorm Cannons": { "summary": "Two S6 AP3 Templates." },
     "Throne of Judgement": { "summary": "Provides +2S, +2T, +1W, 2+ Save (already in profile). Counts as Monstrous Creature for movement." },
-    "Orbital Strike Relay": { "summary": "Allows Karamazov to fire an Orbital Strike." }
+    "Orbital Strike Relay": { "summary": "Allows Karamazov to fire an Orbital Strike." },
+    "Master-crafted Weapon": { "summary": "Re-roll one failed To Hit roll per turn." }
   },
   "weapons": {
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
@@ -88,6 +89,7 @@
     "Incinerator": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "Soul Blaze" },
     "Incinerator (NOT ALLOWED)": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "INVALID SELECTION" },
     "Heavy Incinerator": { "range": "Template", "S": "6", "AP": "4", "type": "Assault 1", "notes": "Soul Blaze, Torrent" },
+    "Heavy Flamer": { "range": "Template", "S": "5", "AP": "4", "type": "Assault 1", "notes": "" },
     "Psilencer": { "range": "24\"", "S": "4", "AP": "-", "type": "Heavy 6", "notes": "Force" },
     "Gatling Psilencer": { "range": "24\"", "S": "4", "AP": "-", "type": "Heavy 12", "notes": "Force" },
     "Heavy Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Large Blast", "notes": "Rending" },
@@ -96,7 +98,10 @@
     "Power Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "" },
     "Power Fist": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy" },
     "Combi-Weapon": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
-    "Combi-weapon": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
+    "Combi-Melta": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "One shot Melta" },
+    "Combi-Plasma": { "range": "24\"", "S": "7", "AP": "2", "type": "Rapid Fire", "notes": "One shot Plasma" },
+    "Combi-Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "One shot Flamer" },
+    "combi": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
     "Combi-Weapon (Replace Storm Bolter)": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "One shot as special weapon" },
     "Meltagun": { "range": "12\"", "S": "8", "AP": "1", "type": "Assault 1", "notes": "Melta" },
     "Multi-melta": { "range": "24\"", "S": "8", "AP": "1", "type": "Heavy 1", "notes": "Melta" },
@@ -136,7 +141,7 @@
           "choices": [
             { "id": "sword", "name": "Nemesis Force Sword", "points": 0 },
             { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
-            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 5 },
+            { "id": "hammer", "name": "Nemesis Daemon Hammer", "points": 5 },
             { "id": "stave", "name": "Nemesis Warding Stave", "points": 20 },
             { "id": "falchions", "name": "Nemesis Falchions", "points": 5 }
           ]
@@ -266,7 +271,7 @@
           "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
           "choices": [
             { "id": "psy", "name": "Psyocculum", "points": 25 },
-            { "id": "skulls", "name": "Servo-skulls (x3)", "points": 10 }
+            { "id": "skulls", "name": "Servo-skulls", "points": 3 }
           ]
         }
       ]
@@ -289,14 +294,16 @@
             { "id": "condemnor", "name": "Condemnor Boltgun", "points": 10 },
             { "id": "null", "name": "Null Rod", "points": 25 },
             { "id": "sword", "name": "Power Sword", "points": 10 },
-            { "id": "combi", "name": "Combi-Weapon", "points": 10 }
+            { "id": "combi_melta", "name": "Combi-Melta", "points": 10 },
+            { "id": "combi_plasma", "name": "Combi-Plasma", "points": 10 },
+            { "id": "combi_flamer", "name": "Combi-Flamer", "points": 10 }
           ]
         },
         {
           "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
           "choices": [
             { "id": "psy", "name": "Psyocculum", "points": 25 },
-            { "id": "skulls", "name": "Servo-skulls (x3)", "points": 10 }
+            { "id": "skulls", "name": "Servo-skulls", "points": 3 }
           ]
         }
       ]
@@ -344,7 +351,8 @@
           ]
         },
         {
-          "group_id": "servitor", "group_name": "Servitor (10pts Base)", "min_select": 0, "max_select": 12, "choices": [
+          "group_id": "servitor", "group_name": "Servitor (10pts Base)", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "servitor", "name": "Servitor (Base)", "points": 10, "points_mode": "flat" },
             { "id": "hb", "name": "Heavy Bolter", "points": 0 },
             { "id": "mm", "name": "Multi-melta", "points": 0 },
@@ -352,7 +360,8 @@
           ]
         },
         {
-          "group_id": "monkey", "group_name": "Jokaero", "min_select": 0, "max_select": 12, "choices": [
+          "group_id": "monkey", "group_name": "Jokaero", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "monkey", "name": "Jokaero Weaponsmith", "points": 35, "points_mode": "flat" }
           ]
         }
@@ -376,6 +385,12 @@
             { "id": "las", "name": "Twin-linked Lascannon", "points": 20 },
             { "id": "ac", "name": "Assault Cannon", "points": 10 },
             { "id": "heavy", "name": "Heavy Plasma Cannon", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "underslung", "group_name": "Underslung Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "hf", "name": "Heavy Flamer", "points": 10 }
           ]
         }
       ]
@@ -522,6 +537,12 @@
         "justicar": { "name": "Justicar", "WS": 4, "BS": 4, "S": 4, "T": 4, "W": 1, "I": 4, "A": 2, "Ld": 9, "Sv": "3+" }
       },
       "options": [
+        {
+          "group_id": "leader", "group_name": "Leader Upgrades", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "mc", "name": "Master-crafted Weapon", "points": 5 }
+          ]
+        },
         {
           "group_id": "melee", "group_name": "Melee Weapons", "min_select": 0, "max_select": 10, "linked_to_size": true,
           "choices": [

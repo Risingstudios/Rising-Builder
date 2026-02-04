@@ -155,6 +155,7 @@ def generate_text_summary(roster, codex_name, limit):
     
     def print_entry(entry, depth=0):
         u = get_unit_by_id(entry["unit_id"])
+        if not u: return []
         indent = "  " * depth
         prefix = "• " if depth == 0 else "> "
         name_str = f"{u['name']}"
@@ -371,15 +372,18 @@ with st.sidebar:
     # --- TEXT EXPORT ---
     with st.expander("📋 Text Export (Copy/Paste)"):
         st.caption("Perfect for Reddit/Discord")
-        if "codex_data" in st.session_state:
+        # FIXED: Check if codex_data exists before accessing keys
+        if st.session_state.get("codex_data"):
             txt_out = generate_text_summary(st.session_state.roster, st.session_state.codex_data.get("codex_name", "Army"), points_limit)
             st.code(txt_out, language="text")
+        else:
+            st.info("Load a Codex to generate text summary.")
 
     # --- CODEX AUDITOR ---
     st.divider()
     with st.expander("🛡️ Codex Auditor"):
         if st.button("Run Audit"):
-            if "codex_data" in st.session_state:
+            if "codex_data" in st.session_state and st.session_state.codex_data:
                 data = st.session_state.codex_data
                 issues = []
                 all_defs = set(data.get("weapons", {}).keys()) | set(data.get("wargear", {}).keys()) | set(data.get("rules", {}).keys())
@@ -392,7 +396,7 @@ with st.sidebar:
                     for opt in unit.get("options", []):
                         for ch in opt.get("choices", []):
                             c_name = ch.get("name", "")
-                            parts = re.split(r' & | and |, | / ', c_name)
+                            parts = re.split(r' & | and |, | / | \+ ', c_name)
                             for p in parts:
                                 p = p.strip()
                                 if p and "Upgrade" not in p and "Twin-linked" not in p and p not in all_defs:
@@ -401,10 +405,12 @@ with st.sidebar:
                 else:
                     st.error(f"Found {len(issues)} potential issues:")
                     for i in issues: st.write(i)
+            else:
+                st.error("No Codex Loaded.")
 
     st.divider()
     st.subheader("Project Tracker")
-    with st.expander("Previous Report Status"):
+    with st.expander("Status"):
         issues = fetch_github_issues()
         if issues:
             for i in issues: st.markdown(f"{'✅' if i['state']=='closed' else '🔴'} [{i['title']}]({i['html_url']})")
@@ -429,7 +435,6 @@ def recursive_render_unit(entry, depth=0):
     u = get_unit_by_id(entry["unit_id"])
     if not u: return
     
-    # Indentation visual for children
     if depth > 0:
         st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;" * depth + f"↳ **{u['name']}**")
     
@@ -440,7 +445,6 @@ def recursive_render_unit(entry, depth=0):
     with st.expander(display_title, expanded=False):
         render_unit_options(entry, u, data)
         
-        # ATTACHMENT LOGIC (Recursive!)
         valid_transports = u.get("dedicated_transports", [])
         if valid_transports:
             st.divider()
@@ -455,9 +459,7 @@ def recursive_render_unit(entry, depth=0):
                 st.rerun()
         st.divider()
         
-        # Remove Logic
         if st.button(f"Remove {u['name']}", key=f"del_{entry['id']}", type="primary" if depth==0 else "secondary"):
-            # Recursive delete
             ids_to_remove = [entry["id"]]
             def find_kids(eid):
                 kids = [c for c in st.session_state.roster if c.get("parent_id") == eid]
@@ -468,7 +470,6 @@ def recursive_render_unit(entry, depth=0):
             st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
             st.rerun()
 
-    # Render Children of this unit
     children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
     for child in children:
         recursive_render_unit(child, depth + 1)
@@ -478,14 +479,12 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     st.title(f"{st.session_state.roster_name}")
     st.caption(f"Using: {data.get('codex_name', 'Army')}")
     
-    # --- VALIDATOR & METRICS ---
     curr_pts, slots = calculate_roster()
     issues = validate_roster(points_limit, curr_pts, slots)
     
     if issues: st.error("  \n".join(issues))
     else: st.success("✅ Roster is Valid!")
 
-    # 1. SLOT COUNTERS
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
     col2.metric("HQ", f"{slots['HQ']}/2")
@@ -494,7 +493,6 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     col5.metric("Fast", f"{slots['Fast Attack']}/3")
     col6.metric("Heavy", f"{slots['Heavy Support']}/3")
 
-    # 2. POINTS BREAKDOWN
     if curr_pts > 0:
         breakdown = {}
         for entry in st.session_state.roster:
@@ -544,4 +542,3 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             st.session_state.roster.append(new_entry)
             st.rerun()
 else: st.info("⬅️ Please select a Codex from the sidebar to begin.")
-

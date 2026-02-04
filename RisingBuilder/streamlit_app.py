@@ -12,7 +12,6 @@ BASE_DIR = Path(__file__).parent
 CODEX_DIR = BASE_DIR / "codexes"
 CODEX_DIR.mkdir(exist_ok=True)
 
-# Load Icon
 icon_path = BASE_DIR / "app_icon.ico"
 if icon_path.exists():
     app_icon = Image.open(icon_path)
@@ -21,7 +20,6 @@ else:
 
 st.set_page_config(page_title="Rising Builder", page_icon=app_icon, layout="wide")
 
-# Initialize Session State
 if "roster" not in st.session_state:
     st.session_state.roster = []
 if "roster_name" not in st.session_state:
@@ -44,12 +42,7 @@ def get_unit_by_id(unit_id):
     return None
 
 def get_tooltip(item_name, codex_data):
-    """
-    Scans the item_name and finds ALL matching weapons/rules/wargear in the codex.
-    Returns a combined string of all matches.
-    """
     if not codex_data or not item_name: return None
-    
     query = item_name.lower()
     matches = []
     
@@ -74,9 +67,7 @@ def get_tooltip(item_name, codex_data):
         if n in query:
             matches.append(f"📜 [{name}] {data.get('summary', '')}")
     
-    if not matches:
-        return None
-        
+    if not matches: return None
     return "\n\n".join(matches)
 
 def fetch_github_issues():
@@ -92,11 +83,87 @@ def fetch_github_issues():
         return []
     except Exception: return []
 
+# --- CORE LOGIC ---
+def calculate_roster():
+    total_pts = 0
+    counts = {"HQ": 0, "Troops": 0, "Elites": 0, "Fast Attack": 0, "Heavy Support": 0}
+    
+    for entry in st.session_state.roster:
+        u = get_unit_by_id(entry["unit_id"])
+        if not u: continue
+        
+        cost = u.get("base_points", 0) + u.get("points_per_model", 0) * entry.get("size", 1)
+        selection_tracker = {}
+        
+        for gid, picks in entry.get("selected", {}).items():
+            opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
+            if not opt_def: continue
+            
+            for choice in opt_def.get("choices", []):
+                c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
+                if c_qty > 0:
+                    pts = choice.get("points", 0)
+                    if choice.get("points_mode") == "per_model":
+                        cost += pts * entry.get("size", 1)
+                    else:
+                        cost += pts * c_qty
+                        cid = choice["id"]
+                        if cid not in selection_tracker:
+                            selection_tracker[cid] = {"count": 0, "points": pts}
+                        selection_tracker[cid]["count"] += c_qty
+
+        if u.get("enable_twin_link_discount"):
+            for cid, data in selection_tracker.items():
+                pairs = data["count"] // 2
+                if pairs > 0:
+                    discount = pairs * (data["points"] * 0.5)
+                    cost -= discount
+
+        entry["calculated_cost"] = cost
+        total_pts += cost
+        
+        if not entry.get("parent_id") and u.get("slot") in counts:
+            counts[u["slot"]] += 1
+            
+    return total_pts, counts
+
+def validate_roster(limit, curr_pts, slots):
+    """Returns a list of issue strings."""
+    issues = []
+    
+    # 1. Points
+    if curr_pts > limit:
+        issues.append(f"❌ **Points:** {curr_pts}/{limit} (Over by {curr_pts - limit})")
+    
+    # 2. Force Org
+    limits = {"HQ": 2, "Troops": 6, "Elites": 3, "Fast Attack": 3, "Heavy Support": 3}
+    for s, max_limit in limits.items():
+        if slots[s] > max_limit:
+            issues.append(f"❌ **{s}:** {slots[s]}/{max_limit}")
+            
+    # 3. Compulsory
+    if slots["HQ"] < 1: issues.append("⚠️ **HQ:** Need at least 1.")
+    if slots["Troops"] < 2: issues.append("⚠️ **Troops:** Need at least 2.")
+    
+    # 4. Unit Constraints
+    for entry in st.session_state.roster:
+        u = get_unit_by_id(entry["unit_id"])
+        if not u: continue
+        
+        # Check Size
+        min_s = u.get("min_size", 1)
+        max_s = u.get("max_size", 1)
+        if entry["size"] < min_s:
+            issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too small (Min {min_s}).")
+        if entry["size"] > max_s:
+            issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too large (Max {max_s}).")
+            
+    return issues
+
 # --- CALLBACKS ---
 def cb_update_roster_name(): st.session_state.roster_name = st.session_state.roster_name_input
 def cb_update_custom_name(entry, key): entry["custom_name"] = st.session_state[key]
 def cb_update_size(entry, key): entry["size"] = st.session_state[key]
-
 def cb_update_counter(entry, gid, cid, key):
     qty = st.session_state[key]
     current_picks = entry.get("selected", {}).get(gid, [])
@@ -104,7 +171,6 @@ def cb_update_counter(entry, gid, cid, key):
     current_picks.extend([cid] * qty)
     if "selected" not in entry: entry["selected"] = {}
     entry["selected"][gid] = current_picks
-
 def cb_update_radio(entry, gid, name_to_id_map, key):
     selected_name = st.session_state[key]
     if "selected" not in entry: entry["selected"] = {}
@@ -112,7 +178,6 @@ def cb_update_radio(entry, gid, name_to_id_map, key):
     else:
         cid = name_to_id_map.get(selected_name)
         if cid: entry["selected"][gid] = [cid]
-
 def cb_update_checkbox(entry, gid, cid, key):
     is_checked = st.session_state[key]
     if "selected" not in entry: entry["selected"] = {}
@@ -123,44 +188,10 @@ def cb_update_checkbox(entry, gid, cid, key):
         if cid in current_picks: current_picks.remove(cid)
     entry["selected"][gid] = current_picks
 
-def calculate_roster():
-    total_pts = 0
-    counts = {"HQ": 0, "Troops": 0, "Elites": 0, "Fast Attack": 0, "Heavy Support": 0}
-    for entry in st.session_state.roster:
-        u = get_unit_by_id(entry["unit_id"])
-        if not u: continue
-        cost = u.get("base_points", 0) + u.get("points_per_model", 0) * entry.get("size", 1)
-        selection_tracker = {}
-        for gid, picks in entry.get("selected", {}).items():
-            opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
-            if not opt_def: continue
-            for choice in opt_def.get("choices", []):
-                c_qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
-                if c_qty > 0:
-                    pts = choice.get("points", 0)
-                    if choice.get("points_mode") == "per_model": cost += pts * entry.get("size", 1)
-                    else:
-                        cost += pts * c_qty
-                        cid = choice["id"]
-                        if cid not in selection_tracker: selection_tracker[cid] = {"count": 0, "points": pts}
-                        selection_tracker[cid]["count"] += c_qty
-        if u.get("enable_twin_link_discount"):
-            for cid, data in selection_tracker.items():
-                pairs = data["count"] // 2
-                if pairs > 0:
-                    discount = pairs * (data["points"] * 0.5)
-                    cost -= discount
-        entry["calculated_cost"] = cost
-        total_pts += cost
-        if not entry.get("parent_id") and u.get("slot") in counts: counts[u["slot"]] += 1
-    return total_pts, counts
-
 def render_unit_options(entry, unit, codex_data):
     k_name = f"name_{entry['id']}"
-    st.text_input("Custom Name (Optional)", 
-                  value=entry.get("custom_name", ""), 
-                  placeholder=f"e.g. {unit['name']} Squad Alpha",
-                  key=k_name,
+    st.text_input("Custom Name (Optional)", value=entry.get("custom_name", ""), 
+                  placeholder=f"e.g. {unit['name']} Squad Alpha", key=k_name,
                   on_change=cb_update_custom_name, args=(entry, k_name))
 
     col_pts, col_tip = st.columns([1, 1])
@@ -171,10 +202,8 @@ def render_unit_options(entry, unit, codex_data):
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
         k = f"size_{entry['id']}"
-        st.number_input(f"Squad Size ({min_s}-{max_s})", 
-                        min_value=min_s, max_value=max_s, 
-                        value=int(entry.get("size", min_s)), 
-                        key=k,
+        st.number_input(f"Squad Size ({min_s}-{max_s})", min_value=min_s, max_value=max_s, 
+                        value=int(entry.get("size", min_s)), key=k,
                         on_change=cb_update_size, args=(entry, k))
 
     if "selected" not in entry: entry["selected"] = {}
@@ -193,10 +222,8 @@ def render_unit_options(entry, unit, codex_data):
                 qty = current_picks.count(cid)
                 k = f"opt_{entry['id']}_{gid}_{cid}"
                 tooltip = get_tooltip(c["name"], codex_data)
-                st.number_input(f"{c['name']} (+{c['points']} pts)", 
-                                min_value=0, max_value=max_sel, value=qty, 
-                                key=k, help=tooltip, 
-                                on_change=cb_update_counter, args=(entry, gid, cid, k))
+                st.number_input(f"{c['name']} (+{c['points']} pts)", min_value=0, max_value=max_sel, value=qty, 
+                                key=k, help=tooltip, on_change=cb_update_counter, args=(entry, gid, cid, k))
         elif max_sel == 1:
             name_map = {}
             opts_display = ["(None)"]
@@ -205,7 +232,6 @@ def render_unit_options(entry, unit, codex_data):
                 name_map[d_name] = c['id']
                 opts_display.append(d_name)
             current_idx = 0
-            
             current_selected_name = "(None)"
             if current_picks:
                 curr_id = current_picks[0]
@@ -222,44 +248,36 @@ def render_unit_options(entry, unit, codex_data):
                 if desc: dropdown_tooltip = desc
 
             k = f"opt_{entry['id']}_{gid}"
-            
-            selected = st.selectbox("", opts_display, index=current_idx, key=k, 
-                         help=dropdown_tooltip,
+            selected = st.selectbox("", opts_display, index=current_idx, key=k, help=dropdown_tooltip,
                          on_change=cb_update_radio, args=(entry, gid, name_map, k))
-            
             if selected != "(None)":
                 clean_name = re.sub(r' \(\+\d+.*\)', '', selected)
                 desc = get_tooltip(clean_name, codex_data)
                 if desc: st.caption(f"↳ {desc}")
-
         else:
             for c in choices:
                 cid = c["id"]
                 is_checked = cid in current_picks
                 k = f"opt_{entry['id']}_{gid}_{cid}"
                 tooltip = get_tooltip(c["name"], codex_data)
-                st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=k,
-                            help=tooltip,
+                st.checkbox(f"{c['name']} (+{c['points']})", value=is_checked, key=k, help=tooltip,
                             on_change=cb_update_checkbox, args=(entry, gid, cid, k))
 
-# --- Sidebar ---
+# --- SIDEBAR ---
 with st.sidebar:
     col1, col2 = st.columns([1, 4])
     with col1:
         if icon_path.exists(): st.image(app_icon, width=60)
         else: st.write("🌙")
-    with col2:
-        st.title("Rising Builder")
-        
+    with col2: st.title("Rising Builder")
     st.divider()
-    st.header("Settings")
     
+    st.header("Settings")
     available_codexes = list(CODEX_DIR.glob("*.json"))
     codex_names = [p.name for p in available_codexes]
     index = 0
     if "current_codex_name" in st.session_state and st.session_state.current_codex_name in codex_names:
         index = codex_names.index(st.session_state.current_codex_name)
-
     selected_codex_name = st.selectbox("Select Codex", codex_names, index=index)
     
     if selected_codex_name:
@@ -277,166 +295,112 @@ with st.sidebar:
     st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
-    # --- CODEX AUDITOR (NEW!) ---
+    # --- CODEX AUDITOR ---
     with st.expander("🛡️ Codex Auditor"):
         st.caption("Validates that all unit rules & wargear exist in the database.")
         if st.button("Run Audit"):
             if "codex_data" in st.session_state:
                 data = st.session_state.codex_data
                 issues = []
-                
-                # Create lookups
-                all_defs = set(data.get("weapons", {}).keys()) | \
-                           set(data.get("wargear", {}).keys()) | \
-                           set(data.get("rules", {}).keys())
-                
+                all_defs = set(data.get("weapons", {}).keys()) | set(data.get("wargear", {}).keys()) | set(data.get("rules", {}).keys())
                 for unit in data.get("units", []):
                     u_name = unit.get("name", "Unknown")
-                    # 1. Check Base Wargear
                     for item in unit.get("wargear", []):
-                        if item not in all_defs:
-                            issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
-                    
-                    # 2. Check Special Rules
+                        if item not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
                     for rule in unit.get("special_rules", []):
-                        if rule not in all_defs:
-                            issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
-                    
-                    # 3. Check Options (Smart Split)
+                        if rule not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
                     for opt in unit.get("options", []):
                         for ch in opt.get("choices", []):
                             c_name = ch.get("name", "")
-                            # Split by common delimiters
                             parts = re.split(r' & | and |, ', c_name)
                             for p in parts:
-                                # Clean up string
-                                p_clean = p.strip()
-                                # Ignore common modifiers if you want, or just check exact matches
-                                # For now, check if p exists. If not, maybe it's just a name like "Twin-linked"
-                                # We'll do a simple check: if the part isn't in DB, warn.
-                                # To avoid noise, we only warn if NO part of the string matches anything.
-                                pass
-                            
-                            # Stricter check for auditor:
-                            # If it's a composite name "X & Y", both should ideally exist.
-                            # But let's just check if *parts* exist.
-                            for p in parts:
                                 p = p.strip()
-                                if p not in all_defs and "Upgrade" not in p and "Twin-linked" not in p:
+                                if p and "Upgrade" not in p and "Twin-linked" not in p and p not in all_defs:
                                      issues.append(f"⚠️ Option **'{c_name}'**: Part **'{p}'** is undefined.")
-
-                if not issues:
-                    st.success("✅ Codex looks healthy! No missing references found.")
+                if not issues: st.success("✅ Codex looks healthy!")
                 else:
                     st.error(f"Found {len(issues)} potential issues:")
-                    for i in issues:
-                        st.write(i)
+                    for i in issues: st.write(i)
 
     st.divider()
-    st.subheader("Save / Load List")
-    
+    st.subheader("Save / Load")
     safe_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', st.session_state.roster_name)
     if not safe_filename: safe_filename = "army_list"
-    
-    save_data = {
-        "roster_name": st.session_state.roster_name,
-        "roster": st.session_state.roster,
-        "codex_file": selected_codex_name,
-        "points_limit": points_limit
-    }
-    roster_json = json.dumps(save_data, indent=2)
-    st.download_button("💾 Download Roster File", roster_json, f"{safe_filename}.json", "application/json")
+    save_data = {"roster_name": st.session_state.roster_name, "roster": st.session_state.roster, "codex_file": selected_codex_name, "points_limit": points_limit}
+    st.download_button("💾 Download Roster", json.dumps(save_data, indent=2), f"{safe_filename}.json", "application/json")
 
-    uploaded_file = st.file_uploader("📂 Load Roster File", type=["json"])
+    uploaded_file = st.file_uploader("📂 Load Roster", type=["json"])
     if uploaded_file is not None:
         if uploaded_file.file_id != st.session_state.get("last_loaded_file_id"):
             try:
                 uploaded_file.seek(0)
                 data = json.load(uploaded_file)
                 saved_codex = data.get("codex_file")
-                
                 st.session_state.is_loading_file = True
                 st.session_state.last_loaded_file_id = uploaded_file.file_id
-                
-                # --- SMART CODEX FALLBACK ---
                 target_path = CODEX_DIR / saved_codex if saved_codex else None
                 if target_path and target_path.exists():
                     st.session_state.current_codex_name = saved_codex
                     st.session_state.current_codex_path = str(target_path)
                     st.session_state.codex_data = load_codex(target_path)
                     st.success(f"Loaded '{saved_codex}'.")
-                else:
-                    st.warning(f"⚠️ Original Codex '{saved_codex}' missing. Using current Codex.")
-                
+                else: st.warning(f"⚠️ Original Codex '{saved_codex}' missing. Using current Codex.")
                 st.session_state.roster = data.get("roster", [])
                 st.session_state.roster_name = data.get("roster_name", "My Army List")
                 st.rerun()
             except Exception as e: st.error(f"Error reading file: {e}")
 
-    # --- PANIC BUTTON ---
-    if st.button("⚠️ Reset App (Clear All)", type="primary"):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
+    if st.button("⚠️ Reset App", type="primary"):
+        for key in list(st.session_state.keys()): del st.session_state[key]
         st.rerun()
 
     st.divider()
-    st.write("### Export Options")
-    include_tables = st.checkbox("Include Game Reference Tables", value=True)
-    if st.button("📄 Generate PDF Roster"):
+    st.write("### Export")
+    include_tables = st.checkbox("Include Ref Tables", value=True)
+    if st.button("📄 Generate PDF"):
         pdf_path = BASE_DIR / "temp_roster.pdf"
-        write_roster_pdf(
-            st.session_state.roster, st.session_state.codex_data, points_limit, str(pdf_path), 
-            get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name
-        )
-        with open(pdf_path, "rb") as f:
-            st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
+        write_roster_pdf(st.session_state.roster, st.session_state.codex_data, points_limit, str(pdf_path), get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name)
+        with open(pdf_path, "rb") as f: st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
 
-    # --- PROJECT TRACKER ---
     st.divider()
     st.subheader("Project Tracker")
-    with st.expander("🛠️ Development Status"):
+    with st.expander("Status"):
         issues = fetch_github_issues()
-        if not issues:
-            st.caption("No recent data found.")
-        else:
-            for i in issues:
-                icon = "✅" if i["state"] == "closed" else "🔴"
-                st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
+        if issues:
+            for i in issues: st.markdown(f"{'✅' if i['state']=='closed' else '🔴'} [{i['title']}]({i['html_url']})")
+        else: st.caption("No recent data.")
 
     st.divider()
-    st.subheader("Report an Issue")
     with st.form("feedback_form"):
-        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Wrong Stat", "Missing Upgrade", "Weapon/Wargear Selection", "Feature Request"])
-        feedback_title = st.text_input("Short Summary")
-        feedback_name = st.text_input("Your Name (Optional)")
-        feedback_msg = st.text_area("Detailed Description")
-        include_context = st.checkbox("Include roster data", value=True)
-        submitted = st.form_submit_button("Submit Feedback")
-        if submitted:
-            if not feedback_title or not feedback_msg: st.error("Summary & Description required.")
+        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Feature Request"])
+        feedback_title = st.text_input("Summary")
+        feedback_msg = st.text_area("Description")
+        if st.form_submit_button("Report"):
+            if not feedback_title: st.error("Summary required.")
             else:
-                report_pts, _ = calculate_roster()
                 try:
-                    if "github" not in st.secrets: st.error("GitHub secrets missing.")
-                    else:
-                        token, owner, repo = st.secrets["github"]["token"], st.secrets["github"]["owner"], st.secrets["github"]["repo"]
-                        final_title = f"[{feedback_type}] {feedback_title}" + (f" (by {feedback_name})" if feedback_name else "")
-                        body_text = f"**Reporter:** {feedback_name or 'Anonymous'}\n\n{feedback_msg}"
-                        if include_context:
-                            body_text += f"\n\n**Context:**\n- Codex: {st.session_state.codex_data.get('codex_name')}\n- Points: {report_pts}/{points_limit}\n- Units: {len(st.session_state.roster)}"
-                        api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
-                        headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"}
-                        requests.post(api_url, json={"title": final_title, "body": body_text}, headers=headers)
-                        st.success("Feedback sent!")
+                    token, owner, repo = st.secrets["github"]["token"], st.secrets["github"]["owner"], st.secrets["github"]["repo"]
+                    api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+                    requests.post(api_url, json={"title": f"[{feedback_type}] {feedback_title}", "body": feedback_msg}, headers={"Authorization": f"token {token}"})
+                    st.success("Sent!")
                 except Exception as e: st.error(f"Error: {e}")
 
-# --- Main Page ---
+# --- MAIN PAGE ---
 if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
     st.title(f"{st.session_state.roster_name}")
-    st.caption(f"Using Codex: {data.get('codex_name', 'Army')}")
+    st.caption(f"Using: {data.get('codex_name', 'Army')}")
     
+    # --- VALIDATOR ---
     curr_pts, slots = calculate_roster()
+    issues = validate_roster(points_limit, curr_pts, slots)
+    
+    if issues:
+        st.error("  \n".join(issues))
+    else:
+        st.success("✅ Roster is Valid!")
+
+    # METRICS
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
     col2.metric("HQ", f"{slots['HQ']}/2")
@@ -459,6 +423,8 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
 
             with st.expander(display_title, expanded=False):
                 render_unit_options(entry, u, data)
+                
+                # ATTACHMENT LOGIC
                 valid_transports = u.get("dedicated_transports", [])
                 if valid_transports:
                     st.divider()
@@ -497,9 +463,8 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
     
-    # --- SORT LOGIC ---
     slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
-    slot_units.sort(key=lambda x: x["name"]) # Sort alphabetically
+    slot_units.sort(key=lambda x: x["name"])
     
     if not slot_units: st.caption(f"No units found for {selected_slot}")
     else:

@@ -232,6 +232,10 @@ def render_unit_options(entry, unit, codex_data):
     col_pts.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
     col_tip.caption("ℹ️ Hover over the **?** icons for rules.")
     
+    # Feature #13: Show Default Wargear
+    if unit.get("wargear"):
+        st.caption(f"**Default Wargear:** {', '.join(unit['wargear'])}")
+    
     min_s = int(unit.get("min_size", 1))
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
@@ -250,7 +254,10 @@ def render_unit_options(entry, unit, codex_data):
         max_sel = opt.get("max_select", 1)
         if opt.get("linked_to_size"): max_sel = entry["size"]
         
-        if (opt.get("linked_to_size") and len(choices) > 1) or (len(choices)==1 and max_sel > 1):
+        # Bug Fix #15/16: Use Counters if max_select > 1, even if choice is single or not linked
+        use_counters = (opt.get("linked_to_size")) or (max_sel > 1) or (len(choices) == 1 and max_sel > 1)
+        
+        if use_counters:
             for c in choices:
                 cid = c["id"]
                 qty = current_picks.count(cid)
@@ -509,9 +516,10 @@ def recursive_render_edit_unit(entry, depth=0):
     if depth > 0:
         st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;" * depth + f"↳ **{u['name']}**")
     
-    display_title = f"[{u['slot']}] {u['name']}"
-    if entry.get("custom_name"): display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']})"
-    if depth > 0: display_title = f"Edit {u['name']}"
+    # Feature #12: Points in header
+    display_title = f"[{u['slot']}] {u['name']} ({entry.get('calculated_cost', 0)} pts)"
+    if entry.get("custom_name"): display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']}) ({entry.get('calculated_cost', 0)} pts)"
+    if depth > 0: display_title = f"Edit {u['name']} ({entry.get('calculated_cost', 0)} pts)"
 
     with st.expander(display_title, expanded=False):
         render_unit_options(entry, u, data)

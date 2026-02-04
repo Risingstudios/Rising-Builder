@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.4 Fix",
+  "codex_name": "Grey Knights (My Data) - V0.5 Fix",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -24,7 +24,10 @@
     "Holocaust": { "summary": "Psychic Power. Large Blast S5 AP- range 12\"." },
     "Assault Vehicle": { "summary": "Passengers may assault the turn they disembark." },
     "Power of the Machine Spirit": { "summary": "Vehicle can fire one more weapon than normal at BS4, even if moving Fast." },
-    "Repair": { "summary": "If immobilized, roll a D6 in shooting phase. On a 6, the vehicle is repaired." }
+    "Repair": { "summary": "If immobilized, roll a D6 in shooting phase. On a 6, the vehicle is repaired." },
+    "Psychic Mastery 2": { "summary": "Can use 2 psychic powers per turn." },
+    "Perfect Warrior": { "summary": "Start of Assault phase choose one: Sword Storm (Re-roll hits, +1A), Blade Shield (Re-roll saves), or Rapier Strike (I10, Rending)." },
+    "Venerable": { "summary": "If vehicle suffers a penetrating hit, you may force opponent to re-roll the result on the Damage Chart." }
   },
   "wargear": {
     "Personal Teleporter": { "summary": "Unit moves as Jump Infantry. Once per game 30\" shunt move." },
@@ -54,7 +57,12 @@
     "Blade of Antwyr": { "summary": "Demon weapon. Becomes Fleshbane, AP2. Crowe must always issue/accept challenges." },
     "Searchlight": { "summary": "Used at night. If you shoot, target is illuminated for other units." },
     "Psybolt Ammunition": { "summary": "+1 Strength to Storm Bolters, Psycannons, Psilencers, and Autocannons." },
-    "Narthecium/Reductor": { "summary": "Unit gains Feel No Pain." }
+    "Narthecium/Reductor": { "summary": "Unit gains Feel No Pain." },
+    "Rosarius": { "summary": "4+ Invulnerable Save." },
+    "Null Rod": { "summary": "Unit immune to psychic powers. Power Weapon." },
+    "Condemnor Boltgun": { "summary": "Combi-bolter. If it hits a Psyker, they suffer Perils of the Warp." },
+    "Anointed Sword": { "summary": "Master-crafted Nemesis Force Sword." },
+    "Frag Assault Launchers": { "summary": "Unit charging out of vehicle counts as having Frag Grenades." }
   },
   "weapons": {
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
@@ -64,6 +72,7 @@
     "Nemesis Warding Stave": { "range": "-", "S": "+2", "AP": "4", "type": "Melee", "notes": "Force Weapon, 2+ Invulnerable Save in combat" },
     "Nemesis Falchions": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Force Weapon, +1 Attack" },
     "Nemesis Greatsword": { "range": "-", "S": "User", "AP": "2", "type": "Melee", "notes": "Force Weapon, Master-crafted, Re-roll hits/wounds/penetration" },
+    "Anointed Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Master-crafted Force Weapon" },
     "Storm Bolter": { "range": "24\"", "S": "4", "AP": "5", "type": "Assault 2", "notes": "" },
     "Psycannon": { "range": "24\"", "S": "7", "AP": "4", "type": "Assault 2/Heavy 4", "notes": "Rending" },
     "Psycannon (Replace Storm Bolter)": { "range": "24\"", "S": "7", "AP": "4", "type": "Assault 2/Heavy 4", "notes": "Rending" },
@@ -89,7 +98,10 @@
     "Twin-linked Heavy Bolter": { "range": "36\"", "S": "5", "AP": "4", "type": "Heavy 3", "notes": "Twin-linked" },
     "Multi-laser": { "range": "36\"", "S": "6", "AP": "6", "type": "Heavy 3", "notes": "" },
     "Two Twin-linked Lascannons": { "range": "48\"", "S": "9", "AP": "2", "type": "Heavy 1", "notes": "Twin-linked" },
-    "Two Dreadknight Close Combat Weapons": { "range": "-", "S": "10", "AP": "2", "type": "Melee", "notes": "Doomfists" }
+    "Two Dreadknight Close Combat Weapons": { "range": "-", "S": "10", "AP": "2", "type": "Melee", "notes": "Doomfists" },
+    "Flamestorm Cannon": { "range": "Template", "S": "6", "AP": "3", "type": "Heavy 1", "notes": "Template" },
+    "Assault Cannon": { "range": "24\"", "S": "6", "AP": "4", "type": "Heavy 4", "notes": "Rending" },
+    "Condemnor Boltgun": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "Psi-shock" }
   },
   "units": [
     {
@@ -145,6 +157,45 @@
       "options": []
     },
     {
+      "id": "hq_brotherhood_champion",
+      "name": "Brotherhood Champion",
+      "slot": "HQ",
+      "base_points": 100,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 7, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 5, "A": 2, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Power Armour", "Anointed Sword", "Storm Bolter", "Iron Halo", "Digital Weapons", "Frag/Krak Grenades" ],
+      "special_rules": [ "The Aegis", "Independent Character", "Psyker (Mastery 1)", "Hammerhand", "Heroic Sacrifice", "Perfect Warrior" ],
+      "options": []
+    },
+    {
+      "id": "hq_librarian",
+      "name": "Brotherhood Librarian",
+      "slot": "HQ",
+      "base_points": 150,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 5, "BS": 4, "S": 4, "T": 4, "W": 2, "I": 4, "A": 2, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Terminator Armour", "Nemesis Force Sword", "Storm Bolter", "Psychic Hood" ],
+      "special_rules": [ "Independent Character", "Psyker (Mastery 1)", "Hammerhand", "Sanctuary", "Psychic Mastery 2" ],
+      "options": [
+        {
+          "group_id": "weapon", "group_name": "Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "stave", "name": "Nemesis Warding Stave", "points": 0 },
+            { "id": "halberd", "name": "Nemesis Force Halberd", "points": 0 },
+            { "id": "hammer", "name": "Nemesis Daemonhammer", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "mastery", "group_name": "Upgrade", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "m3", "name": "Mastery Level 3", "points": 50 }
+          ]
+        }
+      ]
+    },
+    {
       "id": "hq_inquisitor",
       "name": "Ordo Malleus Inquisitor",
       "slot": "HQ",
@@ -154,6 +205,7 @@
       "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 3, "I": 4, "A": 3, "Ld": 10, "Sv": "3+" },
       "wargear": [ "Power Armour", "Bolt pistol", "Chainsword", "Frag/Krak Grenades" ],
       "special_rules": [ "Independent Character", "Psyker (Mastery 1)", "Hammerhand" ],
+      "dedicated_transports": ["el_henchmen"],
       "options": [
         {
           "group_id": "armour", "group_name": "Armour Upgrade", "min_select": 0, "max_select": 1,
@@ -178,6 +230,36 @@
             { "id": "hammer", "name": "Daemonhammer", "points": 15 },
             { "id": "combi", "name": "Combi-Weapon", "points": 10 },
             { "id": "incin", "name": "Incinerator (NOT ALLOWED)", "points": 0 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
+          "choices": [
+            { "id": "psy", "name": "Psyocculum", "points": 25 },
+            { "id": "skulls", "name": "Servo-skulls (x3)", "points": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hq_hereticus",
+      "name": "Ordo Hereticus Inquisitor",
+      "slot": "HQ",
+      "base_points": 25,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 4, "BS": 4, "S": 3, "T": 3, "W": 3, "I": 4, "A": 3, "Ld": 10, "Sv": "3+" },
+      "wargear": [ "Power Armour", "Bolt pistol", "Chainsword", "Frag/Krak Grenades" ],
+      "special_rules": [ "Independent Character", "Psyker (Mastery 1)", "Hammerhand" ],
+      "dedicated_transports": ["el_henchmen"],
+      "options": [
+        {
+          "group_id": "weapons", "group_name": "Weapons", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "condemnor", "name": "Condemnor Boltgun", "points": 10 },
+            { "id": "null", "name": "Null Rod", "points": 25 },
+            { "id": "sword", "name": "Power Sword", "points": 10 },
+            { "id": "combi", "name": "Combi-Weapon", "points": 10 }
           ]
         },
         {
@@ -238,6 +320,28 @@
         {
           "group_id": "monkey", "group_name": "Jokaero", "min_select": 0, "max_select": 12, "choices": [
             { "id": "monkey", "name": "Jokaero Weaponsmith", "points": 35, "points_mode": "flat" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_ven_dread",
+      "name": "Venerable Dreadnought",
+      "slot": "Elites",
+      "base_points": 175,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Walker)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 13, "Side": 12, "Rear": 10, "WS": 5, "BS": 5, "S": 6, "I": 4, "A": 2 },
+      "wargear": [ "Multi-melta", "Dreadnought Close Combat Weapon", "Storm Bolter", "Smoke Launchers", "Searchlight" ],
+      "special_rules": [ "Psychic Pilot", "Fortitude", "Venerable" ],
+      "options": [
+        {
+          "group_id": "arm", "group_name": "Weapon Arm", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "las", "name": "Twin-linked Lascannon", "points": 20 },
+            { "id": "ac", "name": "Assault Cannon", "points": 10 },
+            { "id": "heavy", "name": "Heavy Plasma Cannon", "points": 10 }
           ]
         }
       ]
@@ -494,6 +598,33 @@
       "profile_type": "vehicle",
       "profile": { "Front": 14, "Side": 14, "Rear": 14, "BS": 4 },
       "wargear": [ "Twin-linked Heavy Bolter", "Two Twin-linked Lascannons", "Smoke Launchers", "Searchlight" ],
+      "special_rules": [ "The Aegis", "Psychic Pilot", "Fortitude", "Assault Vehicle", "Power of the Machine Spirit" ],
+      "options": [
+        {
+          "group_id": "pintle", "group_name": "Pintle Weapon", "min_select": 0, "max_select": 1,
+          "choices": [
+            { "id": "mm", "name": "Multi-melta", "points": 10 },
+            { "id": "sb", "name": "Storm Bolter", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "choices": [
+            { "id": "psy", "name": "Psybolt Ammunition", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hs_lr_redeemer",
+      "name": "Land Raider Redeemer",
+      "slot": "Heavy Support",
+      "base_points": 245,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Vehicle (Tank)",
+      "profile_type": "vehicle",
+      "profile": { "Front": 14, "Side": 14, "Rear": 14, "BS": 4 },
+      "wargear": [ "Twin-linked Assault Cannon", "Two Flamestorm Cannons", "Frag Assault Launchers", "Smoke Launchers", "Searchlight" ],
       "special_rules": [ "The Aegis", "Psychic Pilot", "Fortitude", "Assault Vehicle", "Power of the Machine Spirit" ],
       "options": [
         {

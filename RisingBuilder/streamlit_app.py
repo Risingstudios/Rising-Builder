@@ -348,8 +348,19 @@ with st.sidebar:
             get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name
         )
         with open(pdf_path, "rb") as f:
-            # CHANGED: Now uses safe_filename for PDF too
             st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
+
+    # --- PROJECT TRACKER ---
+    st.divider()
+    st.subheader("Project Tracker")
+    with st.expander("🛠️ Development Status"):
+        issues = fetch_github_issues()
+        if not issues:
+            st.caption("No recent data found.")
+        else:
+            for i in issues:
+                icon = "✅" if i["state"] == "closed" else "🔴"
+                st.markdown(f"{icon} [{i['title']}]({i['html_url']})")
 
     st.divider()
     st.subheader("Report an Issue")

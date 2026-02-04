@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.5 Fix",
+  "codex_name": "Grey Knights (My Data) - V0.6",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -62,7 +62,11 @@
     "Null Rod": { "summary": "Unit immune to psychic powers. Power Weapon." },
     "Condemnor Boltgun": { "summary": "Combi-bolter. If it hits a Psyker, they suffer Perils of the Warp." },
     "Anointed Sword": { "summary": "Master-crafted Nemesis Force Sword." },
-    "Frag Assault Launchers": { "summary": "Unit charging out of vehicle counts as having Frag Grenades." }
+    "Frag Assault Launchers": { "summary": "Unit charging out of vehicle counts as having Frag Grenades." },
+    "Mastery Level 3": { "summary": "Upgrade. Psyker generates 3 Warp Charge per turn." },
+    "Dreadnought Close Combat Weapon": { "summary": "Power Weapon. Doubles Strength." },
+    "Twin-linked Assault Cannon": { "summary": "Range 24\" S6 AP4 Heavy 4 Rending Twin-linked." },
+    "Two Flamestorm Cannons": { "summary": "Two S6 AP3 Templates." }
   },
   "weapons": {
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
@@ -93,6 +97,7 @@
     "Multi-melta": { "range": "24\"", "S": "8", "AP": "1", "type": "Heavy 1", "notes": "Melta" },
     "Plasma Gun": { "range": "24\"", "S": "7", "AP": "2", "type": "Rapid Fire", "notes": "Gets Hot" },
     "Plasma Cannon": { "range": "36\"", "S": "7", "AP": "2", "type": "Heavy 1", "notes": "Blast, Gets Hot" },
+    "Heavy Plasma Cannon": { "range": "36\"", "S": "7", "AP": "2", "type": "Heavy 1", "notes": "Blast, Gets Hot" },
     "Flamer": { "range": "Template", "S": "4", "AP": "5", "type": "Assault 1", "notes": "" },
     "Heavy Bolter": { "range": "36\"", "S": "5", "AP": "4", "type": "Heavy 3", "notes": "" },
     "Twin-linked Heavy Bolter": { "range": "36\"", "S": "5", "AP": "4", "type": "Heavy 3", "notes": "Twin-linked" },
@@ -100,8 +105,11 @@
     "Two Twin-linked Lascannons": { "range": "48\"", "S": "9", "AP": "2", "type": "Heavy 1", "notes": "Twin-linked" },
     "Two Dreadknight Close Combat Weapons": { "range": "-", "S": "10", "AP": "2", "type": "Melee", "notes": "Doomfists" },
     "Flamestorm Cannon": { "range": "Template", "S": "6", "AP": "3", "type": "Heavy 1", "notes": "Template" },
+    "Two Flamestorm Cannons": { "range": "Template", "S": "6", "AP": "3", "type": "Heavy 1", "notes": "Two weapons" },
     "Assault Cannon": { "range": "24\"", "S": "6", "AP": "4", "type": "Heavy 4", "notes": "Rending" },
-    "Condemnor Boltgun": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "Psi-shock" }
+    "Twin-linked Assault Cannon": { "range": "24\"", "S": "6", "AP": "4", "type": "Heavy 4", "notes": "Rending, Twin-linked" },
+    "Condemnor Boltgun": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "Psi-shock" },
+    "Dreadnought Close Combat Weapon": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon" }
   },
   "units": [
     {

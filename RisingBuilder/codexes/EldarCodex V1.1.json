@@ -57,7 +57,7 @@
     "Chainsabres": { "summary": "Counts as Twin-linked Shuriken Pistols. In melee, grants +1 Attack and re-rolls to Hit and Wound." },
     "Powerblades": { "summary": "Count as Power Weapons. Grant +1 Attack." },
     "Sunrifle": { "summary": "Range 24\", S3, AP5, Assault 6, Pinning." },
-    "Hawk's Talon": { "summary": "Range 24\", S5, AP5, Assault 3." }
+    "Hawk's Talon": { "summary": "Range 24\", S5, AP5, Assault 3." },
     "Ghosthelm": { "summary": "Ignore Perils of the Warp on a 3+ (take an invulnerable save)." },
     "Rune Armour": { "summary": "4+ Invulnerable save." },
     "Spirit Stones": { "summary": "Psyker: Use a second power per turn. Vehicle: Ignore 'Crew Stunned' on 2+." },
@@ -1021,3 +1021,4 @@
   ]
 
 }
+

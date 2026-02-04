@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.6",
+  "codex_name": "Grey Knights (My Data) - V0.7 Fix",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -27,7 +27,9 @@
     "Repair": { "summary": "If immobilized, roll a D6 in shooting phase. On a 6, the vehicle is repaired." },
     "Psychic Mastery 2": { "summary": "Can use 2 psychic powers per turn." },
     "Perfect Warrior": { "summary": "Start of Assault phase choose one: Sword Storm (Re-roll hits, +1A), Blade Shield (Re-roll saves), or Rapier Strike (I10, Rending)." },
-    "Venerable": { "summary": "If vehicle suffers a penetrating hit, you may force opponent to re-roll the result on the Damage Chart." }
+    "Venerable": { "summary": "If vehicle suffers a penetrating hit, you may force opponent to re-roll the result on the Damage Chart." },
+    "By Any Means Necessary": { "summary": "Can target friendly units with Orbital Strike. If done, no scatter. Friendly unit takes hits." },
+    "Relentless": { "summary": "Can move and shoot Heavy weapons. Can assault after rapid firing." }
   },
   "wargear": {
     "Personal Teleporter": { "summary": "Unit moves as Jump Infantry. Once per game 30\" shunt move." },
@@ -66,7 +68,9 @@
     "Mastery Level 3": { "summary": "Upgrade. Psyker generates 3 Warp Charge per turn." },
     "Dreadnought Close Combat Weapon": { "summary": "Power Weapon. Doubles Strength." },
     "Twin-linked Assault Cannon": { "summary": "Range 24\" S6 AP4 Heavy 4 Rending Twin-linked." },
-    "Two Flamestorm Cannons": { "summary": "Two S6 AP3 Templates." }
+    "Two Flamestorm Cannons": { "summary": "Two S6 AP3 Templates." },
+    "Throne of Judgement": { "summary": "Provides +2S, +2T, +1W, 2+ Save (already in profile). Counts as Monstrous Creature for movement." },
+    "Orbital Strike Relay": { "summary": "Allows Karamazov to fire an Orbital Strike." }
   },
   "weapons": {
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
@@ -109,7 +113,10 @@
     "Assault Cannon": { "range": "24\"", "S": "6", "AP": "4", "type": "Heavy 4", "notes": "Rending" },
     "Twin-linked Assault Cannon": { "range": "24\"", "S": "6", "AP": "4", "type": "Heavy 4", "notes": "Rending, Twin-linked" },
     "Condemnor Boltgun": { "range": "24\"", "S": "4", "AP": "5", "type": "Rapid Fire", "notes": "Psi-shock" },
-    "Dreadnought Close Combat Weapon": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon" }
+    "Dreadnought Close Combat Weapon": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon" },
+    "Master-crafted Multi-melta": { "range": "24\"", "S": "8", "AP": "1", "type": "Heavy 1", "notes": "Melta, Master-crafted" },
+    "Master-crafted Power Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Master-crafted" },
+    "Orbital Strike": { "range": "Unlimited", "S": "10", "AP": "1", "type": "Ordnance 1", "notes": "Large Blast, Barrage" }
   },
   "units": [
     {
@@ -150,6 +157,19 @@
           ]
         }
       ]
+    },
+    {
+      "id": "hq_karamazov",
+      "name": "Inquisitor Karamazov",
+      "slot": "HQ",
+      "unique": true,
+      "base_points": 200,
+      "min_size": 1, "max_size": 1, "default_size": 1,
+      "unit_type": "Infantry (Character)",
+      "profile": { "WS": 4, "BS": 4, "S": 5, "T": 5, "W": 4, "I": 3, "A": 3, "Ld": 10, "Sv": "2+" },
+      "wargear": [ "Throne of Judgement", "Master-crafted Multi-melta", "Master-crafted Power Sword", "Orbital Strike Relay", "Iron Halo", "Frag/Krak Grenades" ],
+      "special_rules": [ "Independent Character", "Fearless", "Relentless", "By Any Means Necessary" ],
+      "options": []
     },
     {
       "id": "hq_crowe",

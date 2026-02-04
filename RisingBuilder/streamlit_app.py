@@ -206,7 +206,6 @@ def render_unit_options(entry, unit, codex_data):
                 opts_display.append(d_name)
             current_idx = 0
             
-            # Find selected name
             current_selected_name = "(None)"
             if current_picks:
                 curr_id = current_picks[0]
@@ -216,7 +215,6 @@ def render_unit_options(entry, unit, codex_data):
                         current_selected_name = d_name
                         break
             
-            # Calculate tooltip
             dropdown_tooltip = "Select an option to see rules."
             if current_selected_name != "(None)":
                 clean_name = re.sub(r' \(\+\d+.*\)', '', current_selected_name)
@@ -279,31 +277,19 @@ with st.sidebar:
     st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
-    # --- NEW CODEX INSPECTOR ---
+    # --- CODEX INSPECTOR ---
     with st.expander("🔍 Codex Inspector"):
         st.caption("Search your loaded JSON for rules.")
         search_term = st.text_input("Search DB", placeholder="e.g. Shield").lower()
         if search_term and "codex_data" in st.session_state:
             data = st.session_state.codex_data
             found = False
-            # Check Weapons
-            for k in data.get("weapons", {}):
-                if search_term in k.lower():
-                    st.markdown(f"**⚔️ {k}**")
-                    found = True
-            # Check Wargear
-            for k in data.get("wargear", {}):
-                if search_term in k.lower():
-                    st.markdown(f"**⚙️ {k}**")
-                    found = True
-            # Check Rules
-            for k in data.get("rules", {}):
-                if search_term in k.lower():
-                    st.markdown(f"**📜 {k}**")
-                    found = True
-            
-            if not found:
-                st.warning(f"No match for '{search_term}' found in DB.")
+            for cat in ["weapons", "wargear", "rules"]:
+                for k in data.get(cat, {}):
+                    if search_term in k.lower():
+                        st.markdown(f"**{cat.capitalize()}: {k}**")
+                        found = True
+            if not found: st.warning(f"No match for '{search_term}'.")
 
     st.divider()
     st.subheader("Save / Load List")
@@ -327,17 +313,30 @@ with st.sidebar:
                 uploaded_file.seek(0)
                 data = json.load(uploaded_file)
                 saved_codex = data.get("codex_file")
+                
                 st.session_state.is_loading_file = True
                 st.session_state.last_loaded_file_id = uploaded_file.file_id
-                if saved_codex:
+                
+                # --- SMART CODEX FALLBACK ---
+                target_path = CODEX_DIR / saved_codex if saved_codex else None
+                if target_path and target_path.exists():
                     st.session_state.current_codex_name = saved_codex
-                    st.session_state.current_codex_path = str(CODEX_DIR / saved_codex)
-                    st.session_state.codex_data = load_codex(CODEX_DIR / saved_codex)
+                    st.session_state.current_codex_path = str(target_path)
+                    st.session_state.codex_data = load_codex(target_path)
+                    st.success(f"Loaded '{saved_codex}'.")
+                else:
+                    st.warning(f"⚠️ Original Codex '{saved_codex}' missing. Using current Codex.")
+                
                 st.session_state.roster = data.get("roster", [])
                 st.session_state.roster_name = data.get("roster_name", "My Army List")
-                st.success("List loaded successfully!")
                 st.rerun()
             except Exception as e: st.error(f"Error reading file: {e}")
+
+    # --- PANIC BUTTON ---
+    if st.button("⚠️ Reset App (Clear All)", type="primary"):
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
 
     st.divider()
     st.write("### Export Options")

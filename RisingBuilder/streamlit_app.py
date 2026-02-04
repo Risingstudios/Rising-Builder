@@ -145,7 +145,8 @@ def validate_roster(limit, curr_pts, slots):
     if slots["HQ"] < 1: issues.append("⚠️ **HQ:** Need at least 1.")
     if slots["Troops"] < 2: issues.append("⚠️ **Troops:** Need at least 2.")
     
-    # 4. Unit Constraints
+    # 4. Unit Constraints & Uniqueness
+    unique_counter = {}
     for entry in st.session_state.roster:
         u = get_unit_by_id(entry["unit_id"])
         if not u: continue
@@ -158,7 +159,56 @@ def validate_roster(limit, curr_pts, slots):
         if entry["size"] > max_s:
             issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too large (Max {max_s}).")
             
+        # Check Unique
+        if u.get("unique", False):
+            if u["name"] in unique_counter:
+                issues.append(f"❌ **Unique:** You cannot take '{u['name']}' more than once.")
+            unique_counter[u["name"]] = True
+            
     return issues
+
+def generate_text_summary(roster, codex_name, limit):
+    """Generates a text block for copy/pasting."""
+    curr_pts, _ = calculate_roster()
+    txt = [f"{codex_name} - {st.session_state.roster_name}", f"Total: {curr_pts}/{limit} pts", "-"*30]
+    
+    slots_order = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support", "Dedicated Transport"]
+    for slot in slots_order:
+        slot_units = [e for e in roster if not e.get("parent_id") and get_unit_by_id(e['unit_id'])['slot'] == slot]
+        if not slot_units: continue
+        
+        txt.append(f"\n[{slot}]")
+        for entry in slot_units:
+            u = get_unit_by_id(entry["unit_id"])
+            name_str = f"{u['name']}"
+            if entry.get("custom_name"): name_str = f"{entry['custom_name']} ({u['name']})"
+            if entry.get("size", 1) > 1: name_str += f" x{entry['size']}"
+            
+            txt.append(f"• {name_str} [{entry.get('calculated_cost', 0)} pts]")
+            
+            # Options
+            opts = []
+            if "selected" in entry:
+                for gid, picks in entry["selected"].items():
+                    opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
+                    if not opt_def: continue
+                    for choice in opt_def.get("choices", []):
+                        count = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
+                        if count > 0:
+                            s = choice['name']
+                            if count > 1: s = f"{count}x {s}"
+                            opts.append(s)
+            if opts: txt.append(f"  + {', '.join(opts)}")
+            
+            # Children
+            children = [c for c in roster if c.get("parent_id") == entry["id"]]
+            for child in children:
+                uc = get_unit_by_id(child["unit_id"])
+                c_name = uc['name']
+                if child.get("custom_name"): c_name = f"{child['custom_name']} ({uc['name']})"
+                txt.append(f"  > Attached: {c_name} [{child.get('calculated_cost', 0)} pts]")
+
+    return "\n".join(txt)
 
 # --- CALLBACKS ---
 def cb_update_roster_name(): st.session_state.roster_name = st.session_state.roster_name_input
@@ -295,33 +345,6 @@ with st.sidebar:
     st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
-    # --- CODEX AUDITOR ---
-    with st.expander("🛡️ Codex Auditor"):
-        st.caption("Validates that all unit rules & wargear exist in the database.")
-        if st.button("Run Audit"):
-            if "codex_data" in st.session_state:
-                data = st.session_state.codex_data
-                issues = []
-                all_defs = set(data.get("weapons", {}).keys()) | set(data.get("wargear", {}).keys()) | set(data.get("rules", {}).keys())
-                for unit in data.get("units", []):
-                    u_name = unit.get("name", "Unknown")
-                    for item in unit.get("wargear", []):
-                        if item not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
-                    for rule in unit.get("special_rules", []):
-                        if rule not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
-                    for opt in unit.get("options", []):
-                        for ch in opt.get("choices", []):
-                            c_name = ch.get("name", "")
-                            parts = re.split(r' & | and |, ', c_name)
-                            for p in parts:
-                                p = p.strip()
-                                if p and "Upgrade" not in p and "Twin-linked" not in p and p not in all_defs:
-                                     issues.append(f"⚠️ Option **'{c_name}'**: Part **'{p}'** is undefined.")
-                if not issues: st.success("✅ Codex looks healthy!")
-                else:
-                    st.error(f"Found {len(issues)} potential issues:")
-                    for i in issues: st.write(i)
-
     st.divider()
     st.subheader("Save / Load")
     safe_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', st.session_state.roster_name)
@@ -362,6 +385,40 @@ with st.sidebar:
         write_roster_pdf(st.session_state.roster, st.session_state.codex_data, points_limit, str(pdf_path), get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name)
         with open(pdf_path, "rb") as f: st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
 
+    # --- TEXT EXPORT ---
+    with st.expander("📋 Text Export (Copy/Paste)"):
+        st.caption("Perfect for Reddit/Discord")
+        if "codex_data" in st.session_state:
+            txt_out = generate_text_summary(st.session_state.roster, st.session_state.codex_data.get("codex_name", "Army"), points_limit)
+            st.code(txt_out, language="text")
+
+    # --- CODEX AUDITOR ---
+    st.divider()
+    with st.expander("🛡️ Codex Auditor"):
+        if st.button("Run Audit"):
+            if "codex_data" in st.session_state:
+                data = st.session_state.codex_data
+                issues = []
+                all_defs = set(data.get("weapons", {}).keys()) | set(data.get("wargear", {}).keys()) | set(data.get("rules", {}).keys())
+                for unit in data.get("units", []):
+                    u_name = unit.get("name", "Unknown")
+                    for item in unit.get("wargear", []):
+                        if item not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
+                    for rule in unit.get("special_rules", []):
+                        if rule not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
+                    for opt in unit.get("options", []):
+                        for ch in opt.get("choices", []):
+                            c_name = ch.get("name", "")
+                            parts = re.split(r' & | and |, | / ', c_name)
+                            for p in parts:
+                                p = p.strip()
+                                if p and "Upgrade" not in p and "Twin-linked" not in p and p not in all_defs:
+                                     issues.append(f"⚠️ Option **'{c_name}'**: Part **'{p}'** is undefined.")
+                if not issues: st.success("✅ Codex looks healthy!")
+                else:
+                    st.error(f"Found {len(issues)} potential issues:")
+                    for i in issues: st.write(i)
+
     st.divider()
     st.subheader("Project Tracker")
     with st.expander("Status"):
@@ -370,7 +427,6 @@ with st.sidebar:
             for i in issues: st.markdown(f"{'✅' if i['state']=='closed' else '🔴'} [{i['title']}]({i['html_url']})")
         else: st.caption("No recent data.")
 
-    st.divider()
     with st.form("feedback_form"):
         feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Feature Request"])
         feedback_title = st.text_input("Summary")
@@ -391,23 +447,38 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     st.title(f"{st.session_state.roster_name}")
     st.caption(f"Using: {data.get('codex_name', 'Army')}")
     
-    # --- VALIDATOR ---
+    # --- VALIDATOR & METRICS ---
     curr_pts, slots = calculate_roster()
     issues = validate_roster(points_limit, curr_pts, slots)
     
-    if issues:
-        st.error("  \n".join(issues))
-    else:
-        st.success("✅ Roster is Valid!")
+    if issues: st.error("  \n".join(issues))
+    else: st.success("✅ Roster is Valid!")
 
-    # METRICS
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
-    col2.metric("HQ", f"{slots['HQ']}/2")
-    col3.metric("Troops", f"{slots['Troops']}/6")
-    col4.metric("Elites", f"{slots['Elites']}/3")
-    col5.metric("Fast", f"{slots['Fast Attack']}/3")
-    col6.metric("Heavy", f"{slots['Heavy Support']}/3")
+    # POINTS BREAKDOWN CHART
+    if curr_pts > 0:
+        breakdown = {}
+        for entry in st.session_state.roster:
+            u = get_unit_by_id(entry["unit_id"])
+            if not u: continue
+            slot = u["slot"]
+            # Assign child points to parent slot
+            if entry.get("parent_id"):
+                # Find parent
+                parent = next((p for p in st.session_state.roster if p["id"] == entry["parent_id"]), None)
+                if parent:
+                    pu = get_unit_by_id(parent["unit_id"])
+                    if pu: slot = pu["slot"]
+            
+            breakdown[slot] = breakdown.get(slot, 0) + entry.get("calculated_cost", 0)
+        
+        # Display Bars
+        st.caption("Investment Breakdown")
+        cols = st.columns(len(breakdown))
+        for i, (slot, pts) in enumerate(breakdown.items()):
+            pct = int((pts / curr_pts) * 100)
+            st.write(f"**{slot}:** {pts}pts ({pct}%)")
+            st.progress(pct / 100)
+    
     st.divider()
 
     st.header(f"Current Roster ({len(st.session_state.roster)} Units)")

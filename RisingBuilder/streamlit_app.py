@@ -348,7 +348,8 @@ with st.sidebar:
             get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name
         )
         with open(pdf_path, "rb") as f:
-            st.download_button("Download PDF", f, "roster.pdf", "application/pdf")
+            # CHANGED: Now uses safe_filename for PDF too
+            st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
 
     st.divider()
     st.subheader("Report an Issue")
@@ -444,7 +445,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
     selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
     
-    # --- SORT LOGIC ADDED HERE ---
+    # --- SORT LOGIC ---
     slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
     slot_units.sort(key=lambda x: x["name"]) # Sort alphabetically
     

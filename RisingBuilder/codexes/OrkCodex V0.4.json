@@ -1,5 +1,5 @@
 {
-  "codex_name": "Orks (5th Edition) - V0.3",
+  "codex_name": "Orks (5th Edition) - V0.4",
   "rules": {
     "Prophet of the Waaagh!": { "summary": "Ghazghkull gives the whole army Fearless for a turn. He gets a 2+ Invuln save that turn." },
     "One Scalpel Short of a Medpack": { "summary": "Grotsnik is Fearless and has Rampage. He must always move towards the nearest enemy." },
@@ -41,7 +41,7 @@
     "Grot Oiler (Max 3)": { "summary": "Re-roll a repair roll." },
     "Ammo Runt": { "summary": "Re-roll one To Hit roll shooting." },
     "Mega Armour": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
-    "Mega Armour (2+ Sv, PK, TL-Shoota)": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
+    "Mega Armour (2+ Sv / PK / TL-Shoota)": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
     "Stikkbombs": { "summary": "Frag grenades (strike at initiative in cover)." },
     "Tankbusta Bombs": { "summary": "S8 AP- melee attacks vs vehicles." },
     "Deff Rolla": { "summary": "Tank Shock causes D6 S10 hits." },
@@ -51,7 +51,7 @@
     "'Eavy Armour": { "summary": "Grants a 4+ Armour Save." },
     "'Eavy Armour (4+ Sv)": { "summary": "Grants a 4+ Armour Save." },
     "Nob: 'Eavy Armour": { "summary": "Grants a 4+ Armour Save." },
-    "Warbike (+1T, 4+ Cover)": { "summary": "Unit becomes Biker. +1 Toughness, 4+ Cover Save, Exhaust Cloud." },
+    "Warbike (+1T / 4+ Cover)": { "summary": "Unit becomes Biker. +1 Toughness, 4+ Cover Save, Exhaust Cloud." },
     "Warbikes (Entire Squad)": { "summary": "Unit mounts Warbikes." },
     "Waaagh! Banner": { "summary": "+1 WS to the unit." },
     "Jump Pack": { "summary": "Move 12\". Can Deep Strike." },
@@ -233,7 +233,7 @@
           "group_id": "armour", "group_name": "Armour", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "eavy", "name": "'Eavy Armour (4+ Sv)", "points": 5 },
-            { "id": "mega", "name": "Mega Armour (2+ Sv, PK, TL-Shoota)", "points": 40 }
+            { "id": "mega", "name": "Mega Armour (2+ Sv / PK / TL-Shoota)", "points": 40 }
           ]
         },
         {
@@ -242,7 +242,7 @@
             { "id": "cybork", "name": "Cybork Body", "points": 10 },
             { "id": "pole", "name": "Bosspole", "points": 5 },
             { "id": "squig", "name": "Attack Squig", "points": 15 },
-            { "id": "bike", "name": "Warbike (+1T, 4+ Cover)", "points": 40 }
+            { "id": "bike", "name": "Warbike (+1T / 4+ Cover)", "points": 40 }
           ]
         }
       ]
@@ -280,7 +280,8 @@
             { "id": "cybork", "name": "Cybork Body", "points": 10 },
             { "id": "pole", "name": "Bosspole", "points": 5 },
             { "id": "eavy", "name": "'Eavy Armour", "points": 5 },
-            { "id": "oiler", "name": "Grot Oiler (Max 3)", "points": 5 }
+            { "id": "oiler", "name": "Grot Oiler (Max 3)", "points": 5 },
+            { "id": "bike", "name": "Warbike (+1T / 4+ Cover)", "points": 30 }
           ]
         }
       ]

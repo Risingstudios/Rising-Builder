@@ -128,85 +128,68 @@ def calculate_roster():
     return total_pts, counts
 
 def validate_roster(limit, curr_pts, slots):
-    """Returns a list of issue strings."""
     issues = []
-    
-    # 1. Points
-    if curr_pts > limit:
-        issues.append(f"❌ **Points:** {curr_pts}/{limit} (Over by {curr_pts - limit})")
-    
-    # 2. Force Org
+    if curr_pts > limit: issues.append(f"❌ **Points:** {curr_pts}/{limit} (Over by {curr_pts - limit})")
     limits = {"HQ": 2, "Troops": 6, "Elites": 3, "Fast Attack": 3, "Heavy Support": 3}
     for s, max_limit in limits.items():
-        if slots[s] > max_limit:
-            issues.append(f"❌ **{s}:** {slots[s]}/{max_limit}")
-            
-    # 3. Compulsory
+        if slots[s] > max_limit: issues.append(f"❌ **{s}:** {slots[s]}/{max_limit}")
     if slots["HQ"] < 1: issues.append("⚠️ **HQ:** Need at least 1.")
     if slots["Troops"] < 2: issues.append("⚠️ **Troops:** Need at least 2.")
     
-    # 4. Unit Constraints & Uniqueness
     unique_counter = {}
     for entry in st.session_state.roster:
         u = get_unit_by_id(entry["unit_id"])
         if not u: continue
-        
-        # Check Size
         min_s = u.get("min_size", 1)
         max_s = u.get("max_size", 1)
-        if entry["size"] < min_s:
-            issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too small (Min {min_s}).")
-        if entry["size"] > max_s:
-            issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too large (Max {max_s}).")
-            
-        # Check Unique
+        if entry["size"] < min_s: issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too small (Min {min_s}).")
+        if entry["size"] > max_s: issues.append(f"⚠️ **{u['name']}:** Size {entry['size']} too large (Max {max_s}).")
         if u.get("unique", False):
-            if u["name"] in unique_counter:
-                issues.append(f"❌ **Unique:** You cannot take '{u['name']}' more than once.")
+            if u["name"] in unique_counter: issues.append(f"❌ **Unique:** You cannot take '{u['name']}' more than once.")
             unique_counter[u["name"]] = True
-            
     return issues
 
 def generate_text_summary(roster, codex_name, limit):
-    """Generates a text block for copy/pasting."""
     curr_pts, _ = calculate_roster()
     txt = [f"{codex_name} - {st.session_state.roster_name}", f"Total: {curr_pts}/{limit} pts", "-"*30]
     
+    def print_entry(entry, depth=0):
+        u = get_unit_by_id(entry["unit_id"])
+        indent = "  " * depth
+        prefix = "• " if depth == 0 else "> "
+        name_str = f"{u['name']}"
+        if entry.get("custom_name"): name_str = f"{entry['custom_name']} ({u['name']})"
+        if entry.get("size", 1) > 1: name_str += f" x{entry['size']}"
+        
+        lines = [f"{indent}{prefix}{name_str} [{entry.get('calculated_cost', 0)} pts]"]
+        
+        opts = []
+        if "selected" in entry:
+            for gid, picks in entry["selected"].items():
+                opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
+                if not opt_def: continue
+                for choice in opt_def.get("choices", []):
+                    count = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
+                    if count > 0:
+                        s = choice['name']
+                        if count > 1: s = f"{count}x {s}"
+                        opts.append(s)
+        if opts: lines.append(f"{indent}  + {', '.join(opts)}")
+        return lines
+
     slots_order = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support", "Dedicated Transport"]
     for slot in slots_order:
         slot_units = [e for e in roster if not e.get("parent_id") and get_unit_by_id(e['unit_id'])['slot'] == slot]
         if not slot_units: continue
-        
         txt.append(f"\n[{slot}]")
-        for entry in slot_units:
-            u = get_unit_by_id(entry["unit_id"])
-            name_str = f"{u['name']}"
-            if entry.get("custom_name"): name_str = f"{entry['custom_name']} ({u['name']})"
-            if entry.get("size", 1) > 1: name_str += f" x{entry['size']}"
-            
-            txt.append(f"• {name_str} [{entry.get('calculated_cost', 0)} pts]")
-            
-            # Options
-            opts = []
-            if "selected" in entry:
-                for gid, picks in entry["selected"].items():
-                    opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
-                    if not opt_def: continue
-                    for choice in opt_def.get("choices", []):
-                        count = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
-                        if count > 0:
-                            s = choice['name']
-                            if count > 1: s = f"{count}x {s}"
-                            opts.append(s)
-            if opts: txt.append(f"  + {', '.join(opts)}")
-            
-            # Children
-            children = [c for c in roster if c.get("parent_id") == entry["id"]]
-            for child in children:
-                uc = get_unit_by_id(child["unit_id"])
-                c_name = uc['name']
-                if child.get("custom_name"): c_name = f"{child['custom_name']} ({uc['name']})"
-                txt.append(f"  > Attached: {c_name} [{child.get('calculated_cost', 0)} pts]")
+        
+        def recursive_text(units, depth):
+            for entry in units:
+                txt.extend(print_entry(entry, depth))
+                children = [c for c in roster if c.get("parent_id") == entry["id"]]
+                recursive_text(children, depth + 1)
+        
+        recursive_text(slot_units, 0)
 
     return "\n".join(txt)
 
@@ -442,6 +425,54 @@ with st.sidebar:
                 except Exception as e: st.error(f"Error: {e}")
 
 # --- MAIN PAGE ---
+def recursive_render_unit(entry, depth=0):
+    u = get_unit_by_id(entry["unit_id"])
+    if not u: return
+    
+    # Indentation visual for children
+    if depth > 0:
+        st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;" * depth + f"↳ **{u['name']}**")
+    
+    display_title = f"[{u['slot']}] {u['name']}"
+    if entry.get("custom_name"): display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']})"
+    if depth > 0: display_title = f"Edit {u['name']}"
+
+    with st.expander(display_title, expanded=False):
+        render_unit_options(entry, u, data)
+        
+        # ATTACHMENT LOGIC (Recursive!)
+        valid_transports = u.get("dedicated_transports", [])
+        if valid_transports:
+            st.divider()
+            cols = st.columns([3, 1])
+            t_opts = [t for t in [get_unit_by_id(tid) for tid in valid_transports] if t]
+            t_names = [t["name"] for t in t_opts]
+            sel_t = cols[0].selectbox(f"Add Attachment to {u['name']}", t_names, key=f"trans_sel_{entry['id']}")
+            if cols[1].button("Add", key=f"add_trans_{entry['id']}"):
+                tid = next(t["id"] for t in t_opts if t["name"] == sel_t)
+                child_entry = {"id": str(uuid.uuid4()), "unit_id": tid, "size": int(get_unit_by_id(tid).get("default_size", 1)), "selected": {}, "parent_id": entry["id"]}
+                st.session_state.roster.append(child_entry)
+                st.rerun()
+        st.divider()
+        
+        # Remove Logic
+        if st.button(f"Remove {u['name']}", key=f"del_{entry['id']}", type="primary" if depth==0 else "secondary"):
+            # Recursive delete
+            ids_to_remove = [entry["id"]]
+            def find_kids(eid):
+                kids = [c for c in st.session_state.roster if c.get("parent_id") == eid]
+                for k in kids:
+                    ids_to_remove.append(k["id"])
+                    find_kids(k["id"])
+            find_kids(entry["id"])
+            st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
+            st.rerun()
+
+    # Render Children of this unit
+    children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
+    for child in children:
+        recursive_render_unit(child, depth + 1)
+
 if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
     st.title(f"{st.session_state.roster_name}")
@@ -454,7 +485,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     if issues: st.error("  \n".join(issues))
     else: st.success("✅ Roster is Valid!")
 
-    # 1. SLOT COUNTERS (RESTORED)
+    # 1. SLOT COUNTERS
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
     col2.metric("HQ", f"{slots['HQ']}/2")
@@ -463,7 +494,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     col5.metric("Fast", f"{slots['Fast Attack']}/3")
     col6.metric("Heavy", f"{slots['Heavy Support']}/3")
 
-    # 2. POINTS BREAKDOWN (BELOW)
+    # 2. POINTS BREAKDOWN
     if curr_pts > 0:
         breakdown = {}
         for entry in st.session_state.roster:
@@ -492,47 +523,7 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     if not parents: st.info("Your roster is empty. Add a unit below!")
     else:
         for entry in parents:
-            u = get_unit_by_id(entry["unit_id"])
-            if not u: continue
-            display_title = f"[{u['slot']}] {u['name']}"
-            if entry.get("custom_name"): display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']})"
-
-            with st.expander(display_title, expanded=False):
-                render_unit_options(entry, u, data)
-                
-                # ATTACHMENT LOGIC
-                valid_transports = u.get("dedicated_transports", [])
-                if valid_transports:
-                    st.divider()
-                    cols = st.columns([3, 1])
-                    t_opts = [t for t in [get_unit_by_id(tid) for tid in valid_transports] if t]
-                    t_names = [t["name"] for t in t_opts]
-                    sel_t = cols[0].selectbox("Add Attachment", t_names, key=f"trans_sel_{entry['id']}")
-                    if cols[1].button("Add", key=f"add_trans_{entry['id']}"):
-                        tid = next(t["id"] for t in t_opts if t["name"] == sel_t)
-                        child_entry = {"id": str(uuid.uuid4()), "unit_id": tid, "size": int(get_unit_by_id(tid).get("default_size", 1)), "selected": {}, "parent_id": entry["id"]}
-                        st.session_state.roster.append(child_entry)
-                        st.rerun()
-                st.divider()
-                if st.button("Remove Unit", key=f"del_{entry['id']}", type="primary"):
-                    ids_to_remove = [entry["id"]] + [c["id"] for c in st.session_state.roster if c.get("parent_id") == entry["id"]]
-                    st.session_state.roster = [e for e in st.session_state.roster if e["id"] not in ids_to_remove]
-                    st.rerun()
-
-            children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
-            for child in children:
-                uc = get_unit_by_id(child["unit_id"])
-                if not uc: continue
-                with st.container():
-                    child_title = uc['name']
-                    if child.get("custom_name"): child_title = f"{child['custom_name']} ({uc['name']})"
-                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;↳ **{child_title}**")
-                    with st.expander(f"Edit {child_title}", expanded=False):
-                        render_unit_options(child, uc, data)
-                        st.divider()
-                        if st.button("Remove Attachment", key=f"del_child_{child['id']}"):
-                            st.session_state.roster.remove(child)
-                            st.rerun()
+            recursive_render_unit(entry, depth=0)
 
     st.divider()
     st.subheader("Add New Unit")

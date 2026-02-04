@@ -454,30 +454,35 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     if issues: st.error("  \n".join(issues))
     else: st.success("✅ Roster is Valid!")
 
-    # POINTS BREAKDOWN CHART
+    # 1. SLOT COUNTERS (RESTORED)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
+    col2.metric("HQ", f"{slots['HQ']}/2")
+    col3.metric("Troops", f"{slots['Troops']}/6")
+    col4.metric("Elites", f"{slots['Elites']}/3")
+    col5.metric("Fast", f"{slots['Fast Attack']}/3")
+    col6.metric("Heavy", f"{slots['Heavy Support']}/3")
+
+    # 2. POINTS BREAKDOWN (BELOW)
     if curr_pts > 0:
         breakdown = {}
         for entry in st.session_state.roster:
             u = get_unit_by_id(entry["unit_id"])
             if not u: continue
             slot = u["slot"]
-            # Assign child points to parent slot
             if entry.get("parent_id"):
-                # Find parent
                 parent = next((p for p in st.session_state.roster if p["id"] == entry["parent_id"]), None)
                 if parent:
                     pu = get_unit_by_id(parent["unit_id"])
                     if pu: slot = pu["slot"]
-            
             breakdown[slot] = breakdown.get(slot, 0) + entry.get("calculated_cost", 0)
         
-        # Display Bars
         st.caption("Investment Breakdown")
         cols = st.columns(len(breakdown))
         for i, (slot, pts) in enumerate(breakdown.items()):
             pct = int((pts / curr_pts) * 100)
-            st.write(f"**{slot}:** {pts}pts ({pct}%)")
-            st.progress(pct / 100)
+            cols[i].write(f"**{slot}**: {pct}%")
+            cols[i].progress(pct / 100)
     
     st.divider()
 

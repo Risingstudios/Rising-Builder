@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (My Data) - V0.9",
+  "codex_name": "Grey Knights (5th Edition) - V1.0",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -719,5 +719,4 @@
       "options": []
     }
   ]
-}
 }

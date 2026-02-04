@@ -304,134 +304,203 @@ with st.sidebar:
         if icon_path.exists(): st.image(app_icon, width=60)
         else: st.write("🌙")
     with col2: st.title("Rising Builder")
+    
+    # PLAY MODE TOGGLE
+    play_mode = st.checkbox("🎲 Play Mode", value=False, key="play_mode_toggle", help="Switch to a clean, read-only view for use during games.")
     st.divider()
     
-    st.header("Settings")
-    available_codexes = list(CODEX_DIR.glob("*.json"))
-    codex_names = [p.name for p in available_codexes]
-    index = 0
-    if "current_codex_name" in st.session_state and st.session_state.current_codex_name in codex_names:
-        index = codex_names.index(st.session_state.current_codex_name)
-    selected_codex_name = st.selectbox("Select Codex", codex_names, index=index)
-    
-    if selected_codex_name:
-        path = CODEX_DIR / selected_codex_name
-        if st.session_state.get("current_codex_path") != str(path):
-            st.session_state.codex_data = load_codex(path)
-            st.session_state.current_codex_path = str(path)
-            st.session_state.current_codex_name = selected_codex_name
-            if not st.session_state.get("is_loading_file", False):
-                st.session_state.roster = [] 
-                st.session_state.roster_name = "My Army List"
-            st.session_state.is_loading_file = False
+    if not play_mode:
+        st.header("Settings")
+        available_codexes = list(CODEX_DIR.glob("*.json"))
+        codex_names = [p.name for p in available_codexes]
+        index = 0
+        if "current_codex_name" in st.session_state and st.session_state.current_codex_name in codex_names:
+            index = codex_names.index(st.session_state.current_codex_name)
+        selected_codex_name = st.selectbox("Select Codex", codex_names, index=index)
+        
+        if selected_codex_name:
+            path = CODEX_DIR / selected_codex_name
+            if st.session_state.get("current_codex_path") != str(path):
+                st.session_state.codex_data = load_codex(path)
+                st.session_state.current_codex_path = str(path)
+                st.session_state.current_codex_name = selected_codex_name
+                if not st.session_state.get("is_loading_file", False):
+                    st.session_state.roster = [] 
+                    st.session_state.roster_name = "My Army List"
+                st.session_state.is_loading_file = False
+                st.rerun()
+
+        st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
+        points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
+        
+        st.divider()
+        st.subheader("Save / Load")
+        safe_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', st.session_state.roster_name)
+        if not safe_filename: safe_filename = "army_list"
+        save_data = {"roster_name": st.session_state.roster_name, "roster": st.session_state.roster, "codex_file": selected_codex_name, "points_limit": points_limit}
+        st.download_button("💾 Download Roster", json.dumps(save_data, indent=2), f"{safe_filename}.json", "application/json")
+
+        uploaded_file = st.file_uploader("📂 Load Roster", type=["json"])
+        if uploaded_file is not None:
+            if uploaded_file.file_id != st.session_state.get("last_loaded_file_id"):
+                try:
+                    uploaded_file.seek(0)
+                    data = json.load(uploaded_file)
+                    saved_codex = data.get("codex_file")
+                    st.session_state.is_loading_file = True
+                    st.session_state.last_loaded_file_id = uploaded_file.file_id
+                    target_path = CODEX_DIR / saved_codex if saved_codex else None
+                    if target_path and target_path.exists():
+                        st.session_state.current_codex_name = saved_codex
+                        st.session_state.current_codex_path = str(target_path)
+                        st.session_state.codex_data = load_codex(target_path)
+                        st.success(f"Loaded '{saved_codex}'.")
+                    else: st.warning(f"⚠️ Original Codex '{saved_codex}' missing. Using current Codex.")
+                    st.session_state.roster = data.get("roster", [])
+                    st.session_state.roster_name = data.get("roster_name", "My Army List")
+                    st.rerun()
+                except Exception as e: st.error(f"Error reading file: {e}")
+
+        if st.button("⚠️ Reset App", type="primary"):
+            for key in list(st.session_state.keys()): del st.session_state[key]
             st.rerun()
 
-    st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
-    points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
-    
-    st.divider()
-    st.subheader("Save / Load")
-    safe_filename = re.sub(r'[^a-zA-Z0-9_\-]', '_', st.session_state.roster_name)
-    if not safe_filename: safe_filename = "army_list"
-    save_data = {"roster_name": st.session_state.roster_name, "roster": st.session_state.roster, "codex_file": selected_codex_name, "points_limit": points_limit}
-    st.download_button("💾 Download Roster", json.dumps(save_data, indent=2), f"{safe_filename}.json", "application/json")
+        st.divider()
+        st.write("### Export")
+        include_tables = st.checkbox("Include Ref Tables", value=True)
+        if st.button("📄 Generate PDF"):
+            pdf_path = BASE_DIR / "temp_roster.pdf"
+            write_roster_pdf(st.session_state.roster, st.session_state.codex_data, points_limit, str(pdf_path), get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name)
+            with open(pdf_path, "rb") as f: st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
 
-    uploaded_file = st.file_uploader("📂 Load Roster", type=["json"])
-    if uploaded_file is not None:
-        if uploaded_file.file_id != st.session_state.get("last_loaded_file_id"):
-            try:
-                uploaded_file.seek(0)
-                data = json.load(uploaded_file)
-                saved_codex = data.get("codex_file")
-                st.session_state.is_loading_file = True
-                st.session_state.last_loaded_file_id = uploaded_file.file_id
-                target_path = CODEX_DIR / saved_codex if saved_codex else None
-                if target_path and target_path.exists():
-                    st.session_state.current_codex_name = saved_codex
-                    st.session_state.current_codex_path = str(target_path)
-                    st.session_state.codex_data = load_codex(target_path)
-                    st.success(f"Loaded '{saved_codex}'.")
-                else: st.warning(f"⚠️ Original Codex '{saved_codex}' missing. Using current Codex.")
-                st.session_state.roster = data.get("roster", [])
-                st.session_state.roster_name = data.get("roster_name", "My Army List")
-                st.rerun()
-            except Exception as e: st.error(f"Error reading file: {e}")
+        # --- TEXT EXPORT ---
+        with st.expander("📋 Text Export (Copy/Paste)"):
+            st.caption("Perfect for Reddit/Discord")
+            if st.session_state.get("codex_data"):
+                txt_out = generate_text_summary(st.session_state.roster, st.session_state.codex_data.get("codex_name", "Army"), points_limit)
+                st.code(txt_out, language="text")
+            else:
+                st.info("Load a Codex to generate text summary.")
 
-    if st.button("⚠️ Reset App", type="primary"):
-        for key in list(st.session_state.keys()): del st.session_state[key]
-        st.rerun()
-
-    st.divider()
-    st.write("### Export")
-    include_tables = st.checkbox("Include Ref Tables", value=True)
-    if st.button("📄 Generate PDF"):
-        pdf_path = BASE_DIR / "temp_roster.pdf"
-        write_roster_pdf(st.session_state.roster, st.session_state.codex_data, points_limit, str(pdf_path), get_unit_by_id, include_ref_tables=include_tables, roster_name=st.session_state.roster_name)
-        with open(pdf_path, "rb") as f: st.download_button("Download PDF", f, f"{safe_filename}.pdf", "application/pdf")
-
-    # --- TEXT EXPORT ---
-    with st.expander("📋 Text Export (Copy/Paste)"):
-        st.caption("Perfect for Reddit/Discord")
-        # FIXED: Check if codex_data exists before accessing keys
-        if st.session_state.get("codex_data"):
-            txt_out = generate_text_summary(st.session_state.roster, st.session_state.codex_data.get("codex_name", "Army"), points_limit)
-            st.code(txt_out, language="text")
-        else:
-            st.info("Load a Codex to generate text summary.")
-
-    # --- CODEX AUDITOR ---
-    st.divider()
-    with st.expander("🛡️ Codex Auditor"):
-        if st.button("Run Audit"):
-            if "codex_data" in st.session_state and st.session_state.codex_data:
-                data = st.session_state.codex_data
-                issues = []
-                all_defs = set(data.get("weapons", {}).keys()) | set(data.get("wargear", {}).keys()) | set(data.get("rules", {}).keys())
-                for unit in data.get("units", []):
-                    u_name = unit.get("name", "Unknown")
-                    for item in unit.get("wargear", []):
-                        if item not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
-                    for rule in unit.get("special_rules", []):
-                        if rule not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
-                    for opt in unit.get("options", []):
-                        for ch in opt.get("choices", []):
-                            c_name = ch.get("name", "")
-                            parts = re.split(r' & | and |, | / | \+ ', c_name)
-                            for p in parts:
-                                p = p.strip()
-                                if p and "Upgrade" not in p and "Twin-linked" not in p and p not in all_defs:
-                                     issues.append(f"⚠️ Option **'{c_name}'**: Part **'{p}'** is undefined.")
-                if not issues: st.success("✅ Codex looks healthy!")
+        # --- CODEX AUDITOR ---
+        st.divider()
+        with st.expander("🛡️ Codex Auditor"):
+            if st.button("Run Audit"):
+                if "codex_data" in st.session_state and st.session_state.codex_data:
+                    data = st.session_state.codex_data
+                    issues = []
+                    all_defs = set(data.get("weapons", {}).keys()) | set(data.get("wargear", {}).keys()) | set(data.get("rules", {}).keys())
+                    for unit in data.get("units", []):
+                        u_name = unit.get("name", "Unknown")
+                        for item in unit.get("wargear", []):
+                            if item not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
+                        for rule in unit.get("special_rules", []):
+                            if rule not in all_defs: issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
+                        for opt in unit.get("options", []):
+                            for ch in opt.get("choices", []):
+                                c_name = ch.get("name", "")
+                                parts = re.split(r' & | and |, | / | \+ ', c_name)
+                                for p in parts:
+                                    p = p.strip()
+                                    if p and "Upgrade" not in p and "Twin-linked" not in p and p not in all_defs:
+                                         issues.append(f"⚠️ Option **'{c_name}'**: Part **'{p}'** is undefined.")
+                    if not issues: st.success("✅ Codex looks healthy!")
+                    else:
+                        st.error(f"Found {len(issues)} potential issues:")
+                        for i in issues: st.write(i)
                 else:
-                    st.error(f"Found {len(issues)} potential issues:")
-                    for i in issues: st.write(i)
-            else:
-                st.error("No Codex Loaded.")
+                    st.error("No Codex Loaded.")
 
-    st.divider()
-    st.subheader("Project Tracker")
-    with st.expander("Status"):
-        issues = fetch_github_issues()
-        if issues:
-            for i in issues: st.markdown(f"{'✅' if i['state']=='closed' else '🔴'} [{i['title']}]({i['html_url']})")
-        else: st.caption("No recent data.")
+        st.divider()
+        st.subheader("Project Tracker")
+        with st.expander("Status"):
+            issues = fetch_github_issues()
+            if issues:
+                for i in issues: st.markdown(f"{'✅' if i['state']=='closed' else '🔴'} [{i['title']}]({i['html_url']})")
+            else: st.caption("No recent data.")
 
-    with st.form("feedback_form"):
-        feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Feature Request"])
-        feedback_title = st.text_input("Summary")
-        feedback_msg = st.text_area("Description")
-        if st.form_submit_button("Report"):
-            if not feedback_title: st.error("Summary required.")
-            else:
-                try:
-                    token, owner, repo = st.secrets["github"]["token"], st.secrets["github"]["owner"], st.secrets["github"]["repo"]
-                    api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
-                    requests.post(api_url, json={"title": f"[{feedback_type}] {feedback_title}", "body": feedback_msg}, headers={"Authorization": f"token {token}"})
-                    st.success("Sent!")
-                except Exception as e: st.error(f"Error: {e}")
+        with st.form("feedback_form"):
+            feedback_type = st.selectbox("Type", ["Bug", "Missing Unit", "Feature Request"])
+            feedback_title = st.text_input("Summary")
+            feedback_msg = st.text_area("Description")
+            if st.form_submit_button("Report"):
+                if not feedback_title: st.error("Summary required.")
+                else:
+                    try:
+                        token, owner, repo = st.secrets["github"]["token"], st.secrets["github"]["owner"], st.secrets["github"]["repo"]
+                        api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+                        requests.post(api_url, json={"title": f"[{feedback_type}] {feedback_title}", "body": feedback_msg}, headers={"Authorization": f"token {token}"})
+                        st.success("Sent!")
+                    except Exception as e: st.error(f"Error: {e}")
+    else:
+        st.info("🎲 Play Mode Active. Editing is disabled.")
 
-# --- MAIN PAGE ---
-def recursive_render_unit(entry, depth=0):
+# --- RENDER FUNCTIONS ---
+def render_play_mode_unit(entry, data, depth=0):
+    u = get_unit_by_id(entry["unit_id"])
+    if not u: return
+
+    # Indentation visual
+    indent = "&nbsp;" * (depth * 4)
+    prefix = "" if depth == 0 else "↳ "
+    
+    title_str = f"{u['name']}"
+    if entry.get("custom_name"): title_str = f"{entry['custom_name']} ({u['name']})"
+    if entry.get("size", 1) > 1: title_str += f" x{entry['size']}"
+    
+    with st.container(border=True):
+        st.markdown(f"{indent}**{prefix}{title_str}** [{entry.get('calculated_cost', 0)} pts]")
+        
+        # 1. Profile
+        prof = u.get("profile", {})
+        if prof:
+            cols = st.columns(len(prof))
+            for i, (k, v) in enumerate(prof.items()):
+                cols[i].metric(k, v)
+        
+        # 2. Gather All Active Items (Base + Selected)
+        active_items = list(u.get("wargear", [])) + list(u.get("special_rules", []))
+        if "selected" in entry:
+            for gid, picks in entry["selected"].items():
+                opt_def = next((o for o in u.get("options", []) if o.get("group_id") == gid), None)
+                if not opt_def: continue
+                for choice in opt_def.get("choices", []):
+                    qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
+                    if qty > 0:
+                        # Clean name to find definition (remove points cost string)
+                        clean = choice['name'].split(" (")[0]
+                        active_items.append(clean)
+        
+        # 3. Weapons Table
+        weapons_to_show = []
+        rules_to_show = []
+        
+        for item in active_items:
+            # Check Weapons
+            w_stats = data.get("weapons", {}).get(item)
+            if w_stats:
+                weapons_to_show.append({"Name": item, **w_stats})
+            # Check Rules/Wargear
+            elif item in data.get("rules", {}):
+                rules_to_show.append(f"**{item}:** {data['rules'][item].get('summary', '')}")
+            elif item in data.get("wargear", {}):
+                rules_to_show.append(f"**{item}:** {data['wargear'][item].get('summary', '')}")
+        
+        if weapons_to_show:
+            st.caption("Weapons")
+            st.dataframe(weapons_to_show, hide_index=True)
+            
+        if rules_to_show:
+            st.caption("Rules & Wargear")
+            for r in rules_to_show:
+                st.markdown(f"- {r}")
+
+    # Render Children
+    children = [c for c in st.session_state.roster if c.get("parent_id") == entry["id"]]
+    for child in children:
+        render_play_mode_unit(child, data, depth + 1)
+
+def recursive_render_edit_unit(entry, depth=0):
     u = get_unit_by_id(entry["unit_id"])
     if not u: return
     
@@ -472,19 +541,22 @@ def recursive_render_unit(entry, depth=0):
 
     children = [e for e in st.session_state.roster if e.get("parent_id") == entry["id"]]
     for child in children:
-        recursive_render_unit(child, depth + 1)
+        recursive_render_edit_unit(child, depth + 1)
 
+# --- MAIN PAGE ---
 if "codex_data" in st.session_state and st.session_state.codex_data:
     data = st.session_state.codex_data
     st.title(f"{st.session_state.roster_name}")
     st.caption(f"Using: {data.get('codex_name', 'Army')}")
     
+    # --- VALIDATOR & METRICS ---
     curr_pts, slots = calculate_roster()
     issues = validate_roster(points_limit, curr_pts, slots)
     
-    if issues: st.error("  \n".join(issues))
-    else: st.success("✅ Roster is Valid!")
+    if issues and not play_mode: st.error("  \n".join(issues))
+    elif not issues: st.success("✅ Roster is Valid!")
 
+    # 1. SLOT COUNTERS
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.metric("Total Points", f"{curr_pts} / {points_limit}", delta=points_limit-curr_pts)
     col2.metric("HQ", f"{slots['HQ']}/2")
@@ -493,7 +565,8 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     col5.metric("Fast", f"{slots['Fast Attack']}/3")
     col6.metric("Heavy", f"{slots['Heavy Support']}/3")
 
-    if curr_pts > 0:
+    # 2. POINTS BREAKDOWN
+    if curr_pts > 0 and not play_mode:
         breakdown = {}
         for entry in st.session_state.roster:
             u = get_unit_by_id(entry["unit_id"])
@@ -521,24 +594,28 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
     if not parents: st.info("Your roster is empty. Add a unit below!")
     else:
         for entry in parents:
-            recursive_render_unit(entry, depth=0)
+            if play_mode:
+                render_play_mode_unit(entry, data, depth=0)
+            else:
+                recursive_render_edit_unit(entry, depth=0)
 
-    st.divider()
-    st.subheader("Add New Unit")
-    slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
-    selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
-    
-    slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
-    slot_units.sort(key=lambda x: x["name"])
-    
-    if not slot_units: st.caption(f"No units found for {selected_slot}")
-    else:
-        unit_options = [u["name"] for u in slot_units]
-        selected_unit_name = st.selectbox(f"Select {selected_slot} Unit", unit_options, key=f"sel_unit_{selected_slot}")
-        if st.button(f"Add {selected_unit_name}", key=f"btn_add_{selected_slot}"):
-            uid = next(u["id"] for u in slot_units if u["name"] == selected_unit_name)
-            unit_def = get_unit_by_id(uid)
-            new_entry = {"id": str(uuid.uuid4()), "unit_id": uid, "size": int(unit_def.get("default_size", 1)), "selected": {}, "parent_id": None}
-            st.session_state.roster.append(new_entry)
-            st.rerun()
+    if not play_mode:
+        st.divider()
+        st.subheader("Add New Unit")
+        slots_map = ["HQ", "Troops", "Elites", "Fast Attack", "Heavy Support"]
+        selected_slot = st.radio("Force Organisation Slot", slots_map, horizontal=True, label_visibility="collapsed", key="add_unit_slot_selection")
+        
+        slot_units = [u for u in data.get("units", []) if u.get("slot") == selected_slot]
+        slot_units.sort(key=lambda x: x["name"])
+        
+        if not slot_units: st.caption(f"No units found for {selected_slot}")
+        else:
+            unit_options = [u["name"] for u in slot_units]
+            selected_unit_name = st.selectbox(f"Select {selected_slot} Unit", unit_options, key=f"sel_unit_{selected_slot}")
+            if st.button(f"Add {selected_unit_name}", key=f"btn_add_{selected_slot}"):
+                uid = next(u["id"] for u in slot_units if u["name"] == selected_unit_name)
+                unit_def = get_unit_by_id(uid)
+                new_entry = {"id": str(uuid.uuid4()), "unit_id": uid, "size": int(unit_def.get("default_size", 1)), "selected": {}, "parent_id": None}
+                st.session_state.roster.append(new_entry)
+                st.rerun()
 else: st.info("⬅️ Please select a Codex from the sidebar to begin.")

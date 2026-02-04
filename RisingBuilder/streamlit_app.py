@@ -277,19 +277,60 @@ with st.sidebar:
     st.text_input("Roster Name", value=st.session_state.roster_name, key="roster_name_input", on_change=cb_update_roster_name)
     points_limit = st.number_input("Points Limit", value=1500, step=250, key="points_limit_input")
     
-    # --- CODEX INSPECTOR ---
-    with st.expander("🔍 Codex Inspector"):
-        st.caption("Search your loaded JSON for rules.")
-        search_term = st.text_input("Search DB", placeholder="e.g. Shield").lower()
-        if search_term and "codex_data" in st.session_state:
-            data = st.session_state.codex_data
-            found = False
-            for cat in ["weapons", "wargear", "rules"]:
-                for k in data.get(cat, {}):
-                    if search_term in k.lower():
-                        st.markdown(f"**{cat.capitalize()}: {k}**")
-                        found = True
-            if not found: st.warning(f"No match for '{search_term}'.")
+    # --- CODEX AUDITOR (NEW!) ---
+    with st.expander("🛡️ Codex Auditor"):
+        st.caption("Validates that all unit rules & wargear exist in the database.")
+        if st.button("Run Audit"):
+            if "codex_data" in st.session_state:
+                data = st.session_state.codex_data
+                issues = []
+                
+                # Create lookups
+                all_defs = set(data.get("weapons", {}).keys()) | \
+                           set(data.get("wargear", {}).keys()) | \
+                           set(data.get("rules", {}).keys())
+                
+                for unit in data.get("units", []):
+                    u_name = unit.get("name", "Unknown")
+                    # 1. Check Base Wargear
+                    for item in unit.get("wargear", []):
+                        if item not in all_defs:
+                            issues.append(f"⚠️ Unit **{u_name}** has base wargear **'{item}'** which is undefined.")
+                    
+                    # 2. Check Special Rules
+                    for rule in unit.get("special_rules", []):
+                        if rule not in all_defs:
+                            issues.append(f"⚠️ Unit **{u_name}** has rule **'{rule}'** which is undefined.")
+                    
+                    # 3. Check Options (Smart Split)
+                    for opt in unit.get("options", []):
+                        for ch in opt.get("choices", []):
+                            c_name = ch.get("name", "")
+                            # Split by common delimiters
+                            parts = re.split(r' & | and |, ', c_name)
+                            for p in parts:
+                                # Clean up string
+                                p_clean = p.strip()
+                                # Ignore common modifiers if you want, or just check exact matches
+                                # For now, check if p exists. If not, maybe it's just a name like "Twin-linked"
+                                # We'll do a simple check: if the part isn't in DB, warn.
+                                # To avoid noise, we only warn if NO part of the string matches anything.
+                                pass
+                            
+                            # Stricter check for auditor:
+                            # If it's a composite name "X & Y", both should ideally exist.
+                            # But let's just check if *parts* exist.
+                            for p in parts:
+                                p = p.strip()
+                                if p not in all_defs and "Upgrade" not in p and "Twin-linked" not in p:
+                                     issues.append(f"⚠️ Option **'{c_name}'**: Part **'{p}'** is undefined.")
+
+                if not issues:
+                    st.success("✅ Codex looks healthy! No missing references found.")
+                else:
+                    st.error(f"Found {len(issues)} potential issues:")
+                    for i in issues:
+                        st.write(i)
 
     st.divider()
     st.subheader("Save / Load List")

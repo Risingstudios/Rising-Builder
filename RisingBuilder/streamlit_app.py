@@ -24,6 +24,9 @@ if "roster" not in st.session_state:
     st.session_state.roster = []
 if "roster_name" not in st.session_state:
     st.session_state.roster_name = "My Army List"
+# New state to track which unit is currently being edited to prevent collapsing
+if "active_unit_id" not in st.session_state:
+    st.session_state.active_unit_id = None
 
 # --- Helper Functions ---
 def load_codex(filepath):
@@ -196,9 +199,14 @@ def generate_text_summary(roster, codex_name, limit):
 
 # --- CALLBACKS ---
 def cb_update_roster_name(): st.session_state.roster_name = st.session_state.roster_name_input
-def cb_update_custom_name(entry, key): entry["custom_name"] = st.session_state[key]
-def cb_update_size(entry, key): entry["size"] = st.session_state[key]
+def cb_update_custom_name(entry, key):
+    st.session_state.active_unit_id = entry["id"] 
+    entry["custom_name"] = st.session_state[key]
+def cb_update_size(entry, key):
+    st.session_state.active_unit_id = entry["id"] 
+    entry["size"] = st.session_state[key]
 def cb_update_counter(entry, gid, cid, key):
+    st.session_state.active_unit_id = entry["id"]
     qty = st.session_state[key]
     current_picks = entry.get("selected", {}).get(gid, [])
     current_picks = [x for x in current_picks if x != cid]
@@ -206,6 +214,7 @@ def cb_update_counter(entry, gid, cid, key):
     if "selected" not in entry: entry["selected"] = {}
     entry["selected"][gid] = current_picks
 def cb_update_radio(entry, gid, name_to_id_map, key):
+    st.session_state.active_unit_id = entry["id"]
     selected_name = st.session_state[key]
     if "selected" not in entry: entry["selected"] = {}
     if selected_name == "(None)": entry["selected"][gid] = []
@@ -213,6 +222,7 @@ def cb_update_radio(entry, gid, name_to_id_map, key):
         cid = name_to_id_map.get(selected_name)
         if cid: entry["selected"][gid] = [cid]
 def cb_update_checkbox(entry, gid, cid, key):
+    st.session_state.active_unit_id = entry["id"]
     is_checked = st.session_state[key]
     if "selected" not in entry: entry["selected"] = {}
     current_picks = entry["selected"].get(gid, [])
@@ -521,7 +531,10 @@ def recursive_render_edit_unit(entry, depth=0):
     if entry.get("custom_name"): display_title = f"[{u['slot']}] {entry['custom_name']} ({u['name']}) ({entry.get('calculated_cost', 0)} pts)"
     if depth > 0: display_title = f"Edit {u['name']} ({entry.get('calculated_cost', 0)} pts)"
 
-    with st.expander(display_title, expanded=False):
+    # FIX: Check if this unit is the active one to keep expanded
+    is_expanded = (entry['id'] == st.session_state.get('active_unit_id'))
+
+    with st.expander(display_title, expanded=is_expanded):
         render_unit_options(entry, u, data)
         
         valid_transports = u.get("dedicated_transports", [])

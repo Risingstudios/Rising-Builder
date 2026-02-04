@@ -404,7 +404,7 @@ with st.sidebar:
 
     st.divider()
     st.subheader("Project Tracker")
-    with st.expander("Status"):
+    with st.expander("Previous Report Status"):
         issues = fetch_github_issues()
         if issues:
             for i in issues: st.markdown(f"{'✅' if i['state']=='closed' else '🔴'} [{i['title']}]({i['html_url']})")
@@ -544,3 +544,4 @@ if "codex_data" in st.session_state and st.session_state.codex_data:
             st.session_state.roster.append(new_entry)
             st.rerun()
 else: st.info("⬅️ Please select a Codex from the sidebar to begin.")
+

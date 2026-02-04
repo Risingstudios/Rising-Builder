@@ -337,6 +337,7 @@
       "unit_type": "Infantry",
       "profile": { "WS": 5, "BS": 5, "S": 3, "T": 3, "W": 3, "I": 5, "A": 1, "Ld": 10, "Sv": "3+" },
       "wargear": [ "Ghosthelm", "Shuriken pistol", "Witchblade", "Rune Armour" ],
+      "dedicated_transports": ["hq_warlocks", "dt_wave_serpent"],
       "special_rules": [ "Independent Character", "Fleet of Foot", "Psychic Powers" ],
       "options": [
         {

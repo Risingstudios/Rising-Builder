@@ -29,7 +29,11 @@
     "Perfect Warrior": { "summary": "Start of Assault phase choose one: Sword Storm (Re-roll hits, +1A), Blade Shield (Re-roll saves), or Rapier Strike (I10, Rending)." },
     "Venerable": { "summary": "If vehicle suffers a penetrating hit, you may force opponent to re-roll the result on the Damage Chart." },
     "By Any Means Necessary": { "summary": "Can target friendly units with Orbital Strike. If done, no scatter. Friendly unit takes hits." },
-    "Relentless": { "summary": "Can move and shoot Heavy weapons. Can assault after rapid firing." }
+    "Relentless": { "summary": "Can move and shoot Heavy weapons. Can assault after rapid firing." },
+    "Mindlock": { "summary": "Servitors must test Ld if not near an Inquisitor. If failed, they do nothing." },
+    "Inconceivable Customisation": { "summary": "Jokaero can upgrade squad weapons (Roll D6)." },
+    "Digital Weapons": { "summary": "Jokaero: Re-roll 1s to Hit shooting. Inquisitor: Re-roll 1 To Wound in melee." },
+    "Psyker (Henchman)": { "summary": "Unit of Psykers casts Psychic Barrage." }
   },
   "wargear": {
     "Personal Teleporter": { "summary": "Unit moves as Jump Infantry. Once per game 30\" shunt move." },
@@ -37,7 +41,6 @@
     "Iron Halo": { "summary": "4+ Invulnerable Save." },
     "Psychic Hood": { "summary": "Attempt to nullify enemy psychic powers within 24\"." },
     "Blind Grenades": { "summary": "Defensive grenades. Enemies do not gain +1A for charging." },
-    "Digital Weapons": { "summary": "Re-roll one failed To Wound roll in the assault phase." },
     "Power Armour": { "summary": "3+ Armour Save." },
     "Artificer Armour": { "summary": "2+ Armour Save." },
     "Artificer Armour (2+ Sv)": { "summary": "2+ Armour Save." },
@@ -71,7 +74,11 @@
     "Two Flamestorm Cannons": { "summary": "Two S6 AP3 Templates." },
     "Throne of Judgement": { "summary": "Provides +2S, +2T, +1W, 2+ Save (already in profile). Counts as Monstrous Creature for movement." },
     "Orbital Strike Relay": { "summary": "Allows Karamazov to fire an Orbital Strike." },
-    "Master-crafted Weapon": { "summary": "Re-roll one failed To Hit roll per turn." }
+    "Master-crafted Weapon": { "summary": "Re-roll one failed To Hit roll per turn." },
+    "Arco-flagellant": { "summary": "Feel No Pain. Arco-flails." },
+    "Banisher": { "summary": "Aura of Faith (Daemons invuln re-roll success). Preferred Enemy (Daemons)." },
+    "Daemonhost": { "summary": "5+ Invuln. Random power (Re-roll to hit, FNP, or +1S/I)." },
+    "Mystic": { "summary": "Deep Strike no scatter within 6\"." }
   },
   "weapons": {
     "Nemesis Force Halberd": { "range": "-", "S": "+1", "AP": "3", "type": "Melee", "notes": "Force Weapon, +2 Initiative" },
@@ -122,7 +129,10 @@
     "Dreadnought Close Combat Weapon": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Power Weapon" },
     "Master-crafted Multi-melta": { "range": "24\"", "S": "8", "AP": "1", "type": "Heavy 1", "notes": "Melta, Master-crafted" },
     "Master-crafted Power Sword": { "range": "-", "S": "User", "AP": "3", "type": "Melee", "notes": "Master-crafted" },
-    "Orbital Strike": { "range": "Unlimited", "S": "10", "AP": "1", "type": "Ordnance 1", "notes": "Large Blast, Barrage" }
+    "Orbital Strike": { "range": "Unlimited", "S": "10", "AP": "1", "type": "Ordnance 1", "notes": "Large Blast, Barrage" },
+    "Eviscerator": { "range": "-", "S": "x2", "AP": "2", "type": "Melee", "notes": "Unwieldy, Armourbane" },
+    "Arco-flails": { "range": "-", "S": "User", "AP": "-", "type": "Melee", "notes": "D6 Attacks" },
+    "Hot-shot Lasgun": { "range": "18\"", "S": "3", "AP": "3", "type": "Rapid Fire", "notes": "" }
   },
   "units": [
     {
@@ -263,7 +273,9 @@
             { "id": "sword", "name": "Power Sword", "points": 10 },
             { "id": "fist", "name": "Power Fist", "points": 15 },
             { "id": "hammer", "name": "Daemonhammer", "points": 15 },
-            { "id": "combi", "name": "Combi-Weapon", "points": 10 },
+            { "id": "combi_melta", "name": "Combi-Melta", "points": 10 },
+            { "id": "combi_plasma", "name": "Combi-Plasma", "points": 10 },
+            { "id": "combi_flamer", "name": "Combi-Flamer", "points": 10 },
             { "id": "incin", "name": "Incinerator (NOT ALLOWED)", "points": 0 }
           ]
         },
@@ -313,56 +325,52 @@
       "name": "Inquisitorial Henchmen Warband",
       "slot": "Elites",
       "base_points": 0,
-      "min_size": 3, "max_size": 12, "default_size": 3,
+      "min_size": 1, "max_size": 1, "default_size": 1,
       "unit_type": "Infantry",
       "profile": { "WS": 3, "BS": 3, "S": 3, "T": 3, "W": 1, "I": 3, "A": 1, "Ld": 7, "Sv": "-" },
       "wargear": [],
       "dedicated_transports": ["dt_rhino", "dt_razorback", "dt_chimera"],
       "options": [
         {
-          "group_id": "acolyte", "group_name": "Warrior Acolyte (4pts Base)", "min_select": 0, "max_select": 12,
+          "group_id": "models", "group_name": "Select Models (Min 3, Max 12 Total)", "min_select": 3, "max_select": 12,
           "choices": [
-            { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4, "points_mode": "flat" },
+            { "id": "acolyte", "name": "Warrior Acolyte (4 pts)", "points": 4 },
+            { "id": "crusader", "name": "Crusader (15 pts)", "points": 15 },
+            { "id": "dca", "name": "Death Cult Assassin (15 pts)", "points": 15 },
+            { "id": "arco", "name": "Arco-flagellant (15 pts)", "points": 15 },
+            { "id": "banisher", "name": "Banisher (15 pts)", "points": 15 },
+            { "id": "daemonhost", "name": "Daemonhost (10 pts)", "points": 10 },
+            { "id": "mystic", "name": "Mystic (10 pts)", "points": 10 },
+            { "id": "psyker", "name": "Psyker (10 pts)", "points": 10 },
+            { "id": "servitor", "name": "Servitor (10 pts)", "points": 10 },
+            { "id": "jokaero", "name": "Jokaero Weaponsmith (35 pts)", "points": 35 }
+          ]
+        },
+        {
+          "group_id": "acolyte_upgrades", "group_name": "Acolyte Swaps (Requires Acolyte)", "min_select": 0, "max_select": 12,
+          "choices": [
             { "id": "sb", "name": "Storm Bolter", "points": 3 },
-            { "id": "combi", "name": "Combi-weapon", "points": 10 },
+            { "id": "hotshot", "name": "Hot-shot Lasgun", "points": 5 },
+            { "id": "bolt", "name": "Boltgun", "points": 1 },
+            { "id": "carapace", "name": "Carapace Armour", "points": 4 },
+            { "id": "power", "name": "Power Armour", "points": 10 }
+          ]
+        },
+        {
+          "group_id": "acolyte_special", "group_name": "Acolyte Special Weapons (Max 3)", "min_select": 0, "max_select": 3,
+          "choices": [
             { "id": "melta", "name": "Meltagun", "points": 10 },
             { "id": "plasma", "name": "Plasma Gun", "points": 10 },
             { "id": "flamer", "name": "Flamer", "points": 10 },
-            { "id": "cara", "name": "Carapace Armour (4+)", "points": 4 },
-            { "id": "power", "name": "Power Armour (3+)", "points": 10 }
+            { "id": "combi", "name": "Combi-weapon", "points": 10 }
           ]
         },
         {
-          "group_id": "crusader", "group_name": "Crusader", "min_select": 0, "max_select": 12,
+          "group_id": "servitor_guns", "group_name": "Servitor Upgrades (Max 3)", "min_select": 0, "max_select": 3,
           "choices": [
-            { "id": "crusader", "name": "Crusader (Power Weapon/Storm Shield)", "points": 15, "points_mode": "flat" }
-          ]
-        },
-        {
-          "group_id": "dca", "group_name": "Death Cult Assassin", "min_select": 0, "max_select": 12,
-          "choices": [
-            { "id": "dca", "name": "Death Cult Assassin (2x Power Wep)", "points": 15, "points_mode": "flat" }
-          ]
-        },
-        {
-          "group_id": "psyker", "group_name": "Psyker", "min_select": 0, "max_select": 12,
-          "choices": [
-            { "id": "psyker", "name": "Psyker", "points": 10, "points_mode": "flat" }
-          ]
-        },
-        {
-          "group_id": "servitor", "group_name": "Servitor (10pts Base)", "min_select": 0, "max_select": 12,
-          "choices": [
-            { "id": "servitor", "name": "Servitor (Base)", "points": 10, "points_mode": "flat" },
             { "id": "hb", "name": "Heavy Bolter", "points": 0 },
             { "id": "mm", "name": "Multi-melta", "points": 0 },
             { "id": "pc", "name": "Plasma Cannon", "points": 10 }
-          ]
-        },
-        {
-          "group_id": "monkey", "group_name": "Jokaero", "min_select": 0, "max_select": 12,
-          "choices": [
-            { "id": "monkey", "name": "Jokaero Weaponsmith", "points": 35, "points_mode": "flat" }
           ]
         }
       ]

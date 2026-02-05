@@ -38,10 +38,10 @@
   "wargear": {
     "Personal Teleporter": { "summary": "Unit moves as Jump Infantry. Once per game 30\" shunt move." },
     "Terminator Armour": { "summary": "2+ Armour Save, 5+ Invulnerable Save. Relentless, Bulky, Deep Strike." },
+    "Terminator Armour - Daemonhammer - Storm Bolter": { "summary": "2+ Armour Save, 5+ Invulnerable Save. Includes Daemonhammer and Storm Bolter." },
     "Iron Halo": { "summary": "4+ Invulnerable Save." },
     "Psychic Hood": { "summary": "Attempt to nullify enemy psychic powers within 24\"." },
     "Blind Grenades": { "summary": "Defensive grenades. Enemies do not gain +1A for charging." },
-    "Digital Weapons": { "summary": "Re-roll one failed To Wound roll in the assault phase." },
     "Power Armour": { "summary": "3+ Armour Save." },
     "Artificer Armour": { "summary": "2+ Armour Save." },
     "Artificer Armour (2+ Sv)": { "summary": "2+ Armour Save." },
@@ -53,7 +53,6 @@
     "Storm Shield": { "summary": "3+ Invulnerable Save. No bonus attack for two weapons." },
     "Storm Shield (Replace Storm Bolter/Hammer)": { "summary": "3+ Invulnerable Save." },
     "Smoke Launchers": { "summary": "Once per game, vehicle gains 5+ cover save but cannot shoot." },
-    "Terminator Armour (Daemon Hammer + Storm Bolter)": { "summary": "Standard Terminator loadout." },
     "Warrior Acolyte (4 pts)": { "summary": "Basic Henchman. BS3 S3 T3 Sv 5+." },
     "Crusader (Power Weapon/Storm Shield)": { "summary": "Henchman. WS4, Power Weapon, Storm Shield (3+ Inv)." },
     "Death Cult Assassin (2x Power Wep)": { "summary": "Henchman. WS5 I6 A2, Two Power Weapons (5+ Inv)." },
@@ -264,7 +263,9 @@
           "group_id": "ranged_term", "group_name": "Terminator Weapons (Requires Terminator Armour)", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "psyc", "name": "Psycannon (Replace Storm Bolter)", "points": 15 },
-            { "id": "combi", "name": "Combi-Weapon (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi_m", "name": "Combi-Melta (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi_p", "name": "Combi-Plasma (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi_f", "name": "Combi-Flamer (Replace Storm Bolter)", "points": 5 },
             { "id": "shield", "name": "Storm Shield (Replace Storm Bolter/Hammer)", "points": 10 }
           ]
         },

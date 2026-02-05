@@ -240,64 +240,12 @@ def render_unit_options(entry, unit, codex_data):
 
     col_pts, col_tip = st.columns([1, 1])
     col_pts.markdown(f"**Unit Cost:** :green[{entry.get('calculated_cost', 0)} pts]")
+    col_tip.caption("ℹ️ Hover over the **?** icons for rules.")
     
-    # --- LIVE STAT PREVIEW ---
-    # 1. Determine Active Wargear (Base + Selected - Replaced)
-    active_items = []
-    replaced_items = []
-
-    # Check selected options for replacements
-    if "selected" in entry:
-        for gid, picks in entry["selected"].items():
-            opt_def = next((o for o in unit.get("options", []) if o.get("group_id") == gid), None)
-            if not opt_def: continue
-            for choice in opt_def.get("choices", []):
-                qty = picks.count(choice["id"]) if isinstance(picks, list) else (1 if picks == choice["id"] else 0)
-                if qty > 0:
-                    c_name = choice['name']
-                    # Smart Replace Logic: "Replace X with Y"
-                    replace_match = re.search(r"Replace (.*?) with", c_name, re.IGNORECASE)
-                    if replace_match:
-                        replaced_items.append(replace_match.group(1).strip())
-                    
-                    # Clean name for lookup (remove "Replace..." and points)
-                    clean_name = re.sub(r" \(.*?\)", "", c_name).strip()
-                    if clean_name in codex_data.get("weapons", {}):
-                         active_items.append(clean_name)
-
-    # Add Base Wargear (if not replaced)
-    for item in unit.get("wargear", []):
-        # Fuzzy match for replacement
-        is_replaced = False
-        for r in replaced_items:
-            if r.lower() in item.lower():
-                is_replaced = True
-                break
-        
-        if not is_replaced and item in codex_data.get("weapons", {}):
-            active_items.append(item)
-
-    # 2. Render Stat Table
-    if active_items:
-        stat_rows = []
-        for item in active_items:
-            stats = codex_data["weapons"][item]
-            stat_rows.append({
-                "Weapon": item,
-                "Range": stats.get("range", "-"),
-                "S": stats.get("S", "-"),
-                "AP": stats.get("AP", "-"),
-                "Type": stats.get("type", "-"),
-                "Notes": stats.get("notes", "")
-            })
-        
-        st.caption("Active Weapon Profiles")
-        st.dataframe(pd.DataFrame(stat_rows), hide_index=True, use_container_width=True)
-    else:
-        # Fallback if no weapons found/mapped
-        if unit.get("wargear"):
-            st.caption(f"**Default Wargear:** {', '.join(unit['wargear'])}")
-
+    # Feature #13: Show Default Wargear
+    if unit.get("wargear"):
+        st.caption(f"**Default Wargear:** {', '.join(unit['wargear'])}")
+    
     min_s = int(unit.get("min_size", 1))
     max_s = int(unit.get("max_size", 1))
     if min_s != max_s:
@@ -316,6 +264,7 @@ def render_unit_options(entry, unit, codex_data):
         max_sel = opt.get("max_select", 1)
         if opt.get("linked_to_size"): max_sel = entry["size"]
         
+        # Bug Fix #15/16: Use Counters if max_select > 1, even if choice is single or not linked
         use_counters = (opt.get("linked_to_size")) or (max_sel > 1) or (len(choices) == 1 and max_sel > 1)
         
         if use_counters:
@@ -529,12 +478,27 @@ def render_play_mode_unit(entry, data, depth=0):
     with st.container(border=True):
         st.markdown(f"{indent}**{prefix}{title_str}** [{entry.get('calculated_cost', 0)} pts]")
         
-        # 1. Profile
-        prof = u.get("profile", {})
-        if prof:
-            cols = st.columns(len(prof))
-            for i, (k, v) in enumerate(prof.items()):
-                cols[i].metric(k, v)
+        # 1. Profiles (Main + Sub)
+        all_profiles = []
+        
+        # Main Model
+        main_prof = u.get("profile", {})
+        if main_prof:
+            main_entry = {"Model": u.get("name", "Unit")}
+            main_entry.update(main_prof)
+            all_profiles.append(main_entry)
+            
+        # Sub Profiles (Exarchs, Sergeants, etc.)
+        subs = u.get("sub_profiles", {})
+        for sub_key, sub_data in subs.items():
+            sub_name = sub_data.get("name", sub_key.capitalize())
+            sub_entry = {"Model": sub_name}
+            sub_entry.update({k: v for k, v in sub_data.items() if k != "name"})
+            all_profiles.append(sub_entry)
+
+        if all_profiles:
+            st.caption("Unit Profiles")
+            st.dataframe(pd.DataFrame(all_profiles), hide_index=True, use_container_width=True)
         
         # 2. Gather All Active Items (Base + Selected)
         active_items = list(u.get("wargear", [])) + list(u.get("special_rules", []))

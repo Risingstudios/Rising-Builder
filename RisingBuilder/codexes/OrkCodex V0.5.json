@@ -1,5 +1,5 @@
 {
-  "codex_name": "Orks (5th Edition) - V0.4",
+  "codex_name": "Orks (5th Edition) - V0.5",
   "rules": {
     "Prophet of the Waaagh!": { "summary": "Ghazghkull gives the whole army Fearless for a turn. He gets a 2+ Invuln save that turn." },
     "One Scalpel Short of a Medpack": { "summary": "Grotsnik is Fearless and has Rampage. He must always move towards the nearest enemy." },
@@ -43,10 +43,12 @@
     "Mega Armour": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
     "Mega Armour (2+ Sv / PK / TL-Shoota)": { "summary": "2+ Armor Save, Relentless, Slow and Purposeful. Includes Power Klaw and Twin-linked Shoota." },
     "Stikkbombs": { "summary": "Frag grenades (strike at initiative in cover)." },
+    "Stikkbomb Chucka": { "summary": "Vehicle upgrade. Counts as assault grenades for passengers (strike at Initiative in cover)." },
     "Tankbusta Bombs": { "summary": "S8 AP- melee attacks vs vehicles." },
     "Deff Rolla": { "summary": "Tank Shock causes D6 S10 hits." },
-    "Grot Riggers": { "summary": "Vehicle has 'It Will Not Die' equivalent (Fix Immobilised on 6)." },
+    "Grot Riggers": { "summary": "If Immobilised, roll D6 in shooting phase. On a 4+, the damage is repaired." },
     "Red Paint Job": { "summary": "+1\" movement." },
+    "Wreckin' Ball": { "summary": "Range 2\". S9 hit on a model in base contact during movement phase." },
     "Mek's Tools": { "summary": "Can repair vehicles in base contact on a 4+ (or 3+ with Grot Oiler)." },
     "'Eavy Armour": { "summary": "Grants a 4+ Armour Save." },
     "'Eavy Armour (4+ Sv)": { "summary": "Grants a 4+ Armour Save." },
@@ -507,7 +509,8 @@
         {
           "group_id": "bomb", "group_name": "Bombs", "min_select": 0, "max_select": 5, "linked_to_size": true,
           "choices": [
-            { "id": "bomb", "name": "Bigbomm", "points": 15, "points_mode": "flat" }
+            { "id": "bomb", "name": "Bigbomm", "points": 15, "points_mode": "flat" },
+            { "id": "buzz", "name": "Buzzsaw", "points": 25, "points_mode": "flat" }
           ]
         }
       ]
@@ -545,7 +548,10 @@
             { "id": "rolla", "name": "Deff Rolla", "points": 20 },
             { "id": "riggers", "name": "Grot Riggers", "points": 5 },
             { "id": "plates", "name": "Armour Plates", "points": 10 },
-            { "id": "ram", "name": "Reinforced Ram", "points": 5 }
+            { "id": "ram", "name": "Reinforced Ram", "points": 5 },
+            { "id": "chukka", "name": "Stikkbomb Chucka", "points": 5 },
+            { "id": "plank", "name": "Boarding Plank", "points": 5 },
+            { "id": "ball", "name": "Wreckin' Ball", "points": 10 }
           ]
         }
       ]
@@ -606,6 +612,13 @@
             { "id": "skorcha", "name": "Skorcha", "points": 5, "points_mode": "flat" },
             { "id": "kmb", "name": "Kustom Mega-blasta", "points": 20, "points_mode": "flat" }
           ]
+        },
+        {
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 2,
+          "choices": [
+            { "id": "riggers", "name": "Grot Riggers", "points": 5, "points_mode": "flat" },
+            { "id": "plates", "name": "Armour Plates", "points": 10, "points_mode": "flat" }
+          ]
         }
       ]
     },
@@ -622,12 +635,15 @@
       "wargear": [ "Big Shoota", "Ramshackle" ],
       "options": [
         {
-          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 5,
+          "group_id": "gear", "group_name": "Upgrades", "min_select": 0, "max_select": 6,
           "choices": [
             { "id": "red", "name": "Red Paint Job", "points": 5 },
             { "id": "ram", "name": "Reinforced Ram", "points": 5 },
             { "id": "planks", "name": "Boarding Planks", "points": 5 },
-            { "id": "rokkit", "name": "Upgrade Big Shoota to Rokkit Launcha", "points": 5 }
+            { "id": "rokkit", "name": "Upgrade Big Shoota to Rokkit Launcha", "points": 5 },
+            { "id": "chukka", "name": "Stikkbomb Chucka", "points": 5 },
+            { "id": "riggers", "name": "Grot Riggers", "points": 5 },
+            { "id": "ball", "name": "Wreckin' Ball", "points": 10 }
           ]
         }
       ]

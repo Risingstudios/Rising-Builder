@@ -1,5 +1,5 @@
 {
-  "codex_name": "Grey Knights (5th Edition) - V1.2",
+  "codex_name": "Grey Knights (5th Edition) - V1.3 Fix",
   "rules": {
     "The Aegis": { "summary": "Unit reduces enemy psychic leadership by -1 within 12\". Re-roll 1s to Deny the Witch (6th) / Psychic Hood effect." },
     "Brotherhood of Psykers": { "summary": "The squad counts as a single Psyker. If the Justicar is alive, use his Ld." },
@@ -41,6 +41,7 @@
     "Iron Halo": { "summary": "4+ Invulnerable Save." },
     "Psychic Hood": { "summary": "Attempt to nullify enemy psychic powers within 24\"." },
     "Blind Grenades": { "summary": "Defensive grenades. Enemies do not gain +1A for charging." },
+    "Digital Weapons": { "summary": "Re-roll one failed To Wound roll in the assault phase." },
     "Power Armour": { "summary": "3+ Armour Save." },
     "Artificer Armour": { "summary": "2+ Armour Save." },
     "Artificer Armour (2+ Sv)": { "summary": "2+ Armour Save." },
@@ -169,7 +170,7 @@
             { "id": "blind", "name": "Blind Grenades", "points": 5 },
             { "id": "digi", "name": "Digital Weapons", "points": 5 },
             { "id": "psy", "name": "Psyocculum", "points": 25 },
-            { "id": "skulls", "name": "Servo-skulls (x3)", "points": 10 }
+            { "id": "skulls", "name": "Servo-skulls", "points": 3, "points_mode": "flat" }
           ]
         }
       ]
@@ -255,7 +256,7 @@
         {
           "group_id": "armour", "group_name": "Armour Upgrade", "min_select": 0, "max_select": 1,
           "choices": [
-            { "id": "term", "name": "Terminator Armour (Daemon Hammer + Storm Bolter)", "points": 40 },
+            { "id": "term", "name": "Terminator Armour - Daemonhammer - Storm Bolter", "points": 40 },
             { "id": "art", "name": "Artificer Armour (2+ Sv)", "points": 10 }
           ]
         },
@@ -263,9 +264,7 @@
           "group_id": "ranged_term", "group_name": "Terminator Weapons (Requires Terminator Armour)", "min_select": 0, "max_select": 1,
           "choices": [
             { "id": "psyc", "name": "Psycannon (Replace Storm Bolter)", "points": 15 },
-            { "id": "combi_m", "name": "Combi-Melta (Replace Storm Bolter)", "points": 5 },
-            { "id": "combi_p", "name": "Combi-Plasma (Replace Storm Bolter)", "points": 5 },
-            { "id": "combi_f", "name": "Combi-Flamer (Replace Storm Bolter)", "points": 5 },
+            { "id": "combi", "name": "Combi-Weapon (Replace Storm Bolter)", "points": 5 },
             { "id": "shield", "name": "Storm Shield (Replace Storm Bolter/Hammer)", "points": 10 }
           ]
         },
@@ -285,7 +284,7 @@
           "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
           "choices": [
             { "id": "psy", "name": "Psyocculum", "points": 25 },
-            { "id": "skulls", "name": "Servo-skulls", "points": 3 }
+            { "id": "skulls", "name": "Servo-skulls", "points": 3, "points_mode": "flat" }
           ]
         }
       ]
@@ -308,16 +307,16 @@
             { "id": "condemnor", "name": "Condemnor Boltgun", "points": 10 },
             { "id": "null", "name": "Null Rod", "points": 25 },
             { "id": "sword", "name": "Power Sword", "points": 10 },
-            { "id": "combi_melta", "name": "Combi-Melta", "points": 10 },
-            { "id": "combi_plasma", "name": "Combi-Plasma", "points": 10 },
-            { "id": "combi_flamer", "name": "Combi-Flamer", "points": 10 }
+            { "id": "combi_m", "name": "Combi-Melta", "points": 10 },
+            { "id": "combi_p", "name": "Combi-Plasma", "points": 10 },
+            { "id": "combi_f", "name": "Combi-Flamer", "points": 10 }
           ]
         },
         {
           "group_id": "gear", "group_name": "Wargear", "min_select": 0, "max_select": 3,
           "choices": [
             { "id": "psy", "name": "Psyocculum", "points": 25 },
-            { "id": "skulls", "name": "Servo-skulls", "points": 3 }
+            { "id": "skulls", "name": "Servo-skulls", "points": 3, "points_mode": "flat" }
           ]
         }
       ]
